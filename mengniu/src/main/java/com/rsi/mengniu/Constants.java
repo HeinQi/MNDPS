@@ -1,9 +1,9 @@
 package com.rsi.mengniu;
 
 public final class Constants {
-	public static final String RETAILER_CARREFOUR = "Carrefour";
-	public static final String RETAILER_TESCO = "Tesco";
-	public static final String RETAILER_YONGHUI = "YongHui";
-	public static final String RETAILER_METRO = "Metro";
+	public static final String RETAILER_CARREFOUR = "carrefour";
+	public static final String RETAILER_TESCO = "tesco";
+	public static final String RETAILER_YONGHUI = "yonghui";
+	public static final String RETAILER_METRO = "metro";
 
 }

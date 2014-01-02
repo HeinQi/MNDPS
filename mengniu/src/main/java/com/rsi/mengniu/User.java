@@ -24,5 +24,7 @@ public class User {
 		this.retailer = retailer;
 	}
 	
-
+	public String toString() {
+		return "UserId["+userId+"],Password["+password+"],Retailer["+retailer+"]";
+	}
 }

@@ -5,5 +5,7 @@
            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id ="applicationContextHelper" class="com.rsi.mengniu.util.AppContextHelper"></bean>
-
+	
+	<bean id ="Carrefour" class="com.rsi.mengniu.retailer.CarrefourDataPull"></bean>
+	<bean id ="Tesco" class="com.rsi.mengniu.retailer.TescoDataPull"></bean>
 </beans>

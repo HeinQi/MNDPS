@@ -46,16 +46,10 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-		<dependency>
-		  <groupId>org.apache.poi</groupId>
-		  <artifactId>poi-scratchpad</artifactId>
-		  <version>3.10-beta2</version>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.9</version>
 		</dependency>
-		<dependency>
-  <groupId>org.apache.poi</groupId>
-  <artifactId>poi-ooxml</artifactId>
-  <version>3.10-beta2</version>
-</dependency>
 	</dependencies>
 	
 	<build>

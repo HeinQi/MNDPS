@@ -22,8 +22,8 @@ public class OCR {
 
 		cmd.add("");
 		cmd.add(outputName);
-		//cmd.add(LANG_OPTION);
-		//cmd.add("eng");
+		// cmd.add(LANG_OPTION);
+		// cmd.add("eng");
 		cmd.add("digits");
 
 		ProcessBuilder pb = new ProcessBuilder();

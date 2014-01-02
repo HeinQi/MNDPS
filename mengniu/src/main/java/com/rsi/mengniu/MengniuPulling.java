@@ -15,9 +15,9 @@ public class MengniuPulling {
 	public static void main(String[] args) {
 		try {
 			ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-			DataPullTaskPool.initTaskPool("ALL");
+			//DataPullTaskPool.initTaskPool("ALL");
 			//DataPullTaskPool.initTaskPool("Carrefour");
-			
+			DataPullTaskPool.initTaskPool("Tesco");
 			int threadNum = 2;
 			ExecutorService exec = Executors.newFixedThreadPool(threadNum);
 			for (int i=0; i<threadNum; i++) {

@@ -1,4 +1,4 @@
-package com.rsi.mengniu.retailer;
+package com.rsi.mengniu.retailer.service;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.rsi.mengniu.User;
+import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 //https://tesco.chinab2bi.com/security/login.hlt

@@ -1,4 +1,4 @@
-package com.rsi.mengniu;
+package com.rsi.mengniu.retailer.module;
 
 public class User {
 	String userId;

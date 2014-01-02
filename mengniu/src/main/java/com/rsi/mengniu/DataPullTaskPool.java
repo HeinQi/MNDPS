@@ -13,6 +13,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import com.rsi.mengniu.retailer.module.User;
+
 public class DataPullTaskPool {
 	private static Log log = LogFactory.getLog(DataPullTaskPool.class);
 	private static List<List<User>> taskPool = new ArrayList<List<User>>();

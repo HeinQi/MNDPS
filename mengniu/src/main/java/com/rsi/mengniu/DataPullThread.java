@@ -3,7 +3,8 @@ package com.rsi.mengniu;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.rsi.mengniu.retailer.RetailerDataPull;
+import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.retailer.service.RetailerDataPull;
 import com.rsi.mengniu.util.AppContextHelper;
 
 public class DataPullThread implements Runnable {

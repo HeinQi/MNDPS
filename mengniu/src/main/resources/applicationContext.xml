@@ -6,6 +6,6 @@
 
 	<bean id ="applicationContextHelper" class="com.rsi.mengniu.util.AppContextHelper"></bean>
 	
-	<bean id ="Carrefour" class="com.rsi.mengniu.retailer.CarrefourDataPull"></bean>
-	<bean id ="Tesco" class="com.rsi.mengniu.retailer.TescoDataPull"></bean>
+	<bean id ="Carrefour" class="com.rsi.mengniu.retailer.service.CarrefourDataPull"></bean>
+	<bean id ="Tesco" class="com.rsi.mengniu.retailer.service.TescoDataPull"></bean>
 </beans>

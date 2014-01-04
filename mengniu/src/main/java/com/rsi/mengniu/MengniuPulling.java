@@ -17,8 +17,8 @@ public class MengniuPulling {
 		try {
 			new ClassPathXmlApplicationContext("applicationContext.xml");
 			//DataPullTaskPool.initTaskPool("ALL");
-			//DataPullTaskPool.initTaskPool("Carrefour");
-			DataPullTaskPool.initTaskPool("Tesco");
+			DataPullTaskPool.initTaskPool("Carrefour");
+			//DataPullTaskPool.initTaskPool("Tesco");
 			int threadNum = 2;
 			final CountDownLatch mDoneSignal = new CountDownLatch(2); 
 
@@ -31,7 +31,7 @@ public class MengniuPulling {
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
 		}
-		log.info("All Thread End!");
+		log.info("All Data Pull Thread End!");
 		
 
 	}

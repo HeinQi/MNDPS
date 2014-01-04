@@ -23,6 +23,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
@@ -44,8 +45,8 @@ public class CarrefourDataPull implements RetailerDataPull {
 				return;
 			}
 			// receive
-			// getReceiveExcel(httpClient);
-
+			 getReceiveExcel(httpClient);
+			 // order
 			getOrder(httpClient);
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
@@ -187,7 +188,6 @@ public class CarrefourDataPull implements RetailerDataPull {
 			Element orderItemTable = orderDoc.select("table.tab2").last();
 			
 			for (Element row:orderItemTable.select("tr:gt(2)")) {
-				System.out.println(row);
 				Elements tds = row.select("td");
 				OrderTO orderTo = new OrderTO();
 				orderTo.setStoreName(storeName);
@@ -201,10 +201,7 @@ public class CarrefourDataPull implements RetailerDataPull {
 				orderTo.setTotalPrice(tds.get(8).text());//总金额
 				orderItems.add(orderTo);
 			}
-			System.out.println(orderItems);
-			break;
-			
-			
+			FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
 		}
 
 //		Element dataTable = doc.select("table.tbllist").first();

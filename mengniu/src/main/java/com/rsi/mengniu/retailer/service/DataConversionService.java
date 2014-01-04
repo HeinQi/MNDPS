@@ -9,19 +9,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -33,10 +27,10 @@ import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.util.DateUtil;
+import com.rsi.mengniu.util.FileUtil;
 
 public class DataConversionService {
 
-	private static String root_path = "C:/root/";
 
 	public static void main(String[] args) throws BaseException {
 
@@ -90,172 +84,37 @@ public class DataConversionService {
 			throw new BaseException(e);
 		}
 
-		// Process Receiving Note
-		// Get data from excel
-		Map<String, List<ReceivingNoteTO>> receivingNoteMap = processReceiving(
+		// Get Receiving Note
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, processDate);
 
-		// Get matched order info from TXT
+		// Get Order Info
 		for (Map.Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap
 				.entrySet()) {
 			String orderNo = entry.getKey();
 
-			// prepare the map which key is "store No + item code"
-			Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseToMapByStoreAndItem(entry
-					.getValue());
+			// Convert Receiving info list to map
+			// Key: Store ID + Item Code
+			List<ReceivingNoteTO> receivingList = entry.getValue();
+			Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseReceivingListToMap(receivingList);
 
-			// Get order info txt file by receiving note order No
+			// Get order info map
+			// Key: Store ID + Item Code
+			Map<String, OrderTO> orderTOMap = getOrderInfo(retailerID, orderNo);
+
 			// Get matched receiving note by iterate order txt file
 			// Merge to one record
 			// Write to merged txt file
-
-			Map<String, OrderTO> orderTOMap = getOrderInfo(retailerID, orderNo);
-
-			for (Map.Entry<String, OrderTO> orderEntry : orderTOMap.entrySet()) {
-				String combineKey = orderEntry.getKey();
-				if (receivingNoteByStoreMap.containsKey(combineKey)) {
-
-					OrderTO orderTO = orderEntry.getValue();
-					ReceivingNoteTO receivingNoteTO = receivingNoteByStoreMap
-							.get(combineKey);
-					/*
-					 * Order_NO(订单号)， Store_No(收货单明细中的门店号)，
-					 * Receiving_Date（收获明细中的收获日期） item_code(),barcode(条形码)，
-					 * Item_Name(产品名称)， Oder_Unit（订货明细中的总计数量），
-					 * order_amount（订货明细中的总金额）， receive_unit(收获明细中的收获量)，
-					 * receive_amount（收获明细中的收获金额）， Unit_Price(单价)，
-					 * 下载过程中已经下过的订单信息不能再下，  所有账号下载下来的文件按照日期合并
-					 * ，每个date一个文件,文件名为Carrefour_order_YYYYMMDD,Unicode txt
-					 */
-
-					String mergedLine = orderTO.getOrderNo() + "\t"
-							+ orderTO.getStoreNo() + "\t"
-							+ receivingNoteTO.getReceivingDate() + "\t"
-							+ orderTO.getItemCode() + "\t"
-							+ orderTO.getBarcode() + "\t"
-							+ orderTO.getItemName() + "\t"
-							+ orderTO.getQuantity() + "\t"
-							+ orderTO.getTotalPrice() + "\t"
-							+ receivingNoteTO.getQuantity() + "\t"
-							+ receivingNoteTO.getTotalPrice() + "\t"
-							+ orderTO.getUnitPrice();
-					try {
-						writer.write(mergedLine);
-
-						writer.newLine();
-					} catch (IOException e) {
-						closeFileWriter(writer);
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
+			mergeOrderAndReceiving(writer, receivingNoteByStoreMap, orderTOMap);
 		}
-
-		// check if the item No. and store is matching.
-		// if matched then merge order info and receiving note
-		// info to txt
 
 		// Close the opened file
-		closeFileWriter(writer);
+		FileUtil.closeFileWriter(writer);
 
-		// Copy processed receiving note and order file from inbound to
-		// processed folder
+		// Copy processed receiving note from inbound to processed folder
 
+		// TODO
 		// Move the merged data to completed folder
-	}
-
-	/**
-	 * Merge Order & Receiving Note to Txt file
-	 * 
-	 * @param retailID
-	 * @param orderNo
-	 * @param writer
-	 * @param receivingNoteByStoreMap
-	 */
-	public static Map<String, OrderTO> getOrderInfo(String retailID,
-			String orderNo) {
-		String fileName = root_path + retailID + "/order/" + orderNo + ".txt";
-		File orderFile = new File(fileName);
-
-		if (orderFile.exists()) {
-			BufferedReader reader = null;
-			Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-			try {
-				// Open the file
-				reader = new BufferedReader(new FileReader(orderFile));
-				reader.readLine();
-				// Read line by line
-				String orderLine = null;
-				while ((orderLine = reader.readLine()) != null) {
-					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getStoreNo() + orderTO.getItemCode();
-
-					orderMap.put(key, orderTO);
-
-				}
-				// orderTOList.add(orderTO);
-
-				// Save merged file
-				// Save updated order file
-
-				closeFileReader(reader);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			return orderMap;
-
-		}
-
-		return null;
-
-	}
-
-	private static Map<String, ReceivingNoteTO> parseToMapByStoreAndItem(
-			List<ReceivingNoteTO> receivingNoteList) throws BaseException {
-		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
-
-		for (int i = 0; i < receivingNoteList.size(); i++) {
-			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
-			String key = receivingNoteByStoreTO.getStoreNo()
-					+ receivingNoteByStoreTO.getItemCode();
-			if (receivingNoteByStoreMap.containsKey(key)) {
-				throw new BaseException();
-			} else {
-
-				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
-			}
-
-		}
-		return receivingNoteByStoreMap;
-	}
-
-	private static void closeFileWriter(BufferedWriter writer) {
-		if (writer != null) {
-			try {
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private static void closeFileReader(BufferedReader reader) {
-		if (reader != null) {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/**
@@ -265,12 +124,12 @@ public class DataConversionService {
 	 * @param processDate
 	 * @return
 	 */
-	public static Map<String, List<ReceivingNoteTO>> processReceiving(
+	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
 			String retailerID, Date processDate) {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
-		File receivingInboundFolder = new File(root_path + retailerID
-				+ "/receivingnote/excel/inbound/");
+		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH+ retailerID
+				+ "/receiving/inbound/");
 
 		File[] receivingList = receivingInboundFolder.listFiles();
 
@@ -286,37 +145,10 @@ public class DataConversionService {
 
 	}
 
-	/*
-	 * public static void exportReceivingNoteToTXT( Map<String,
-	 * List<ReceivingNoteTO>> receivingNoteMap) {
-	 * 
-	 * for (Map.Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap
-	 * .entrySet()) { String orderNo = entry.getKey(); List<ReceivingNoteTO>
-	 * receivingNoteList = entry.getValue();
-	 * 
-	 * File destFile = new File(
-	 * "C:/root/carrefour/receivingnote/generated/inbound/" + orderNo + ".txt");
-	 * // TODO 移动文件覆盖时要考虑合并相同订单号的文件
-	 * 
-	 * BufferedWriter writer = null; try { writer = new BufferedWriter(new
-	 * FileWriter(destFile));
-	 * 
-	 * for (ReceivingNoteTO receivingNoteTO : receivingNoteList) { String
-	 * receivingNoteRow = receivingNoteTO.toString(); if (receivingNoteRow !=
-	 * null) { writer.write(receivingNoteRow); writer.newLine(); } }
-	 * 
-	 * writer.flush(); writer.close();
-	 * 
-	 * } catch (IOException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } finally { closeFileWriter(writer); }
-	 * 
-	 * } }
-	 */
-
 	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			File receivingFile) {
 
-		Map<String, List<ReceivingNoteTO>> receivingNoteMap = null;
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>> ();
 		try {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
@@ -333,12 +165,6 @@ public class DataConversionService {
 					continue;
 				}
 				ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
-				// check if the row is in the date range
-				Cell receivingDateCell = sourceRow.getCell(6);
-				String receivingDateStr = receivingDateCell
-						.getStringCellValue();
-
-				// convert string to date: yyyy-mm-dd
 
 				String orderNo = null;
 				List<ReceivingNoteTO> receivingNoteTOList = null;
@@ -413,6 +239,134 @@ public class DataConversionService {
 		return receivingNoteMap;
 
 	}
+
+	/**
+	 * Merge Order & Receiving Note to Txt file
+	 * 
+	 * @param retailID
+	 * @param orderNo
+	 * @param writer
+	 * @param receivingNoteByStoreMap
+	 */
+	public static Map<String, OrderTO> getOrderInfo(String retailID,
+			String orderNo) {
+		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/" + orderNo + ".txt";
+		File orderFile = new File(fileName);
+		
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+
+		if (orderFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				reader = new BufferedReader(new FileReader(orderFile));
+				reader.readLine();
+				// Read line by line
+				String orderLine = null;
+				while ((orderLine = reader.readLine()) != null) {
+					OrderTO orderTO = new OrderTO(orderLine);
+					String key = orderTO.getStoreNo() + orderTO.getItemCode();
+
+					orderMap.put(key, orderTO);
+
+				}
+				// orderTOList.add(orderTO);
+
+				// Save merged file
+				// Save updated order file
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+
+				FileUtil.closeFileReader(reader);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			FileUtil.closeFileReader(reader);
+
+		}
+
+		return orderMap;
+
+	}
+
+	private static Map<String, ReceivingNoteTO> parseReceivingListToMap(
+			List<ReceivingNoteTO> receivingNoteList) throws BaseException {
+		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
+
+		for (int i = 0; i < receivingNoteList.size(); i++) {
+			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
+			String key = receivingNoteByStoreTO.getStoreNo()
+					+ receivingNoteByStoreTO.getItemCode();
+			if (receivingNoteByStoreMap.containsKey(key)) {
+				throw new BaseException();
+			} else {
+
+				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
+			}
+
+		}
+		return receivingNoteByStoreMap;
+	}
+
+	/**
+	 * Merge Order Info and Receiving Info to one txt record
+	 * 
+	 * @param writer
+	 * @param receivingNoteByStoreMap
+	 * @param orderTOMap
+	 */
+	private static void mergeOrderAndReceiving(BufferedWriter writer,
+			Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
+			Map<String, OrderTO> orderTOMap) {
+		for (Map.Entry<String, OrderTO> orderEntry : orderTOMap.entrySet()) {
+			String combineKey = orderEntry.getKey();
+
+			// check if the item No. and store is matching.
+			// if matched then merge order info and receiving note
+			// info to txt
+			if (receivingNoteByStoreMap.containsKey(combineKey)) {
+
+				OrderTO orderTO = orderEntry.getValue();
+				ReceivingNoteTO receivingNoteTO = receivingNoteByStoreMap
+						.get(combineKey);
+				/*
+				 * Order_NO(订单号)， Store_No(收货单明细中的门店号)，
+				 * Receiving_Date（收获明细中的收获日期） item_code(),barcode(条形码)，
+				 * Item_Name(产品名称)， Oder_Unit（订货明细中的总计数量），
+				 * order_amount（订货明细中的总金额）， receive_unit(收获明细中的收获量)，
+				 * receive_amount（收获明细中的收获金额）， Unit_Price(单价)，
+				 * 下载过程中已经下过的订单信息不能再下，  所有账号下载下来的文件按照日期合并
+				 * ，每个date一个文件,文件名为Carrefour_order_YYYYMMDD,Unicode txt
+				 */
+
+				String mergedLine = orderTO.getOrderNo() + "\t"
+						+ orderTO.getStoreNo() + "\t"
+						+ receivingNoteTO.getReceivingDate() + "\t"
+						+ orderTO.getItemCode() + "\t" + orderTO.getBarcode()
+						+ "\t" + orderTO.getItemName() + "\t"
+						+ orderTO.getQuantity() + "\t"
+						+ orderTO.getTotalPrice() + "\t"
+						+ receivingNoteTO.getQuantity() + "\t"
+						+ receivingNoteTO.getTotalPrice() + "\t"
+						+ orderTO.getUnitPrice();
+				try {
+					writer.write(mergedLine);
+
+					writer.newLine();
+				} catch (IOException e) {
+					FileUtil.closeFileWriter(writer);
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Export Under Info to TXT file Start Date End Date

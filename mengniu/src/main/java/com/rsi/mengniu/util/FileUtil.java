@@ -38,7 +38,7 @@ public class FileUtil {
 			writer = new BufferedWriter(new FileWriter(receivingInboundFile));
 			writer.write(receivingHeader);
 			for (int i = 0; i < receivingList.size(); i++) {
-				ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
+				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
 				String receivingNoteRow = receivingNoteTO.toString();
 				writer.write(receivingNoteRow);
 				writer.newLine();
@@ -75,7 +75,7 @@ public class FileUtil {
 			writer = new BufferedWriter(new FileWriter(orderFile));
 			writer.write(orderHeader);
 			for (int i = 0; i < orderList.size(); i++) {
-				OrderTO orderTO = new OrderTO();
+				OrderTO orderTO = orderList.get(i);
 				String orderRow = orderTO.toString();
 				writer.write(orderRow);
 				writer.newLine();
@@ -90,6 +90,24 @@ public class FileUtil {
 		closeFileWriter(writer);
 
 	}
+	
+
+	public void copyFile(String sourceFileName, String destFolder) {
+		// 文件原地址
+		File oldFile = new File("c:/test.xls");
+		// 文件新（目标）地址
+		String newPath = "c:/test/";
+		// new一个新文件夹
+		File fnewpath = new File(newPath);
+		// 判断文件夹是否存在
+		if (!fnewpath.exists())
+			fnewpath.mkdirs();
+		// 将文件移到新文件里
+		File fnew = new File(newPath + oldFile.getName());
+		oldFile.renameTo(fnew);
+
+	}
+
 	
 
 	public static void closeFileWriter(BufferedWriter writer) {

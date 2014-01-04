@@ -31,7 +31,6 @@ import com.rsi.mengniu.util.FileUtil;
 
 public class DataConversionService {
 
-
 	public static void main(String[] args) throws BaseException {
 
 		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
@@ -79,6 +78,7 @@ public class DataConversionService {
 		try {
 			writer = new BufferedWriter(new FileWriter(mergeFile));
 			writer.write(mergedHeader);
+			writer.newLine();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			throw new BaseException(e);
@@ -128,8 +128,8 @@ public class DataConversionService {
 			String retailerID, Date processDate) {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
-		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH+ retailerID
-				+ "/receiving/inbound/");
+		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
+				+ retailerID + "/receiving/inbound/");
 
 		File[] receivingList = receivingInboundFolder.listFiles();
 
@@ -148,7 +148,7 @@ public class DataConversionService {
 	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			File receivingFile) {
 
-		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>> ();
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 		try {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
@@ -217,17 +217,17 @@ public class DataConversionService {
 						continue;
 
 					}
-					if (receivingNoteMap.containsKey(orderNo)) {
-						receivingNoteTOList = receivingNoteMap.get(orderNo);
-					} else {
-						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
-						// Test the Hashmap
-						receivingNoteMap.put(orderNo, receivingNoteTOList);
-					}
-
-					receivingNoteTOList.add(receivingNoteTO);
 
 				}
+				if (receivingNoteMap.containsKey(orderNo)) {
+					receivingNoteTOList = receivingNoteMap.get(orderNo);
+				} else {
+					receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+					// Test the Hashmap
+					receivingNoteMap.put(orderNo, receivingNoteTOList);
+				}
+
+				receivingNoteTOList.add(receivingNoteTO);
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -250,9 +250,9 @@ public class DataConversionService {
 	 */
 	public static Map<String, OrderTO> getOrderInfo(String retailID,
 			String orderNo) {
-		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/" + orderNo + ".txt";
+		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/"
+				+ orderNo + ".txt";
 		File orderFile = new File(fileName);
-		
 
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
 
@@ -266,7 +266,7 @@ public class DataConversionService {
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getStoreNo() + orderTO.getItemCode();
+					String key = orderTO.getStoreName().substring(3) + orderTO.getItemCode();
 
 					orderMap.put(key, orderTO);
 
@@ -300,8 +300,10 @@ public class DataConversionService {
 
 		for (int i = 0; i < receivingNoteList.size(); i++) {
 			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
-			String key = receivingNoteByStoreTO.getStoreNo()
-					+ receivingNoteByStoreTO.getItemCode();
+			String storeName = receivingNoteByStoreTO.getStoreName();
+			storeName = storeName.substring(storeName.indexOf("-")+1);
+			String key = 
+					storeName+ receivingNoteByStoreTO.getItemCode();
 			if (receivingNoteByStoreMap.containsKey(key)) {
 				throw new BaseException();
 			} else {
@@ -365,43 +367,6 @@ public class DataConversionService {
 				}
 			}
 		}
-	}
-
-
-	/**
-	 * Export Under Info to TXT file Start Date End Date
-	 * 
-	 */
-	public void exportOrderInfoToTXT() {
-		// Get order info from database
-
-		// Export order info to TXT
-		// One user one day one txt file
-	}
-
-	/**
-	 * Export Receiving Note from Excel to DB
-	 */
-	public void importReceivingNoteInfoFromExcel() {
-		// Filter data in excel based on start end date
-
-		// Update the data to DB
-	}
-
-	public void copyFile() {
-		// 文件原地址
-		File oldFile = new File("c:/test.xls");
-		// 文件新（目标）地址
-		String newPath = "c:/test/";
-		// new一个新文件夹
-		File fnewpath = new File(newPath);
-		// 判断文件夹是否存在
-		if (!fnewpath.exists())
-			fnewpath.mkdirs();
-		// 将文件移到新文件里
-		File fnew = new File(newPath + oldFile.getName());
-		oldFile.renameTo(fnew);
-
 	}
 
 	/**

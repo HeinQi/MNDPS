@@ -41,7 +41,7 @@ public class DateUtil {
 	
 	public static String toStringYYYYMMDD(Date date){
 
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		return dateFormat.format(date);
 	}
 	

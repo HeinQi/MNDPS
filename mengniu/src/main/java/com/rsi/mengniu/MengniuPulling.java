@@ -1,5 +1,6 @@
 package com.rsi.mengniu;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,19 +15,23 @@ public class MengniuPulling {
 	private static Log log = LogFactory.getLog(MengniuPulling.class);
 	public static void main(String[] args) {
 		try {
-			ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+			new ClassPathXmlApplicationContext("applicationContext.xml");
 			//DataPullTaskPool.initTaskPool("ALL");
-			//DataPullTaskPool.initTaskPool("Carrefour");
-			DataPullTaskPool.initTaskPool("Tesco");
+			DataPullTaskPool.initTaskPool("Carrefour");
+			//DataPullTaskPool.initTaskPool("Tesco");
 			int threadNum = 2;
+			final CountDownLatch mDoneSignal = new CountDownLatch(2); 
+
 			ExecutorService exec = Executors.newFixedThreadPool(threadNum);
 			for (int i=0; i<threadNum; i++) {
-				exec.execute(new DataPullThread());
+				exec.execute(new DataPullThread(mDoneSignal));
 			}
 			exec.shutdown();
+			mDoneSignal.await(); // Wait all thread done
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
 		}
+		log.info("All Thread End!");
 		
 
 	}

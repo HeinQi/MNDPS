@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -30,6 +33,8 @@ import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 
 public class DataConversionService {
+
+	private static Log log = LogFactory.getLog(DataConversionService.class);
 
 	public static void main(String[] args) throws BaseException {
 
@@ -69,6 +74,7 @@ public class DataConversionService {
 	 */
 	public static void retailerDataProcessing(String retailerID,
 			Date processDate) throws BaseException {
+		log.info("Start process the retailer:" + retailerID);
 		File mergeFile = new File("C:/root/" + retailerID + "/merged/"
 				+ retailerID + "_order_"
 				+ DateUtil.toStringYYYYMMDD(processDate) + ".txt");
@@ -84,9 +90,13 @@ public class DataConversionService {
 			throw new BaseException(e);
 		}
 
+		log.info("Start get the receiving info:" + retailerID);
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
-				retailerID, processDate);
+				retailerID);
+
+		log.info("End get the receiving info:" + retailerID);
+		
 
 		// Get Order Info
 		for (Map.Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap
@@ -95,26 +105,37 @@ public class DataConversionService {
 
 			// Convert Receiving info list to map
 			// Key: Store ID + Item Code
+			log.info("Start parse receiving info to map. Order No.:" + orderNo);
 			List<ReceivingNoteTO> receivingList = entry.getValue();
 			Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseReceivingListToMap(receivingList);
 
+			log.info("End parse receiving info to map. Order No.:" + orderNo);
+
+			log.info("Start get order info Order No.:" + orderNo);
 			// Get order info map
 			// Key: Store ID + Item Code
 			Map<String, OrderTO> orderTOMap = getOrderInfo(retailerID, orderNo);
+			
+
+			log.info("End get order info. Order No.:" + orderNo);
 
 			// Get matched receiving note by iterate order txt file
 			// Merge to one record
 			// Write to merged txt file
+
+			log.info("Start to merge. Order No.:" + orderNo);
 			mergeOrderAndReceiving(writer, receivingNoteByStoreMap, orderTOMap);
+
+			log.info("End merge. Order No.:" + orderNo);
 		}
 
 		// Close the opened file
 		FileUtil.closeFileWriter(writer);
 
+		log.info("End process the retailer:" + retailerID);
+		
 		// Copy processed receiving note from inbound to processed folder
 
-		// TODO
-		// Move the merged data to completed folder
 	}
 
 	/**
@@ -125,7 +146,7 @@ public class DataConversionService {
 	 * @return
 	 */
 	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
-			String retailerID, Date processDate) {
+			String retailerID) {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
@@ -139,6 +160,7 @@ public class DataConversionService {
 			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(receivingFile);
 
 			receivingNoteMap.putAll(receivingNoteSingleMap);
+			log.info("Receiving Total Record :"+receivingNoteMap.size());
 		}
 
 		return receivingNoteMap;
@@ -152,7 +174,7 @@ public class DataConversionService {
 		try {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
-			Workbook sourceWorkbook = new XSSFWorkbook(sourceExcel);
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
 			/*
 			 * Workbook wb = null; if (fileType.equals("xls")) { wb = new
 			 * HSSFWorkbook(); } else if(fileType.equals("xlsx")) { wb = new
@@ -240,60 +262,6 @@ public class DataConversionService {
 
 	}
 
-	/**
-	 * Merge Order & Receiving Note to Txt file
-	 * 
-	 * @param retailID
-	 * @param orderNo
-	 * @param writer
-	 * @param receivingNoteByStoreMap
-	 */
-	public static Map<String, OrderTO> getOrderInfo(String retailID,
-			String orderNo) {
-		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_" + retailID + "_" 
-				+ orderNo + ".txt";
-		File orderFile = new File(fileName);
-
-		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-
-		if (orderFile.exists()) {
-			BufferedReader reader = null;
-			try {
-				// Open the file
-				reader = new BufferedReader(new FileReader(orderFile));
-				reader.readLine();
-				// Read line by line
-				String orderLine = null;
-				while ((orderLine = reader.readLine()) != null) {
-					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getStoreName().substring(3) + orderTO.getItemCode();
-
-					orderMap.put(key, orderTO);
-
-				}
-				// orderTOList.add(orderTO);
-
-				// Save merged file
-				// Save updated order file
-
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-
-				FileUtil.closeFileReader(reader);
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			FileUtil.closeFileReader(reader);
-
-		}
-
-		return orderMap;
-
-	}
-
 	private static Map<String, ReceivingNoteTO> parseReceivingListToMap(
 			List<ReceivingNoteTO> receivingNoteList) throws BaseException {
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
@@ -301,13 +269,20 @@ public class DataConversionService {
 		for (int i = 0; i < receivingNoteList.size(); i++) {
 			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
 			String storeName = receivingNoteByStoreTO.getStoreName();
-			storeName = storeName.substring(storeName.indexOf("-")+1);
-			String key = 
-					storeName+ receivingNoteByStoreTO.getItemCode();
-			if (receivingNoteByStoreMap.containsKey(key)) {
-				throw new BaseException();
-			} else {
+			storeName = storeName.substring(storeName.indexOf("-") + 1);
+			String key = storeName + receivingNoteByStoreTO.getItemCode();
 
+			log.info(receivingNoteByStoreTO.toString());
+			log.info(key);
+			if (receivingNoteByStoreMap.containsKey(key)) {
+				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
+				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO
+						.getQuantity())
+						+ Double.parseDouble(existTO.getQuantity())));
+				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO
+						.getTotalPrice())
+						+ Double.parseDouble(existTO.getTotalPrice()) ));
+			} else {
 				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
 			}
 
@@ -369,6 +344,65 @@ public class DataConversionService {
 		}
 	}
 
+	/**
+	 * Merge Order & Receiving Note to Txt file
+	 * 
+	 * @param retailID
+	 * @param orderNo
+	 * @param writer
+	 * @param receivingNoteByStoreMap
+	 * @throws BaseException
+	 */
+	public static Map<String, OrderTO> getOrderInfo(String retailID,
+			String orderNo) throws BaseException {
+		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_"
+				+ retailID + "_" + orderNo + ".txt";
+		File orderFile = new File(fileName);
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+
+		if (orderFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				reader = new BufferedReader(new FileReader(orderFile));
+				reader.readLine();
+				// Read line by line
+				String orderLine = null;
+				while ((orderLine = reader.readLine()) != null) {
+					OrderTO orderTO = new OrderTO(orderLine);
+					String key = orderTO.getStoreName().substring(3)
+							+ orderTO.getItemCode();
+					if (orderMap.containsKey(key)) {
+						log.error(key);
+						throw new BaseException();
+					}
+					orderMap.put(key, orderTO);
+
+				}
+				// orderTOList.add(orderTO);
+
+				// Save merged file
+				// Save updated order file
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+
+				FileUtil.closeFileReader(reader);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			log.info("Order Total Record :"+orderMap.size());
+			FileUtil.closeFileReader(reader);
+
+		}
+
+		return orderMap;
+
+	}
 	/**
 	 * Export Order from Excel to DB Start Date End Date Excel Name
 	 */

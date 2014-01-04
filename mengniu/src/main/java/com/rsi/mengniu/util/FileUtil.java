@@ -31,11 +31,18 @@ public class FileUtil {
 		File receivingInboundFile = new File(Constants.TEST_ROOT_PATH  + retailerID
 				+ "/receiving/inbound/Receiving_"+ retailerID + "_" + userID +"_"+ DateUtil.toStringYYYYMMDD(processingDate) +".txt");
 
+		if(!receivingInboundFile.exists()){
+			try {
+				receivingInboundFile.createNewFile();
+			} catch (IOException e) {
+				throw new BaseException();
+			}
+		}
 		String receivingHeader = "Order_No	Receiving_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Receiving_Qty	Unit_Price	Receiving_Total_Price";
 
 		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new FileWriter(receivingInboundFile));
+			writer = new BufferedWriter(new FileWriter(receivingInboundFile,true));
 			writer.write(receivingHeader);
 			writer.newLine();
 			for (int i = 0; i < receivingList.size(); i++) {
@@ -69,11 +76,20 @@ public class FileUtil {
 		File orderFile = new File(Constants.TEST_ROOT_PATH + retailerID
 				+ "/order/Order_"+ retailerID + "_" + orderID +".txt");
 
+		if(!orderFile.exists()){
+			try {
+				orderFile.createNewFile();
+			} catch (IOException e) {
+				throw new BaseException();
+			}
+		}
+
+		
 		String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
 
 		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new FileWriter(orderFile));
+			writer = new BufferedWriter(new FileWriter(orderFile,true));
 			writer.write(orderHeader);
 
 			writer.newLine();
@@ -95,18 +111,22 @@ public class FileUtil {
 	}
 	
 
-	public void copyFile(String sourceFileName, String destFolder) {
+	/**
+	 * Copy File
+	 * @param sourceFileName
+	 * @param destPath
+	 */
+	public void copyFile(String sourceFileName, String destPath) {
 		// 文件原地址
-		File oldFile = new File("c:/test.xls");
+		File oldFile = new File(sourceFileName);
 		// 文件新（目标）地址
-		String newPath = "c:/test/";
 		// new一个新文件夹
-		File fnewpath = new File(newPath);
+		File fnewpath = new File(destPath);
 		// 判断文件夹是否存在
 		if (!fnewpath.exists())
 			fnewpath.mkdirs();
 		// 将文件移到新文件里
-		File fnew = new File(newPath + oldFile.getName());
+		File fnew = new File(destPath + oldFile.getName());
 		oldFile.renameTo(fnew);
 
 	}

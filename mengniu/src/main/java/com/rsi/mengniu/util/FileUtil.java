@@ -15,10 +15,9 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 
 public class FileUtil {
 
-	
-
 	/**
 	 * Export Receiving Info To inbound txt file
+	 * 
 	 * @param retailerID
 	 * @param userID
 	 * @param processingDate
@@ -26,25 +25,34 @@ public class FileUtil {
 	 * @throws BaseException
 	 */
 	public static void exportReceivingNoteToTXT(String retailerID,
-			String userID, Date processingDate, List<ReceivingNoteTO> receivingList)
-			throws BaseException {
-		File receivingInboundFile = new File(Constants.TEST_ROOT_PATH  + retailerID
-				+ "/receiving/inbound/Receiving_"+ retailerID + "_" + userID +"_"+ DateUtil.toStringYYYYMMDD(processingDate) +".txt");
+			String userID, Date processingDate,
+			List<ReceivingNoteTO> receivingList) throws BaseException {
+		File receivingInboundFile = new File(Constants.TEST_ROOT_PATH
+				+ retailerID + "/receiving/inbound/Receiving_" + retailerID
+				+ "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(processingDate) + ".txt");
+		String receivingHeader = "Order_No	Receiving_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Receiving_Qty	Unit_Price	Receiving_Total_Price";
 
-		if(!receivingInboundFile.exists()){
+		BufferedWriter writer = null;
+		if (!receivingInboundFile.exists()) {
 			try {
-				receivingInboundFile.createNewFile();
+				receivingInboundFile.createNewFile();writer = new BufferedWriter(new FileWriter(receivingInboundFile,
+						true));
+				writer.write(receivingHeader);
+				writer.newLine();
+			} catch (IOException e) {
+				throw new BaseException();
+			}
+		}else {
+			try {
+				writer = new BufferedWriter(new FileWriter(receivingInboundFile, true));
 			} catch (IOException e) {
 				throw new BaseException();
 			}
 		}
-		String receivingHeader = "Order_No	Receiving_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Receiving_Qty	Unit_Price	Receiving_Total_Price";
-
-		BufferedWriter writer = null;
+		
 		try {
-			writer = new BufferedWriter(new FileWriter(receivingInboundFile,true));
-			writer.write(receivingHeader);
-			writer.newLine();
+			
 			for (int i = 0; i < receivingList.size(); i++) {
 				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
 				String receivingNoteRow = receivingNoteTO.toString();
@@ -61,38 +69,40 @@ public class FileUtil {
 		closeFileWriter(writer);
 
 	}
-	
-	
+
 	/**
 	 * Export Order info from list to txt file
+	 * 
 	 * @param retailerID
 	 * @param orderID
 	 * @param orderList
 	 * @throws BaseException
 	 */
-	public static void exportOrderInfoToTXT(String retailerID,
-			String orderID, List<OrderTO> orderList)
-			throws BaseException {
+	public static void exportOrderInfoToTXT(String retailerID, String orderID,
+			List<OrderTO> orderList) throws BaseException {
 		File orderFile = new File(Constants.TEST_ROOT_PATH + retailerID
-				+ "/order/Order_"+ retailerID + "_" + orderID +".txt");
-
-		if(!orderFile.exists()){
+				+ "/order/Order_" + retailerID + "_" + orderID + ".txt");
+		BufferedWriter writer = null;
+		if (!orderFile.exists()) {
 			try {
 				orderFile.createNewFile();
+				String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
+				writer = new BufferedWriter(new FileWriter(orderFile, true));
+				writer.write(orderHeader);
+				writer.newLine();
+			} catch (IOException e) {
+				throw new BaseException();
+			}
+		} else {
+			try {
+				writer = new BufferedWriter(new FileWriter(orderFile, true));
 			} catch (IOException e) {
 				throw new BaseException();
 			}
 		}
 
-		
-		String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
-
-		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new FileWriter(orderFile,true));
-			writer.write(orderHeader);
 
-			writer.newLine();
 			for (int i = 0; i < orderList.size(); i++) {
 				OrderTO orderTO = orderList.get(i);
 				String orderRow = orderTO.toString();
@@ -109,10 +119,10 @@ public class FileUtil {
 		closeFileWriter(writer);
 
 	}
-	
 
 	/**
 	 * Copy File
+	 * 
 	 * @param sourceFileName
 	 * @param destPath
 	 */
@@ -130,8 +140,6 @@ public class FileUtil {
 		oldFile.renameTo(fnew);
 
 	}
-
-	
 
 	public static void closeFileWriter(BufferedWriter writer) {
 		if (writer != null) {

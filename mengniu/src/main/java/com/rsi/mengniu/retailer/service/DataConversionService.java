@@ -93,7 +93,7 @@ public class DataConversionService {
 		log.info("Start get the receiving info:" + retailerID);
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
-				retailerID);
+				retailerID,processDate);
 
 		log.info("End get the receiving info:" + retailerID);
 		
@@ -146,7 +146,7 @@ public class DataConversionService {
 	 * @return
 	 */
 	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
-			String retailerID) {
+			String retailerID,Date processDate) {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
@@ -157,7 +157,7 @@ public class DataConversionService {
 		for (int i = 0; i < receivingList.length; i++) {
 			File receivingFile = receivingList[i];
 
-			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(receivingFile);
+			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(receivingFile,processDate);
 
 			receivingNoteMap.putAll(receivingNoteSingleMap);
 			log.info("Receiving Total Record :"+receivingNoteMap.size());
@@ -168,7 +168,7 @@ public class DataConversionService {
 	}
 
 	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			File receivingFile) {
+			File receivingFile,Date processDate) {
 
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 		try {
@@ -188,6 +188,10 @@ public class DataConversionService {
 				}
 				ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
 
+
+				String receivingDateStr = sourceRow.getCell(6).getStringCellValue();
+				Date receivingDate = DateUtil.toDate(receivingDateStr);
+				
 				String orderNo = null;
 				List<ReceivingNoteTO> receivingNoteTOList = null;
 
@@ -255,6 +259,9 @@ public class DataConversionService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

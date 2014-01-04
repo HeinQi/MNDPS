@@ -1,12 +1,9 @@
 package com.rsi.mengniu.retailer.module;
 
-
-import com.rsi.mengniu.exception.BaseException;
-
 public class OrderTO extends BaseTO {
 
 	private static final long serialVersionUID = -715249571306618131L;
-	
+
 	private String orderNo; // 1
 	private String orderDate;// 2
 	private String storeID; // 3
@@ -18,38 +15,10 @@ public class OrderTO extends BaseTO {
 	private String unitPrice;// 9
 	private String totalPrice;// 10
 
-
 	private String deptNo;
 	private String deptName;
 	private String supplierID;
 	private String supplierName;
-
-
-	
-	/*
-	 * return this.status + "\t" + this.orderNo + "\t" + this.orderDate +
-	 * "\t" + this.storeNo + "\t" + this.storeName + "\t" + this.itemCode + "\t"
-	 * + this.itemName + "\t" + this.quantity + "\t" + this.unitPrice + "\t" +
-	 * this.totalPrice;
-	 */
-
-	public OrderTO(String orderString) throws BaseException {
-		System.out.println(orderString);
-		String[] orderFieldArray = orderString.split("\t");
-
-		System.out.println(orderFieldArray);
-		this.setOrderNo(orderFieldArray[0]);
-		this.setOrderDate(orderFieldArray[1]);
-		this.setStoreNo(orderFieldArray[2]);
-		this.setStoreName(orderFieldArray[3]);
-		this.setItemCode(orderFieldArray[4]);
-		this.setItemName(orderFieldArray[5]);
-		this.setBarcode(orderFieldArray[6]);
-		this.setQuantity(orderFieldArray[7]);
-		this.setUnitPrice(orderFieldArray[8]);
-		this.setTotalPrice(orderFieldArray[9]);
-
-	}
 
 	public String getOrderNo() {
 		return orderNo;
@@ -165,6 +134,38 @@ public class OrderTO extends BaseTO {
 
 	public OrderTO() {
 		super();
+	}
+
+	public String toString() {
+		return this.orderNo + "\t" + this.orderDate + "\t" + this.storeID
+				+ "\t" + this.storeName + "\t" + this.itemID + "\t"
+				+ this.itemName + "\t" + this.barcode + "\t" + this.quantity
+				+ "\t" + this.unitPrice + "\t" + this.totalPrice;
+	}
+
+	/*
+	 * return this.orderNo + "\t" + this.orderDate + "\t" + this.storeNo + "\t"
+	 * + this.storeName + "\t" + this.itemCode + "\t" + this.itemName + "\t"+
+	 * this.barcode + "\t" + this.quantity + "\t" + this.unitPrice + "\t" +
+	 * this.totalPrice;
+	 */
+
+	public OrderTO(String orderString) {
+		System.out.println(orderString);
+		String[] orderFieldArray = orderString.split("\t");
+
+		System.out.println(orderFieldArray);
+		this.setOrderNo(orderFieldArray[0]);
+		this.setOrderDate(orderFieldArray[1]);
+		this.setStoreNo(orderFieldArray[2]);
+		this.setStoreName(orderFieldArray[3]);
+		this.setItemCode(orderFieldArray[4]);
+		this.setItemName(orderFieldArray[5]);
+		this.setBarcode(orderFieldArray[6]);
+		this.setQuantity(orderFieldArray[7]);
+		this.setUnitPrice(orderFieldArray[8]);
+		this.setTotalPrice(orderFieldArray[9]);
+
 	}
 
 }

@@ -48,6 +48,7 @@ public class CarrefourDataPull implements RetailerDataPull {
 			 getReceiveExcel(httpClient);
 			 // order
 			getOrder(httpClient);
+			httpClient.close();
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
 		}
@@ -143,7 +144,7 @@ public class CarrefourDataPull implements RetailerDataPull {
 
 		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", "03-01-2014"));
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", "01-01-2014"));
 		searchformParams.add(new BasicNameValuePair("receivedDateTo", "03-01-2014"));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/openInbox.htm?");

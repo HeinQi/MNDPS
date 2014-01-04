@@ -113,6 +113,10 @@ public class ReceivingNoteTO extends BaseTO {
 
 	}
 
+	public ReceivingNoteTO() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String toString() {
 		return this.orderNo + "\t" + this.receivingDate + "\t" + this.storeID
 				+ "\t" + this.storeName + "\t" + this.itemID + "\t"

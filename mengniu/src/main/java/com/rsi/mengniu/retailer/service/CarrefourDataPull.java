@@ -1,8 +1,6 @@
 package com.rsi.mengniu.retailer.service;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +8,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -26,6 +21,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
@@ -155,14 +151,60 @@ public class CarrefourDataPull implements RetailerDataPull {
 		String responseStr = EntityUtils.toString(searchRes.getEntity());
 		searchRes.close();
 		Document doc = Jsoup.parse(responseStr);
+		Element mailboxForm = doc.select("form[name=mailboxForm]").first();
+		Element table = mailboxForm.select("table").first();
+		String recordStr = table.select("tr[align=right]").select("td").get(0).text();
+		recordStr = recordStr.substring(recordStr.indexOf("共")+1,recordStr.indexOf("记"));
+		recordStr = recordStr.replaceAll(",", "");
+		int record = Integer.parseInt(recordStr);
+		int page = record % 10 > 0 ? record/10+1 : record/10;
+		System.out.println(page);
+				
 		Elements msgIds = doc.select("input[name=msgId]");
+		List<String> msgIdList = new ArrayList<String>();
 		for (Element msgId: msgIds) {
-			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid="+msgId.attr("value"));
+			msgIdList.add(msgId.attr("value"));
+		}
+		//取得每页的MsgId
+		while (page>1) {
+			getMsgIdByPage(page,msgIdList,httpClient);
+			page--;
+		}
+		for (String msgId: msgIdList) {
+			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid="+msgId);
 			CloseableHttpResponse orderRes = httpClient.execute(httpOrderGet);
 			String orderDetail = EntityUtils.toString(orderRes.getEntity());
 			orderRes.close();
-			System.out.println(orderDetail);
+			if (!orderDetail.contains("Carrefour Purchase Order")) {
+				continue;
+			}
+			List<OrderTO> orderItems = new ArrayList<OrderTO>();
+			Document orderDoc = Jsoup.parse(orderDetail);
+			Element orderTable = orderDoc.select("table.tab2").first();
+			String storeName = orderTable.select("tr:eq(1)").select("td").get(0).text();//store
+			String orderNo = orderTable.select("tr:eq(2)").select("td").get(1).text();//订单号码
+			String orderDate = orderTable.select("tr:eq(3)").select("td").get(1).text();//订单日期时间
+			Element orderItemTable = orderDoc.select("table.tab2").last();
+			for (Element row:orderItemTable.select("tr:gt(1)")) {
+				Elements tds = row.select("td");
+				OrderTO orderTo = new OrderTO();
+				orderTo.setStoreName(storeName);
+				orderTo.setOrderNo(orderNo);
+				orderTo.setOrderDate(orderDate);
+				orderTo.setItemCode(tds.get(0).text());//单品号
+				orderTo.setBarcode(tds.get(1).text()); //条形码
+				orderTo.setItemName(tds.get(2).text());//单品名称
+				orderTo.setQuantity(tds.get(6).text());//总计数量
+				orderTo.setUnitPrice(tds.get(7).text()); //单价
+				orderTo.setTotalPrice(tds.get(8).text());//总金额
+				orderItems.add(orderTo);
+			}
+			System.out.println(orderItems);
+			break;
+			
+			
 		}
+
 //		Element dataTable = doc.select("table.tbllist").first();
 //		for (Element row : dataTable.select("tr:gt(0)")) {
 //			Elements tds = row.select("td:not([rowspan])");
@@ -173,4 +215,24 @@ public class CarrefourDataPull implements RetailerDataPull {
 
 	}
 
+//function gotoPage(page) {
+//  document.forms[0].action = "/platform/mailbox/navigateInbox.htm?gotoPage="+ page;
+//  document.forms[0].submit();
+//}
+	private void getMsgIdByPage(int page,List<String> msgIdList,CloseableHttpClient httpClient) throws Exception {
+		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", "03-01-2014"));
+		searchformParams.add(new BasicNameValuePair("receivedDateTo", "03-01-2014"));
+		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
+		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/navigateInbox.htm?gotoPage="+page);
+		searchPost.setEntity(searchFormEntity);
+		CloseableHttpResponse searchRes = httpClient.execute(searchPost);
+		String responseStr = EntityUtils.toString(searchRes.getEntity());
+		searchRes.close();	
+		Document doc = Jsoup.parse(responseStr);
+		Elements msgIds = doc.select("input[name=msgId]");
+		for (Element msgId: msgIds) {
+			msgIdList.add(msgId.attr("value"));
+		}
+	}
 }

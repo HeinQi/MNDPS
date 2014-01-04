@@ -185,14 +185,16 @@ public class CarrefourDataPull implements RetailerDataPull {
 			String orderNo = orderTable.select("tr:eq(2)").select("td").get(1).text();//订单号码
 			String orderDate = orderTable.select("tr:eq(3)").select("td").get(1).text();//订单日期时间
 			Element orderItemTable = orderDoc.select("table.tab2").last();
-			for (Element row:orderItemTable.select("tr:gt(1)")) {
+			
+			for (Element row:orderItemTable.select("tr:gt(2)")) {
+				System.out.println(row);
 				Elements tds = row.select("td");
 				OrderTO orderTo = new OrderTO();
 				orderTo.setStoreName(storeName);
 				orderTo.setOrderNo(orderNo);
 				orderTo.setOrderDate(orderDate);
-				orderTo.setItemCode(tds.get(0).text());//单品号
-				orderTo.setBarcode(tds.get(1).text()); //条形码
+				orderTo.setItemCode(tds.get(0).select("span").first().text());//单品号
+				orderTo.setBarcode(tds.get(1).select("span").first().text()); //条形码
 				orderTo.setItemName(tds.get(2).text());//单品名称
 				orderTo.setQuantity(tds.get(6).text());//总计数量
 				orderTo.setUnitPrice(tds.get(7).text()); //单价

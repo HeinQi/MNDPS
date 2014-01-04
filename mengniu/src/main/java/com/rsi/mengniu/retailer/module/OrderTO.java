@@ -4,21 +4,21 @@ public class OrderTO extends BaseTO {
 
 	private static final long serialVersionUID = -715249571306618131L;
 
-	private String orderNo; // 1
-	private String orderDate;// 2
-	private String storeID; // 3
-	private String storeName;// 4
-	private String itemID; // 5
-	private String itemName; // 6
-	private String barcode;// 7
-	private String quantity;// 8
-	private String unitPrice;// 9
-	private String totalPrice;// 10
+	private String orderNo=""; // 1
+	private String orderDate="";// 2
+	private String storeID=""; // 3
+	private String storeName="";// 4
+	private String itemID=""; // 5
+	private String itemName=""; // 6
+	private String barcode="";// 7
+	private String quantity="";// 8
+	private String unitPrice="";// 9
+	private String totalPrice="";// 10
 
-	private String deptNo;
-	private String deptName;
-	private String supplierID;
-	private String supplierName;
+	private String deptNo="";
+	private String deptName="";
+	private String supplierID="";
+	private String supplierName="";
 
 	public String getOrderNo() {
 		return orderNo;

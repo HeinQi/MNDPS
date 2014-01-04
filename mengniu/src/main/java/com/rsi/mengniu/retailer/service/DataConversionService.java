@@ -250,7 +250,7 @@ public class DataConversionService {
 	 */
 	public static Map<String, OrderTO> getOrderInfo(String retailID,
 			String orderNo) {
-		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/"
+		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_" + retailID + "_" 
 				+ orderNo + ".txt";
 		File orderFile = new File(fileName);
 

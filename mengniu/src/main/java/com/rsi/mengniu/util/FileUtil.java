@@ -37,6 +37,7 @@ public class FileUtil {
 		try {
 			writer = new BufferedWriter(new FileWriter(receivingInboundFile));
 			writer.write(receivingHeader);
+			writer.newLine();
 			for (int i = 0; i < receivingList.size(); i++) {
 				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
 				String receivingNoteRow = receivingNoteTO.toString();
@@ -74,6 +75,8 @@ public class FileUtil {
 		try {
 			writer = new BufferedWriter(new FileWriter(orderFile));
 			writer.write(orderHeader);
+
+			writer.newLine();
 			for (int i = 0; i < orderList.size(); i++) {
 				OrderTO orderTO = orderList.get(i);
 				String orderRow = orderTO.toString();

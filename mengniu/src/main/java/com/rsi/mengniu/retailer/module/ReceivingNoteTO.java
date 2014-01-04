@@ -4,16 +4,17 @@ public class ReceivingNoteTO extends BaseTO {
 
 	private static final long serialVersionUID = 1665922323609964610L;
 
-	private String orderNo;
-	private String receivingDate;
-	private String storeID;
-	private String storeName;
-	private String itemID;
-	private String itemName;
-	private String barcode;
-	private String quantity;
-	private String unitPrice;
-	private String totalPrice;
+
+	private String orderNo=""; // 1
+	private String receivingDate="";// 2
+	private String storeID=""; // 3
+	private String storeName="";// 4
+	private String itemID=""; // 5
+	private String itemName=""; // 6
+	private String barcode="";// 7
+	private String quantity="";// 8
+	private String unitPrice="";// 9
+	private String totalPrice="";// 10
 
 	public String getOrderNo() {
 		return orderNo;

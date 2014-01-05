@@ -96,21 +96,20 @@ public class ReceivingNoteTO extends BaseTO {
 		this.totalPrice = totalPrice;
 	}
 
-	public ReceivingNoteTO(String orderString) {
-		System.out.println(orderString);
-		String[] orderFieldArray = orderString.split("\t");
+	public ReceivingNoteTO(String receivingString) {
+		String[] receivingFieldArray = receivingString.split("\t");
 
-		System.out.println(orderFieldArray);
-		this.setOrderNo(orderFieldArray[0]);
-		this.setReceivingDate(orderFieldArray[1]);
-		this.setStoreNo(orderFieldArray[2]);
-		this.setStoreName(orderFieldArray[3]);
-		this.setItemCode(orderFieldArray[4]);
-		this.setItemName(orderFieldArray[5]);
-		this.setBarcode(orderFieldArray[6]);
-		this.setQuantity(orderFieldArray[7]);
-		this.setUnitPrice(orderFieldArray[8]);
-		this.setTotalPrice(orderFieldArray[9]);
+		System.out.println(receivingFieldArray);
+		this.setOrderNo(receivingFieldArray[0]);
+		this.setReceivingDate(receivingFieldArray[1]);
+		this.setStoreNo(receivingFieldArray[2]);
+		this.setStoreName(receivingFieldArray[3]);
+		this.setItemCode(receivingFieldArray[4]);
+		this.setItemName(receivingFieldArray[5]);
+		this.setBarcode(receivingFieldArray[6]);
+		this.setQuantity(receivingFieldArray[7]);
+		this.setUnitPrice(receivingFieldArray[8]);
+		this.setTotalPrice(receivingFieldArray[9]);
 
 	}
 

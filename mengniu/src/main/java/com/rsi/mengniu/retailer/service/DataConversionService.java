@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
@@ -35,14 +37,15 @@ public class DataConversionService {
 	private static Log log = LogFactory.getLog(DataConversionService.class);
 
 	public static void main(String[] args) throws BaseException {
-
+		log.info("Start");
 		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
 				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
-
+		log.info("End");
 	}
 
 	/**
 	 * Process Data by time range
+	 * 
 	 * @param retailerID
 	 * @param startDate
 	 * @param endDate
@@ -50,43 +53,49 @@ public class DataConversionService {
 	 */
 	public static void retailerDataProcessing(String retailerID,
 			Date startDate, Date endDate) throws BaseException {
+
+		log.info("Start Process");
+		
 		log.info("Start get the receiving info:" + retailerID);
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, startDate, endDate);
 
 		log.info("End get the receiving info:" + retailerID);
-		
+
 		// Get Order No. List
 
-		Map<String, OrderTO> orderTOMap = getOrderInfo(retailerID, receivingNoteMap.keySet());
+		Map<String, OrderTO> orderTOMap = getOrderInfo(retailerID,
+				receivingNoteMap.keySet());
 
 		// go through the receiving map, generate map: key receiving date
 
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = generateReceivingMapByDate(receivingNoteMap);
 
-		//Iterator Receiving Map by Date
+		// Iterator Receiving Map by Date
 		for (Map.Entry<String, List<ReceivingNoteTO>> entry : receivingByDateMap
 				.entrySet()) {
 			String processDateStr = entry.getKey();
-			log.info("Start to process the merge. Retailer ID: " + retailerID
-					+ " Date:" + processDateStr);
 			List<ReceivingNoteTO> receivingList = entry.getValue();
 
+			log.info("Invoke merge method. Retailer ID: " + retailerID
+					+ " Date:" + processDateStr + "Receiving info Total:" + receivingList.size());
 			retailerDataProcessing(retailerID, processDateStr, receivingList,
 					orderTOMap);
 
-			log.info("End to process the merge. Retailer ID: " + retailerID
-					+ " Date:" + processDateStr);
+			log.info("Invoke merge method complated. Retailer ID: " + retailerID
+					+ " Date:" + processDateStr + "Receiving info Total:" + receivingList.size());
 		}
 
-		String sourceFilePath = Constants.TEST_ROOT_PATH
-		+ retailerID + "/receiving/inbound/";
-		String destPath = Constants.TEST_ROOT_PATH
-				+ retailerID + "/receiving/processed/";
+		String sourceFilePath = Constants.TEST_ROOT_PATH + retailerID
+				+ "/receiving/inbound/";
+		String destPath = Constants.TEST_ROOT_PATH + retailerID
+				+ "/receiving/processed/";
 		// Copy processed receiving note from inbound to processed folder
-		FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
-				destPath);
+		// TODO
+		// FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath),
+		// sourceFilePath,
+		// destPath);
 
 		// create file by date
 		// populate the new receiving map: key:storename+itemid
@@ -100,6 +109,9 @@ public class DataConversionService {
 		 * 
 		 * } catch (ParseException e) { throw new BaseException(e); }
 		 */
+		
+
+		log.info("End Process");
 
 	}
 
@@ -124,6 +136,7 @@ public class DataConversionService {
 
 			}
 		}
+		
 		return receivingByDateMap;
 	}
 
@@ -138,6 +151,7 @@ public class DataConversionService {
 			orderTOMap.putAll(getOrderInfo(retailerID, orderNo));
 
 			log.info("End get order info. Order No.:" + orderNo);
+			log.info("Order Info Total: "+ orderTOMap.size());
 		}
 		return orderTOMap;
 	}
@@ -151,8 +165,6 @@ public class DataConversionService {
 	private static void retailerDataProcessing(String retailerID,
 			String processDate, List<ReceivingNoteTO> receivingList,
 			Map<String, OrderTO> orderTOMap) throws BaseException {
-		log.info("Start process the retailer:" + retailerID);
-		
 
 		BufferedWriter writer = initMergeFile(retailerID, processDate);
 
@@ -160,12 +172,12 @@ public class DataConversionService {
 		// Key: Store ID + Item Code
 
 		log.info("Start parse receiving info to map. Retailer ID: "
-				+ retailerID + " Date:" + processDate + " List Size:"
+				+ retailerID + " Date:" + processDate + " Original List Size:"
 				+ receivingList.size());
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseReceivingListToMap(receivingList);
 
 		log.info("End parse receiving info to map. Retailer ID: " + retailerID
-				+ " Date:" + processDate + " List Size:" + receivingList.size());
+				+ " Date:" + processDate + " Consolidated List Size:" + receivingNoteByStoreMap.size());
 
 		// Get matched receiving note by iterate order txt file
 		// Merge to one record
@@ -181,7 +193,6 @@ public class DataConversionService {
 		// Close the opened file
 		FileUtil.closeFileWriter(writer);
 
-		log.info("End process the retailer:" + retailerID);
 
 	}
 
@@ -192,6 +203,7 @@ public class DataConversionService {
 				+ "/merged/" + retailerID + "_order_"
 				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
 				+ ".txt";
+		log.info("Initial merge file. File Name: " + sourceFilePath);
 		File mergeFile = new File(sourceFilePath);
 
 		try {
@@ -200,8 +212,7 @@ public class DataConversionService {
 			// TODO Auto-generated catch block
 			throw new BaseException(e);
 		}
-		
-		
+
 		writerMergeFileHeader(writer);
 		return writer;
 	}
@@ -209,7 +220,7 @@ public class DataConversionService {
 	private static void writerMergeFileHeader(BufferedWriter writer)
 			throws BaseException {
 		String mergedHeader = "Order_No	Store_No	Receiving_Date	Item_Code	Barcode	Item_Name	Order_Qty	Order_Total_Price	Receiving_Qty	Receiving_Total_Price	Unit_Price";
-		
+
 		try {
 			writer.write(mergedHeader);
 			writer.newLine();
@@ -225,9 +236,10 @@ public class DataConversionService {
 	 * @param retailerID
 	 * @param processDate
 	 * @return
+	 * @throws BaseException 
 	 */
 	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
-			String retailerID, Date startDate, Date endDate) {
+			String retailerID, Date startDate, Date endDate) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
@@ -242,15 +254,16 @@ public class DataConversionService {
 					receivingFile, startDate, endDate);
 
 			receivingNoteMap.putAll(receivingNoteSingleMap);
-			log.info("Receiving Total Record :" + receivingNoteMap.size());
+			log.info("File Name: " + receivingFile.getName());
 		}
+		log.info("Receiving Record Total Size:" + receivingNoteMap.size());
 
 		return receivingNoteMap;
 
 	}
 
 	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			File receivingFile, Date startDate, Date endDate) {
+			File receivingFile, Date startDate, Date endDate) throws BaseException {
 
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 		try {
@@ -340,19 +353,17 @@ public class DataConversionService {
 						receivingNoteMap.put(orderNo, receivingNoteTOList);
 					}
 
+					log.debug("Receiving Info: " + receivingNoteTO.toString());
 					receivingNoteTOList.add(receivingNoteTO);
 
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
+			throw new BaseException(e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
+			throw new BaseException(e);
 		}
 		return receivingNoteMap;
 
@@ -366,10 +377,8 @@ public class DataConversionService {
 			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
 			String storeName = receivingNoteByStoreTO.getStoreName();
 			storeName = storeName.substring(storeName.indexOf("-") + 1);
-			String key = storeName + receivingNoteByStoreTO.getItemCode();
-
-			log.info(receivingNoteByStoreTO.toString());
-			log.info(key);
+			String key = receivingNoteByStoreTO.getOrderNo() + storeName
+					+ receivingNoteByStoreTO.getItemCode();
 			if (receivingNoteByStoreMap.containsKey(key)) {
 				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
 				existTO.setQuantity(String.valueOf(Double
@@ -378,6 +387,9 @@ public class DataConversionService {
 				existTO.setTotalPrice(String.valueOf(Double
 						.parseDouble(receivingNoteByStoreTO.getTotalPrice())
 						+ Double.parseDouble(existTO.getTotalPrice())));
+				log.info("Consolidate receiving record: Original quantity: " + receivingNoteByStoreTO.getQuantity() + " Original Total Price: " + receivingNoteByStoreTO.getTotalPrice());
+
+				log.info("Consolidate receiving record: Consolidated quantity: " + existTO.getQuantity() + " Consolidated Total Price: " + existTO.getTotalPrice());
 			} else {
 				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
 			}
@@ -396,16 +408,22 @@ public class DataConversionService {
 	private static void mergeOrderAndReceiving(BufferedWriter writer,
 			Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
 			Map<String, OrderTO> orderTOMap) {
-		for (Map.Entry<String, OrderTO> orderEntry : orderTOMap.entrySet()) {
-			String combineKey = orderEntry.getKey();
+		
+		Object[] receivingKeyList =  receivingNoteByStoreMap.keySet().toArray();  
+		Arrays.sort(receivingKeyList);  
+
+		int failedCount = 0;
+		for(int i = 0; i<receivingKeyList.length; i++)
+		{  
+			String combineKey = (String) receivingKeyList[i];
+
+			ReceivingNoteTO receivingNoteTO = receivingNoteByStoreMap.get(combineKey);
 
 			// check if the item No. and store is matching.
 			// if matched then merge order info and receiving note
 			// info to txt
-			if (receivingNoteByStoreMap.containsKey(combineKey)) {
-
-				OrderTO orderTO = orderEntry.getValue();
-				ReceivingNoteTO receivingNoteTO = receivingNoteByStoreMap
+			if (orderTOMap.containsKey(combineKey)) {
+				OrderTO orderTO = orderTOMap
 						.get(combineKey);
 				/*
 				 * Order_NO(订单号)， Store_No(收货单明细中的门店号)，
@@ -418,7 +436,7 @@ public class DataConversionService {
 				 */
 
 				String mergedLine = orderTO.getOrderNo() + "\t"
-						+ orderTO.getStoreNo() + "\t"
+						+ receivingNoteTO.getStoreName() + "\t"
 						+ receivingNoteTO.getReceivingDate() + "\t"
 						+ orderTO.getItemCode() + "\t" + orderTO.getBarcode()
 						+ "\t" + orderTO.getItemName() + "\t"
@@ -436,8 +454,13 @@ public class DataConversionService {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			} else {
+				log.info("Failed! Could not match order info. Receiving Record: " + receivingNoteTO.toString());
+				failedCount ++;
 			}
 		}
+		
+		log.info("Failed record: " + failedCount);
 	}
 
 	/**
@@ -467,7 +490,8 @@ public class DataConversionService {
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getStoreName().substring(3)
+					String key = orderTO.getOrderNo()
+							+ orderTO.getStoreName().substring(3)
 							+ orderTO.getItemCode();
 					if (orderMap.containsKey(key)) {
 						log.error(key);
@@ -491,7 +515,7 @@ public class DataConversionService {
 				e.printStackTrace();
 			}
 
-			log.info("Order Total Record :" + orderMap.size());
+			log.info("Order No.: "+ orderNo+" Order Total Record :" + orderMap.size());
 			FileUtil.closeFileReader(reader);
 
 		}

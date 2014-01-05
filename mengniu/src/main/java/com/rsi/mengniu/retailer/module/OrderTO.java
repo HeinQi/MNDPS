@@ -151,7 +151,6 @@ public class OrderTO extends BaseTO {
 	 */
 
 	public OrderTO(String orderString) {
-		System.out.println(orderString);
 		String[] orderFieldArray = orderString.split("\t");
 
 		System.out.println(orderFieldArray);

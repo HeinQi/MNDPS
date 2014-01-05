@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,23 +37,25 @@ public class FileUtil {
 		BufferedWriter writer = null;
 		if (!receivingInboundFile.exists()) {
 			try {
-				receivingInboundFile.createNewFile();writer = new BufferedWriter(new FileWriter(receivingInboundFile,
-						true));
+				receivingInboundFile.createNewFile();
+				writer = new BufferedWriter(new FileWriter(
+						receivingInboundFile, true));
 				writer.write(receivingHeader);
 				writer.newLine();
 			} catch (IOException e) {
 				throw new BaseException();
 			}
-		}else {
+		} else {
 			try {
-				writer = new BufferedWriter(new FileWriter(receivingInboundFile, true));
+				writer = new BufferedWriter(new FileWriter(
+						receivingInboundFile, true));
 			} catch (IOException e) {
 				throw new BaseException();
 			}
 		}
-		
+
 		try {
-			
+
 			for (int i = 0; i < receivingList.size(); i++) {
 				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
 				String receivingNoteRow = receivingNoteTO.toString();
@@ -120,15 +123,33 @@ public class FileUtil {
 
 	}
 
+	public static List<String> getAllFile(String folderPath) {
+		File receivingInboundFolder = new File(folderPath);
+
+		List<String> fileNameList = new ArrayList<String>();
+		if (receivingInboundFolder.isDirectory()) {
+
+			File[] receivingList = receivingInboundFolder.listFiles();
+
+			for (File receivingFile : receivingList) {
+				String receivingFileName = receivingFile.getName();
+				fileNameList.add(receivingFileName);
+			}
+		}
+
+		return fileNameList;
+	}
+
 	/**
 	 * Copy File
 	 * 
 	 * @param sourceFileName
 	 * @param destPath
 	 */
-	public void copyFile(String sourceFileName, String destPath) {
+	public static void copyFile(String sourceFileName, String sourcePath,
+			String destPath) {
 		// 文件原地址
-		File oldFile = new File(sourceFileName);
+		File oldFile = new File(sourcePath + sourceFileName);
 		// 文件新（目标）地址
 		// new一个新文件夹
 		File fnewpath = new File(destPath);
@@ -138,6 +159,26 @@ public class FileUtil {
 		// 将文件移到新文件里
 		File fnew = new File(destPath + oldFile.getName());
 		oldFile.renameTo(fnew);
+
+	}
+
+	public static void copyFiles(List<String> sourceFileNameList,
+			String sourcePath, String destPath) {
+
+		for (String sourceFileName : sourceFileNameList) {
+
+			// 文件原地址
+			File oldFile = new File(sourcePath + sourceFileName);
+			// 文件新（目标）地址
+			// new一个新文件夹
+			File fnewpath = new File(destPath);
+			// 判断文件夹是否存在
+			if (!fnewpath.exists())
+				fnewpath.mkdirs();
+			// 将文件移到新文件里
+			File fnew = new File(destPath + oldFile.getName());
+			oldFile.renameTo(fnew);
+		}
 
 	}
 

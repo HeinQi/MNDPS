@@ -9,12 +9,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 
 public class FileUtil {
+
+	public static void main(String[] args) throws BaseException {
+		try {
+			unzip("C:/test/source/20140106214712.zip", "C:/test/dest/", "");
+		} catch (ZipException e) {
+			throw new BaseException(e);
+		}
+	}
 
 	/**
 	 * Export Receiving Info To inbound txt file
@@ -162,6 +173,13 @@ public class FileUtil {
 
 	}
 
+	/**
+	 * Copy selected files from sourcePath to dest path
+	 * 
+	 * @param sourceFileNameList
+	 * @param sourcePath
+	 * @param destPath
+	 */
 	public static void copyFiles(List<String> sourceFileNameList,
 			String sourcePath, String destPath) {
 
@@ -182,6 +200,11 @@ public class FileUtil {
 
 	}
 
+	/**
+	 * Close File Writer
+	 * 
+	 * @param writer
+	 */
 	public static void closeFileWriter(BufferedWriter writer) {
 		if (writer != null) {
 			try {
@@ -194,6 +217,11 @@ public class FileUtil {
 		}
 	}
 
+	/**
+	 * Close File Reader
+	 * 
+	 * @param reader
+	 */
 	public static void closeFileReader(BufferedReader reader) {
 		if (reader != null) {
 			try {
@@ -203,6 +231,25 @@ public class FileUtil {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static void unzip(String fileName, String dest, String passwd)
+			throws ZipException {
+
+		File zipFile = new File(fileName);
+		ZipFile zFile = new ZipFile(zipFile); // 首先创建ZipFile指向磁盘上的.zip文件
+		// zFile.setFileNameCharset("GBK"); // 设置文件名编码，在GBK系统中需要设置
+		if (!zFile.isValidZipFile()) { // 验证.zip文件是否合法，包括文件是否存在、是否为zip文件、是否被损坏等
+			throw new ZipException("压缩文件不合法,可能被损坏.");
+		}
+		File destDir = new File(dest); // 解压目录
+		if (destDir.isDirectory() && !destDir.exists()) {
+			destDir.mkdir();
+		}
+		if (zFile.isEncrypted()) {
+			zFile.setPassword(passwd.toCharArray()); // 设置密码
+		}
+		zFile.extractAll(dest); // 将文件抽出到解压目录(解压)
 	}
 
 }

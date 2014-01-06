@@ -153,7 +153,6 @@ public class OrderTO extends BaseTO {
 	public OrderTO(String orderString) {
 		String[] orderFieldArray = orderString.split("\t");
 
-		System.out.println(orderFieldArray);
 		this.setOrderNo(orderFieldArray[0]);
 		this.setOrderDate(orderFieldArray[1]);
 		this.setStoreNo(orderFieldArray[2]);

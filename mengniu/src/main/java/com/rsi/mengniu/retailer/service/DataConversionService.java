@@ -37,10 +37,10 @@ public class DataConversionService {
 	private static Log log = LogFactory.getLog(DataConversionService.class);
 
 	public static void main(String[] args) throws BaseException {
-		log.info("Start");
+		log.info("开始");
 		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
 				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
-		log.info("End");
+		log.info("结束");
 	}
 
 	/**
@@ -54,14 +54,14 @@ public class DataConversionService {
 	public static void retailerDataProcessing(String retailerID,
 			Date startDate, Date endDate) throws BaseException {
 
-		log.info("Start Process");
-		
-		log.info("Start get the receiving info:" + retailerID);
+		log.info("开始处理数据");
+
+		log.info("读取收货单数据:" + retailerID);
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, startDate, endDate);
 
-		log.info("End get the receiving info:" + retailerID);
+		log.info("读取收货单数据结束:" + retailerID);
 
 		// Get Order No. List
 
@@ -72,19 +72,23 @@ public class DataConversionService {
 
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = generateReceivingMapByDate(receivingNoteMap);
 
+		Object[] receivingKeyList = receivingByDateMap.keySet().toArray();
+		Arrays.sort(receivingKeyList);
+		
 		// Iterator Receiving Map by Date
-		for (Map.Entry<String, List<ReceivingNoteTO>> entry : receivingByDateMap
-				.entrySet()) {
-			String processDateStr = entry.getKey();
-			List<ReceivingNoteTO> receivingList = entry.getValue();
+		for (int i = 0; i < receivingKeyList.length; i++) {
+			String processDateStr = (String) receivingKeyList[i];
+			List<ReceivingNoteTO> receivingList = receivingByDateMap.get(processDateStr);
 
-			log.info("Invoke merge method. Retailer ID: " + retailerID
-					+ " Date:" + processDateStr + "Receiving info Total:" + receivingList.size());
+			log.info("开始整合. 零售商: " + retailerID + " 日期:"
+					+ processDateStr + "订单数量:"
+					+ receivingList.size());
 			retailerDataProcessing(retailerID, processDateStr, receivingList,
 					orderTOMap);
 
-			log.info("Invoke merge method complated. Retailer ID: " + retailerID
-					+ " Date:" + processDateStr + "Receiving info Total:" + receivingList.size());
+			log.info("整合结束. 零售商: " + retailerID + " 日期:"
+					+ processDateStr + "订单数量:"
+					+ receivingList.size()+"\n");
 		}
 
 		String sourceFilePath = Constants.TEST_ROOT_PATH + retailerID
@@ -109,9 +113,8 @@ public class DataConversionService {
 		 * 
 		 * } catch (ParseException e) { throw new BaseException(e); }
 		 */
-		
 
-		log.info("End Process");
+		log.info("数据处理结束");
 
 	}
 
@@ -136,7 +139,7 @@ public class DataConversionService {
 
 			}
 		}
-		
+
 		return receivingByDateMap;
 	}
 
@@ -147,11 +150,10 @@ public class DataConversionService {
 			// Get order info map
 			// Key: Store ID + Item Code
 
-			log.info("Start to get order info. Order No.:" + orderNo);
+			log.info("读取订单信息. 订单号:" + orderNo);
 			orderTOMap.putAll(getOrderInfo(retailerID, orderNo));
 
-			log.info("End get order info. Order No.:" + orderNo);
-			log.info("Order Info Total: "+ orderTOMap.size());
+			log.info("读取订单信息结束. 订单号:" + orderNo);
 		}
 		return orderTOMap;
 	}
@@ -171,28 +173,24 @@ public class DataConversionService {
 		// Convert Receiving info list to map
 		// Key: Store ID + Item Code
 
-		log.info("Start parse receiving info to map. Retailer ID: "
-				+ retailerID + " Date:" + processDate + " Original List Size:"
-				+ receivingList.size());
+		log.info("转换订单信息。 零售商: " + retailerID + " 日期:" + processDate
+				+ " 转换前的收货单数量:" + receivingList.size());
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseReceivingListToMap(receivingList);
 
-		log.info("End parse receiving info to map. Retailer ID: " + retailerID
-				+ " Date:" + processDate + " Consolidated List Size:" + receivingNoteByStoreMap.size());
+		log.info("转换订单信息。 零售商代码: " + retailerID + " 日期:" + processDate
+				+ " 合并后的收货单数量:" + receivingList.size());
 
 		// Get matched receiving note by iterate order txt file
 		// Merge to one record
 		// Write to merged txt file
 
-		log.info("Start to merge. Retailer ID: " + retailerID + " Date:"
-				+ processDate + " Map Size:" + receivingNoteByStoreMap.size());
+		log.info("开始整合订单和收货单信息. 零售商: " + retailerID + " 日期:" + processDate);
 		mergeOrderAndReceiving(writer, receivingNoteByStoreMap, orderTOMap);
 
-		log.info("End merge. Retailer ID: " + retailerID + " Date:"
-				+ processDate + " Map Size:" + receivingNoteByStoreMap.size());
+		log.info("整合订单和收货单信息结束. 零售商: " + retailerID + " 日期:" + processDate);
 
 		// Close the opened file
 		FileUtil.closeFileWriter(writer);
-
 
 	}
 
@@ -203,13 +201,12 @@ public class DataConversionService {
 				+ "/merged/" + retailerID + "_order_"
 				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
 				+ ".txt";
-		log.info("Initial merge file. File Name: " + sourceFilePath);
+		log.info("初始化整合文本文件. 文件名: " + sourceFilePath);
 		File mergeFile = new File(sourceFilePath);
 
 		try {
 			writer = new BufferedWriter(new FileWriter(mergeFile));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			throw new BaseException(e);
 		}
 
@@ -225,7 +222,7 @@ public class DataConversionService {
 			writer.write(mergedHeader);
 			writer.newLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			throw new BaseException(e);
 		}
 	}
@@ -236,10 +233,11 @@ public class DataConversionService {
 	 * @param retailerID
 	 * @param processDate
 	 * @return
-	 * @throws BaseException 
+	 * @throws BaseException
 	 */
 	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
-			String retailerID, Date startDate, Date endDate) throws BaseException {
+			String retailerID, Date startDate, Date endDate)
+			throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
@@ -248,22 +246,22 @@ public class DataConversionService {
 		File[] receivingList = receivingInboundFolder.listFiles();
 
 		for (int i = 0; i < receivingList.length; i++) {
-			File receivingFile = receivingList[i];
 
+			File receivingFile = receivingList[i];
+			log.info("收货单文件名: " + receivingFile.getName());
 			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(
 					receivingFile, startDate, endDate);
 
 			receivingNoteMap.putAll(receivingNoteSingleMap);
-			log.info("File Name: " + receivingFile.getName());
 		}
-		log.info("Receiving Record Total Size:" + receivingNoteMap.size());
 
 		return receivingNoteMap;
 
 	}
 
 	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			File receivingFile, Date startDate, Date endDate) throws BaseException {
+			File receivingFile, Date startDate, Date endDate)
+			throws BaseException {
 
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 		try {
@@ -353,7 +351,7 @@ public class DataConversionService {
 						receivingNoteMap.put(orderNo, receivingNoteTOList);
 					}
 
-					log.debug("Receiving Info: " + receivingNoteTO.toString());
+					log.debug("收货单详细条目: " + receivingNoteTO.toString());
 					receivingNoteTOList.add(receivingNoteTO);
 
 				}
@@ -387,9 +385,11 @@ public class DataConversionService {
 				existTO.setTotalPrice(String.valueOf(Double
 						.parseDouble(receivingNoteByStoreTO.getTotalPrice())
 						+ Double.parseDouble(existTO.getTotalPrice())));
-				log.info("Consolidate receiving record: Original quantity: " + receivingNoteByStoreTO.getQuantity() + " Original Total Price: " + receivingNoteByStoreTO.getTotalPrice());
+				log.info("整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity()
+						+ " 原始总价: " + receivingNoteByStoreTO.getTotalPrice());
 
-				log.info("Consolidate receiving record: Consolidated quantity: " + existTO.getQuantity() + " Consolidated Total Price: " + existTO.getTotalPrice());
+				log.info("整合收货单: 整合后数量: " + existTO.getQuantity() + " 整合后总价: "
+						+ existTO.getTotalPrice());
 			} else {
 				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
 			}
@@ -404,27 +404,27 @@ public class DataConversionService {
 	 * @param writer
 	 * @param receivingNoteByStoreMap
 	 * @param orderTOMap
+	 * @throws BaseException 
 	 */
 	private static void mergeOrderAndReceiving(BufferedWriter writer,
 			Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
-			Map<String, OrderTO> orderTOMap) {
-		
-		Object[] receivingKeyList =  receivingNoteByStoreMap.keySet().toArray();  
-		Arrays.sort(receivingKeyList);  
+			Map<String, OrderTO> orderTOMap) throws BaseException {
+
+		Object[] receivingKeyList = receivingNoteByStoreMap.keySet().toArray();
+		Arrays.sort(receivingKeyList);
 
 		int failedCount = 0;
-		for(int i = 0; i<receivingKeyList.length; i++)
-		{  
+		for (int i = 0; i < receivingKeyList.length; i++) {
 			String combineKey = (String) receivingKeyList[i];
 
-			ReceivingNoteTO receivingNoteTO = receivingNoteByStoreMap.get(combineKey);
+			ReceivingNoteTO receivingNoteTO = receivingNoteByStoreMap
+					.get(combineKey);
 
 			// check if the item No. and store is matching.
 			// if matched then merge order info and receiving note
 			// info to txt
 			if (orderTOMap.containsKey(combineKey)) {
-				OrderTO orderTO = orderTOMap
-						.get(combineKey);
+				OrderTO orderTO = orderTOMap.get(combineKey);
 				/*
 				 * Order_NO(订单号)， Store_No(收货单明细中的门店号)，
 				 * Receiving_Date（收获明细中的收获日期） item_code(),barcode(条形码)，
@@ -451,16 +451,16 @@ public class DataConversionService {
 					writer.newLine();
 				} catch (IOException e) {
 					FileUtil.closeFileWriter(writer);
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new BaseException(e);
 				}
 			} else {
-				log.info("Failed! Could not match order info. Receiving Record: " + receivingNoteTO.toString());
-				failedCount ++;
+				log.info("警告! 查不到收货单对应的订单信息. 收货单信息为: "
+						+ receivingNoteTO.toString());
+				failedCount++;
 			}
 		}
-		
-		log.info("Failed record: " + failedCount);
+
+		log.info("收货单整合失败数量: " + failedCount);
 	}
 
 	/**
@@ -472,6 +472,7 @@ public class DataConversionService {
 	 * @param receivingNoteByStoreMap
 	 * @throws BaseException
 	 */
+	@SuppressWarnings("resource")
 	public static Map<String, OrderTO> getOrderInfo(String retailID,
 			String orderNo) throws BaseException {
 		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_"
@@ -495,6 +496,7 @@ public class DataConversionService {
 							+ orderTO.getItemCode();
 					if (orderMap.containsKey(key)) {
 						log.error(key);
+						FileUtil.closeFileReader(reader);
 						throw new BaseException();
 					}
 					orderMap.put(key, orderTO);
@@ -506,17 +508,19 @@ public class DataConversionService {
 				// Save updated order file
 
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e);
+				throw new BaseException(e);
 			} catch (IOException e) {
 
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally{
+
 				FileUtil.closeFileReader(reader);
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
-			log.info("Order No.: "+ orderNo+" Order Total Record :" + orderMap.size());
-			FileUtil.closeFileReader(reader);
+			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
 
 		}
 
@@ -575,9 +579,9 @@ public class DataConversionService {
 	 * 
 	 * receivingNoteTOList.add(receivingNoteTO); } } } } catch
 	 * (FileNotFoundException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } catch (IOException e) { // TODO Auto-generated
-	 * catch block e.printStackTrace(); } catch (ParseException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); }
+	 * throw new BaseException(e); } catch (IOException e) { // TODO Auto-generated
+	 * catch block throw new BaseException(e); } catch (ParseException e) { // TODO
+	 * Auto-generated catch block throw new BaseException(e); }
 	 * 
 	 * // Write to txt file exportReceivingNoteToTXT(receivingNoteMap);
 	 * 

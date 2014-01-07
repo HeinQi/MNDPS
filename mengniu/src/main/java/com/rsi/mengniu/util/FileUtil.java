@@ -93,7 +93,7 @@ public class FileUtil {
 			String userID, List<ReceivingNoteTO> receivingList)
 			throws BaseException {
 		File receivingFile = new File(Constants.TEST_ROOT_PATH + retailerID
-				+ "/receiving/Receiving_" + retailerID + "_" + userID + "_"
+				+ "/receiving/inbound/Receiving_" + retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt");
 		BufferedWriter writer = null;
 

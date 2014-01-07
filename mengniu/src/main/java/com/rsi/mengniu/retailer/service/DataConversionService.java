@@ -38,7 +38,11 @@ public class DataConversionService {
 
 	public static void main(String[] args) throws BaseException {
 		log.info("开始");
-		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
+//		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
+//				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
+		
+		
+		retailerDataProcessing(Constants.RETAILER_TESCO,
 				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
 		log.info("结束");
 	}

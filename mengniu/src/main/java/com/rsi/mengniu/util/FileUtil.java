@@ -105,12 +105,16 @@ public class FileUtil {
 				writer.write(orderHeader);
 				writer.newLine();
 			} catch (IOException e) {
-				throw new BaseException();
+
+				closeFileWriter(writer);
+				throw new BaseException(e);
 			}
 		} else {
 			try {
 				writer = new BufferedWriter(new FileWriter(orderFile, true));
 			} catch (IOException e) {
+
+				closeFileWriter(writer);
 				throw new BaseException();
 			}
 		}
@@ -125,12 +129,52 @@ public class FileUtil {
 			}
 
 		} catch (IOException e) {
-			closeFileWriter(writer);
-			// TODO Auto-generated catch block
 			throw new BaseException(e);
+		} finally {
+
+			closeFileWriter(writer);
+
 		}
 
-		closeFileWriter(writer);
+	}
+
+	/**
+	 * Export Receiving Info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param userID
+	 * @param receivingList
+	 * @throws BaseException
+	 */
+	public static void exportReceivingInfoToTXT(String retailerID,
+			String userID, List<ReceivingNoteTO> receivingList)
+			throws BaseException {
+		File receivingFile = new File(Constants.TEST_ROOT_PATH + retailerID
+				+ "/receiving/Receiving_" + retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt");
+		BufferedWriter writer = null;
+
+		try {
+			receivingFile.createNewFile();
+			String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
+			writer = new BufferedWriter(new FileWriter(receivingFile, true));
+			writer.write(orderHeader);
+			writer.newLine();
+
+			for (int i = 0; i < receivingList.size(); i++) {
+				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
+				String receivingRow = receivingNoteTO.toString();
+				writer.write(receivingRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			closeFileWriter(writer);
+
+		}
 
 	}
 

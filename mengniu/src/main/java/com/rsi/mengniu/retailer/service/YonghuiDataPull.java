@@ -1,14 +1,9 @@
 package com.rsi.mengniu.retailer.service;
 
 import java.io.FileOutputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,9 +22,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
-import org.xml.sax.InputSource;
 
 import com.rsi.mengniu.retailer.module.OrderTO;
+import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.OCR;
@@ -43,7 +38,6 @@ public class YonghuiDataPull implements RetailerDataPull {
 	private OCR ocr;
 	private String validateImgPath;
 	private Properties configs; 
-	
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -61,7 +55,7 @@ public class YonghuiDataPull implements RetailerDataPull {
 				return;
 			}
 			// receive
-			getReceive(httpClient);
+			getReceive(httpClient,user);
 			 // order
 			//getOrder(httpClient);
 			httpClient.close();
@@ -124,7 +118,7 @@ public class YonghuiDataPull implements RetailerDataPull {
 		return "Success";
 	}
 
-	public void getReceive(CloseableHttpClient httpClient) throws Exception {
+	public void getReceive(CloseableHttpClient httpClient,User user) throws Exception {
 		// /vss/DaemonSearchSheet?docdate_min=2014-01-01&docdate_max=2014-10-05&sheetname=receipt
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("docdate_min", "2014-01-01"));
@@ -138,13 +132,33 @@ public class YonghuiDataPull implements RetailerDataPull {
 		receiveRes.close();
 		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
 		Elements sheetIdElements = xmlDoc.select("sheetid");
+		List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
 		for (Element eSheetId: sheetIdElements) {
 			String sheetId = eSheetId.text();
 			HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid="+sheetId);
 			CloseableHttpResponse detailResponse = httpClient.execute(httpGet);
 			String detailStr = EntityUtils.toString(detailResponse.getEntity());
 			Document xmlDetailDoc = Jsoup.parse(detailStr, "", Parser.xmlParser());
+			String storeId = xmlDetailDoc.select("shopid").first().text();
+			String storeNm = xmlDetailDoc.select("shopname").first().text();
+			String receiveDate = xmlDetailDoc.select("editdate").first().text();
+			Element bodyElement = xmlDetailDoc.select("body").first();
+			Elements rowElements= bodyElement.select("row");
+			for (Element row:rowElements) {
+				ReceivingNoteTO receiveTo = new ReceivingNoteTO();
+				receiveTo.setStoreNo(storeId);
+				receiveTo.setStoreName(storeNm);
+				receiveTo.setReceivingDate(receiveDate);
+				receiveTo.setItemCode(row.select("goodsid").text());
+				receiveTo.setItemName(row.select("goodsname").text());
+				receiveTo.setBarcode(row.select("barcode").text());
+				receiveTo.setQuantity(row.select("rcvqty").text());
+				receiveTo.setUnitPrice(row.select("cost").text());
+				receiveTo.setTotalPrice(row.select("totalcost").text());
+				receiveList.add(receiveTo);
+			}
 		}
+		FileUtil.exportReceivingInfoToTXT("yonghui", userID, receiveList);
 		
 		//http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid=50000001092014MB
 		

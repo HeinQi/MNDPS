@@ -95,12 +95,14 @@ public class FileUtil {
 		File receivingFile = new File(Constants.TEST_ROOT_PATH + retailerID
 				+ "/receiving/inbound/Receiving_" + retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt");
+		
+		//TODO validate if folder exist
 		BufferedWriter writer = null;
 
 		try {
 			receivingFile.createNewFile();
 			String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
-			writer = new BufferedWriter(new FileWriter(receivingFile, true));
+			writer = new BufferedWriter(new FileWriter(receivingFile));
 			writer.write(orderHeader);
 			writer.newLine();
 

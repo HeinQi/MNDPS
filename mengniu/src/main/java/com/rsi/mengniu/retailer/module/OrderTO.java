@@ -15,10 +15,6 @@ public class OrderTO extends BaseTO {
 	private String unitPrice="";// 9
 	private String totalPrice="";// 10
 
-	private String deptNo="";
-	private String deptName="";
-	private String supplierID="";
-	private String supplierName="";
 
 	public String getOrderNo() {
 		return orderNo;
@@ -50,38 +46,6 @@ public class OrderTO extends BaseTO {
 
 	public void setStoreName(String storeName) {
 		this.storeName = storeName;
-	}
-
-	public String getDeptNo() {
-		return deptNo;
-	}
-
-	public void setDeptNo(String deptNo) {
-		this.deptNo = deptNo;
-	}
-
-	public String getDeptName() {
-		return deptName;
-	}
-
-	public void setDeptName(String deptName) {
-		this.deptName = deptName;
-	}
-
-	public String getSupplierNo() {
-		return supplierID;
-	}
-
-	public void setSupplierNo(String supplierNo) {
-		this.supplierID = supplierNo;
-	}
-
-	public String getSupplierName() {
-		return supplierName;
-	}
-
-	public void setSupplierName(String supplierName) {
-		this.supplierName = supplierName;
 	}
 
 	public String getItemCode() {

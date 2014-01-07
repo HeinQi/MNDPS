@@ -28,63 +28,6 @@ public class FileUtil {
 	}
 
 	/**
-	 * Export Receiving Info To inbound txt file
-	 * 
-	 * @param retailerID
-	 * @param userID
-	 * @param processingDate
-	 * @param receivingList
-	 * @throws BaseException
-	 */
-	public static void exportReceivingNoteToTXT(String retailerID,
-			String userID, Date processingDate,
-			List<ReceivingNoteTO> receivingList) throws BaseException {
-		File receivingInboundFile = new File(Constants.TEST_ROOT_PATH
-				+ retailerID + "/receiving/inbound/Receiving_" + retailerID
-				+ "_" + userID + "_"
-				+ DateUtil.toStringYYYYMMDD(processingDate) + ".txt");
-		String receivingHeader = "Order_No	Receiving_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Receiving_Qty	Unit_Price	Receiving_Total_Price";
-
-		BufferedWriter writer = null;
-		if (!receivingInboundFile.exists()) {
-			try {
-				receivingInboundFile.createNewFile();
-				writer = new BufferedWriter(new FileWriter(
-						receivingInboundFile, true));
-				writer.write(receivingHeader);
-				writer.newLine();
-			} catch (IOException e) {
-				throw new BaseException();
-			}
-		} else {
-			try {
-				writer = new BufferedWriter(new FileWriter(
-						receivingInboundFile, true));
-			} catch (IOException e) {
-				throw new BaseException();
-			}
-		}
-
-		try {
-
-			for (int i = 0; i < receivingList.size(); i++) {
-				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
-				String receivingNoteRow = receivingNoteTO.toString();
-				writer.write(receivingNoteRow);
-				writer.newLine();
-			}
-
-		} catch (IOException e) {
-			closeFileWriter(writer);
-			// TODO Auto-generated catch block
-			throw new BaseException(e);
-		}
-
-		closeFileWriter(writer);
-
-	}
-
-	/**
 	 * Export Order info from list to txt file
 	 * 
 	 * @param retailerID

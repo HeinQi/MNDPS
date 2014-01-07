@@ -38,12 +38,11 @@ public class DataConversionService {
 
 	public static void main(String[] args) throws BaseException {
 		log.info("开始");
-//		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
-//				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
-		
-		
+		// retailerDataProcessing(Constants.RETAILER_CARREFOUR,
+		// DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
+
 		retailerDataProcessing(Constants.RETAILER_TESCO,
-				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
+				DateUtil.toDate("2013-12-30"), DateUtil.toDate("2014-01-05"));
 		log.info("结束");
 	}
 
@@ -78,21 +77,20 @@ public class DataConversionService {
 
 		Object[] receivingKeyList = receivingByDateMap.keySet().toArray();
 		Arrays.sort(receivingKeyList);
-		
+
 		// Iterator Receiving Map by Date
 		for (int i = 0; i < receivingKeyList.length; i++) {
 			String processDateStr = (String) receivingKeyList[i];
-			List<ReceivingNoteTO> receivingList = receivingByDateMap.get(processDateStr);
+			List<ReceivingNoteTO> receivingList = receivingByDateMap
+					.get(processDateStr);
 
-			log.info("开始整合. 零售商: " + retailerID + " 日期:"
-					+ processDateStr + "订单数量:"
-					+ receivingList.size());
+			log.info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
+					+ "订单数量:" + receivingList.size());
 			retailerDataProcessing(retailerID, processDateStr, receivingList,
 					orderTOMap);
 
-			log.info("整合结束. 零售商: " + retailerID + " 日期:"
-					+ processDateStr + "订单数量:"
-					+ receivingList.size()+"\n");
+			log.info("整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
+					+ "订单数量:" + receivingList.size() + "\n");
 		}
 
 		String sourceFilePath = Constants.TEST_ROOT_PATH + retailerID
@@ -163,6 +161,359 @@ public class DataConversionService {
 	}
 
 	/**
+	 * Get order info
+	 * 
+	 * @param retailID
+	 * @param orderNo
+	 * @param writer
+	 * @param receivingNoteByStoreMap
+	 * @throws BaseException
+	 */
+	@SuppressWarnings("resource")
+	public static Map<String, OrderTO> getOrderInfo(String retailID,
+			String orderNo) throws BaseException {
+		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_"
+				+ retailID + "_" + orderNo + ".txt";
+		File orderFile = new File(fileName);
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+
+		if (orderFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				reader = new BufferedReader(new FileReader(orderFile));
+				reader.readLine();
+				// Read line by line
+				String orderLine = null;
+				while ((orderLine = reader.readLine()) != null) {
+					OrderTO orderTO = new OrderTO(orderLine);
+					String key = orderTO.getOrderNo()
+							+ orderTO.getStoreName().substring(3)
+							+ orderTO.getItemCode();
+					if (orderMap.containsKey(key)) {
+						log.error(key);
+						FileUtil.closeFileReader(reader);
+						throw new BaseException();
+					}
+					orderMap.put(key, orderTO);
+
+				}
+				// orderTOList.add(orderTO);
+
+				// Save merged file
+				// Save updated order file
+
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
+
+		}
+
+		return orderMap;
+
+	}
+
+	/**
+	 * Get receiving data
+	 * 
+	 * @param retailerID
+	 * @param processDate
+	 * @return
+	 * @throws BaseException
+	 */
+	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
+			String retailerID, Date startDate, Date endDate)
+			throws BaseException {
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
+
+		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
+				+ retailerID + "/receiving/inbound/");
+
+		File[] receivingList = receivingInboundFolder.listFiles();
+
+		for (int i = 0; i < receivingList.length; i++) {
+
+			File receivingFile = receivingList[i];
+			log.info("收货单文件名: " + receivingFile.getName());
+			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(
+					retailerID, startDate, endDate, receivingFile);
+
+			receivingNoteMap.putAll(receivingNoteSingleMap);
+		}
+
+		return receivingNoteMap;
+
+	}
+
+	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
+			String retailerID, Date startDate, Date endDate, File receivingFile)
+			throws BaseException {
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = null;
+		if (retailerID.equals(Constants.RETAILER_CARREFOUR)) {
+			receivingNoteMap = getReceivingInfoFromFileForCarrefour(
+					receivingFile, startDate, endDate);
+		} else if (retailerID.equals(Constants.RETAILER_TESCO)) {
+			receivingNoteMap = getReceivingInfoFromFileForTesco(receivingFile,
+					startDate, endDate);
+		} else if (retailerID.equals(Constants.RETAILER_YONGHUI)) {
+
+		} else if (retailerID.equals(Constants.RETAILER_METRO)) {
+
+		}
+
+		return receivingNoteMap;
+
+	}
+
+	/**
+	 * Get Receiving Info from file for Carrefour
+	 * 
+	 * @param receivingFile
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws BaseException
+	 */
+	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFileForCarrefour(
+			File receivingFile, Date startDate, Date endDate)
+			throws BaseException {
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
+		try {
+			InputStream sourceExcel = new FileInputStream(receivingFile);
+
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+			/*
+			 * Workbook wb = null; if (fileType.equals("xls")) { wb = new
+			 * HSSFWorkbook(); } else if(fileType.equals("xlsx")) { wb = new
+			 * XSSFWorkbook(); }
+			 */
+			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+				Row sourceRow = sourceSheet.getRow(i);
+				if (sourceRow == null) {
+					continue;
+				}
+
+				String receivingDateStr = sourceRow.getCell(6)
+						.getStringCellValue();
+				Date receivingDate = DateUtil.toDate(receivingDateStr);
+
+				// If receivingDate is in the date range
+				if (receivingDate.before(endDate)
+						&& receivingDate.after(startDate)) {
+
+					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
+					String orderNo = null;
+					List<ReceivingNoteTO> receivingNoteTOList = null;
+
+					for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+
+						Cell sourceCell = sourceRow.getCell(j);
+
+						String sourceCellValue = sourceCell
+								.getStringCellValue();
+
+						switch (j) {
+						case 2:
+							receivingNoteTO.setStoreNo(sourceCellValue);
+
+							continue;
+						case 3:
+							receivingNoteTO.setStoreName(sourceCellValue);
+
+							continue;
+						case 6:
+							receivingNoteTO.setReceivingDate(sourceCellValue);
+
+							continue;
+						case 7:
+							receivingNoteTO.setOrderNo(sourceCellValue);
+							orderNo = sourceCellValue;
+
+							continue;
+						case 8:
+							receivingNoteTO.setItemCode(sourceCellValue);
+
+							continue;
+						case 9:
+							receivingNoteTO.setItemName(sourceCellValue);
+
+							continue;
+						case 11:
+							receivingNoteTO.setQuantity(sourceCellValue);
+
+							continue;
+						case 12:
+							receivingNoteTO.setTotalPrice(sourceCellValue);
+
+							continue;
+
+						}
+
+					}
+					if (receivingNoteMap.containsKey(orderNo)) {
+						receivingNoteTOList = receivingNoteMap.get(orderNo);
+					} else {
+						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+						// Test the Hashmap
+						receivingNoteMap.put(orderNo, receivingNoteTOList);
+					}
+
+					log.debug("收货单详细条目: " + receivingNoteTO.toString());
+					receivingNoteTOList.add(receivingNoteTO);
+
+				}
+			}
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
+		}
+		return receivingNoteMap;
+	}
+
+	/**
+	 * Get receiving info from file for Tesco
+	 * 
+	 * @param receivingFile
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws BaseException
+	 */
+	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFileForTesco(
+			File receivingFile, Date startDate, Date endDate)
+			throws BaseException {
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
+		try {
+			InputStream sourceExcel = new FileInputStream(receivingFile);
+
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+			String orderNo = null;
+			String storeID = null;
+			String storeName = null;
+			String receivingDateStr = null;
+			Date receivingDate = null;
+			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+			for (int i = 1; i < (sourceSheet.getPhysicalNumberOfRows()-1); i++) {
+				Row sourceRow = sourceSheet.getRow(i);
+				if (sourceRow == null) {
+					continue;
+				}
+
+				log.info("i=" + i);
+				if(i==510){
+					log.info("Test");
+				}
+				
+				if (sourceRow.getCell(11).getStringCellValue() != null && !sourceRow.getCell(11).getStringCellValue().equals("")) {
+
+					receivingDateStr = sourceRow.getCell(11).getStringCellValue();
+					receivingDate = DateUtil.toDate(receivingDateStr);
+				}
+				// If receivingDate is in the date range
+				if (receivingDate.before(endDate)
+						&& receivingDate.after(startDate)) {
+
+					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
+					List<ReceivingNoteTO> receivingNoteTOList = null;
+
+					for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+						log.info("j=" + j);
+						Cell sourceCell = sourceRow.getCell(j);
+						String sourceCellValue = null;
+
+						int cellType = sourceCell.getCellType();
+						if (cellType == Cell.CELL_TYPE_NUMERIC) {
+							sourceCellValue = Double.valueOf(
+									sourceCell.getNumericCellValue())
+									.toString();
+						} else {
+
+							sourceCellValue = sourceCell.getStringCellValue();
+						}
+						switch (j) {
+						case 3:
+							if (sourceCellValue != null
+									&& !sourceCellValue.equals("")) {
+								storeID = sourceCellValue;
+							}
+							receivingNoteTO.setStoreNo(storeID);
+							continue;
+						case 4:
+
+							if (sourceCellValue != null
+									&& !sourceCellValue.equals("")) {
+								storeName = sourceCellValue;
+							}
+							receivingNoteTO.setStoreName(storeName);
+							continue;
+						case 5:
+
+							if (sourceCellValue != null
+									&& !sourceCellValue.equals("")) {
+								orderNo = sourceCellValue;
+							}
+							receivingNoteTO.setOrderNo(orderNo);
+							continue;
+						case 11:
+							receivingNoteTO.setReceivingDate(receivingDateStr);
+							continue;
+						case 14:
+							receivingNoteTO.setItemCode(sourceCellValue);
+							continue;
+						case 15:
+							receivingNoteTO.setItemName(sourceCellValue);
+							continue;
+						case 16:
+							receivingNoteTO.setQuantity(sourceCellValue);
+							continue;
+						case 17:
+							receivingNoteTO.setUnitPrice(sourceCellValue);
+							continue;
+						case 18:
+							receivingNoteTO.setTotalPrice(sourceCellValue);
+							continue;
+						}
+					}
+					if (receivingNoteMap.containsKey(orderNo)) {
+						receivingNoteTOList = receivingNoteMap.get(orderNo);
+					} else {
+						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+						// Test the Hashmap
+						receivingNoteMap.put(orderNo, receivingNoteTOList);
+					}
+
+					log.debug("收货单详细条目: " + receivingNoteTO.toString());
+					receivingNoteTOList.add(receivingNoteTO);
+
+				}
+			}
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
+		}
+		return receivingNoteMap;
+	}
+
+	/**
 	 * Process Data of defined date
 	 * 
 	 * @param processDate
@@ -226,149 +577,9 @@ public class DataConversionService {
 			writer.write(mergedHeader);
 			writer.newLine();
 		} catch (IOException e) {
-			
+
 			throw new BaseException(e);
 		}
-	}
-
-	/**
-	 * Get receiving data
-	 * 
-	 * @param retailerID
-	 * @param processDate
-	 * @return
-	 * @throws BaseException
-	 */
-	public static Map<String, List<ReceivingNoteTO>> getReceivingInfo(
-			String retailerID, Date startDate, Date endDate)
-			throws BaseException {
-		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
-
-		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
-				+ retailerID + "/receiving/inbound/");
-
-		File[] receivingList = receivingInboundFolder.listFiles();
-
-		for (int i = 0; i < receivingList.length; i++) {
-
-			File receivingFile = receivingList[i];
-			log.info("收货单文件名: " + receivingFile.getName());
-			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(
-					receivingFile, startDate, endDate);
-
-			receivingNoteMap.putAll(receivingNoteSingleMap);
-		}
-
-		return receivingNoteMap;
-
-	}
-
-	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			File receivingFile, Date startDate, Date endDate)
-			throws BaseException {
-
-		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
-		try {
-			InputStream sourceExcel = new FileInputStream(receivingFile);
-
-			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-			/*
-			 * Workbook wb = null; if (fileType.equals("xls")) { wb = new
-			 * HSSFWorkbook(); } else if(fileType.equals("xlsx")) { wb = new
-			 * XSSFWorkbook(); }
-			 */
-			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
-				Row sourceRow = sourceSheet.getRow(i);
-				if (sourceRow == null) {
-					continue;
-				}
-
-				String receivingDateStr = sourceRow.getCell(6)
-						.getStringCellValue();
-				Date receivingDate = DateUtil.toDate(receivingDateStr);
-
-				// If receivingDate is in the date range
-				if (receivingDate.before(endDate)
-						&& receivingDate.after(startDate)) {
-
-					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
-					String orderNo = null;
-					List<ReceivingNoteTO> receivingNoteTOList = null;
-
-					for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
-
-						Cell sourceCell = sourceRow.getCell(j);
-
-						String sourceCellValue = sourceCell
-								.getStringCellValue();
-
-						switch (j) {
-						case 0:
-						case 1:
-						case 4:
-						case 5:
-						case 10:
-							continue;
-						case 2:
-							receivingNoteTO.setStoreNo(sourceCellValue);
-
-							continue;
-						case 3:
-							receivingNoteTO.setStoreName(sourceCellValue);
-
-							continue;
-						case 6:
-							receivingNoteTO.setReceivingDate(sourceCellValue);
-
-							continue;
-						case 7:
-							receivingNoteTO.setOrderNo(sourceCellValue);
-							orderNo = sourceCellValue;
-
-							continue;
-						case 8:
-							receivingNoteTO.setItemCode(sourceCellValue);
-
-							continue;
-						case 9:
-							receivingNoteTO.setItemName(sourceCellValue);
-
-							continue;
-						case 11:
-							receivingNoteTO.setQuantity(sourceCellValue);
-
-							continue;
-						case 12:
-							receivingNoteTO.setTotalPrice(sourceCellValue);
-
-							continue;
-
-						}
-
-					}
-					if (receivingNoteMap.containsKey(orderNo)) {
-						receivingNoteTOList = receivingNoteMap.get(orderNo);
-					} else {
-						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
-						// Test the Hashmap
-						receivingNoteMap.put(orderNo, receivingNoteTOList);
-					}
-
-					log.debug("收货单详细条目: " + receivingNoteTO.toString());
-					receivingNoteTOList.add(receivingNoteTO);
-
-				}
-			}
-		} catch (FileNotFoundException e) {
-			log.error(e);
-			throw new BaseException(e);
-		} catch (IOException e) {
-			log.error(e);
-			throw new BaseException(e);
-		}
-		return receivingNoteMap;
-
 	}
 
 	private static Map<String, ReceivingNoteTO> parseReceivingListToMap(
@@ -408,7 +619,7 @@ public class DataConversionService {
 	 * @param writer
 	 * @param receivingNoteByStoreMap
 	 * @param orderTOMap
-	 * @throws BaseException 
+	 * @throws BaseException
 	 */
 	private static void mergeOrderAndReceiving(BufferedWriter writer,
 			Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
@@ -468,70 +679,6 @@ public class DataConversionService {
 	}
 
 	/**
-	 * Merge Order & Receiving Note to Txt file
-	 * 
-	 * @param retailID
-	 * @param orderNo
-	 * @param writer
-	 * @param receivingNoteByStoreMap
-	 * @throws BaseException
-	 */
-	@SuppressWarnings("resource")
-	public static Map<String, OrderTO> getOrderInfo(String retailID,
-			String orderNo) throws BaseException {
-		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_"
-				+ retailID + "_" + orderNo + ".txt";
-		File orderFile = new File(fileName);
-
-		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-
-		if (orderFile.exists()) {
-			BufferedReader reader = null;
-			try {
-				// Open the file
-				reader = new BufferedReader(new FileReader(orderFile));
-				reader.readLine();
-				// Read line by line
-				String orderLine = null;
-				while ((orderLine = reader.readLine()) != null) {
-					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getOrderNo()
-							+ orderTO.getStoreName().substring(3)
-							+ orderTO.getItemCode();
-					if (orderMap.containsKey(key)) {
-						log.error(key);
-						FileUtil.closeFileReader(reader);
-						throw new BaseException();
-					}
-					orderMap.put(key, orderTO);
-
-				}
-				// orderTOList.add(orderTO);
-
-				// Save merged file
-				// Save updated order file
-
-			} catch (FileNotFoundException e) {
-				log.error(e);
-				throw new BaseException(e);
-			} catch (IOException e) {
-
-				log.error(e);
-				throw new BaseException(e);
-
-			} finally{
-
-				FileUtil.closeFileReader(reader);
-			}
-
-			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
-
-		}
-
-		return orderMap;
-
-	}
-	/**
 	 * Export Order from Excel to DB Start Date End Date Excel Name
 	 */
 	/*
@@ -582,9 +729,9 @@ public class DataConversionService {
 	 * receivingNoteMap.put(orderNo, receivingNoteTOList); }
 	 * 
 	 * receivingNoteTOList.add(receivingNoteTO); } } } } catch
-	 * (FileNotFoundException e) { // TODO Auto-generated catch block
-	 * throw new BaseException(e); } catch (IOException e) { // TODO Auto-generated
-	 * catch block throw new BaseException(e); } catch (ParseException e) { // TODO
+	 * (FileNotFoundException e) { // TODO Auto-generated catch block throw new
+	 * BaseException(e); } catch (IOException e) { // TODO Auto-generated catch
+	 * block throw new BaseException(e); } catch (ParseException e) { // TODO
 	 * Auto-generated catch block throw new BaseException(e); }
 	 * 
 	 * // Write to txt file exportReceivingNoteToTXT(receivingNoteMap);

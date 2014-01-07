@@ -2,29 +2,34 @@ package com.rsi.mengniu.util;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OCR {
-	private final String LANG_OPTION = "-l";
-	private final String EOL = System.getProperty("line.separator");
-	private String tessPath = "/opt/local/bin";
+	private String tessPath;
 
-	public String recognizeText(String imageFile, String outputName) throws Exception {
+	public String getTessPath() {
+		return tessPath;
+	}
 
+	public void setTessPath(String tessPath) {
+		this.tessPath = tessPath;
+	}
+
+	public String recognizeText(String imageFile, String outputName, boolean isDigits) throws Exception {
 		StringBuffer strB = new StringBuffer();
-
 		List<String> cmd = new ArrayList<String>();
-
 		cmd.add(tessPath + "/tesseract");
-
 		cmd.add("");
 		cmd.add(outputName);
-		// cmd.add(LANG_OPTION);
-		// cmd.add("eng");
-		cmd.add("digits");
+		if (isDigits) {
+			cmd.add("digits");
+
+		} else {
+			cmd.add("-l");
+			cmd.add("eng");
+		}
 
 		ProcessBuilder pb = new ProcessBuilder();
 		// pb.directory(imageFile.getParentFile());
@@ -60,15 +65,7 @@ public class OCR {
 
 			throw new RuntimeException(msg);
 		}
-		return strB.toString();
-	}
-
-	private OCR() {
-	};
-
-	private static OCR ocr = new OCR();
-
-	public static OCR getInstance() {
-		return ocr;
+		String recognizeStr = strB.toString();
+		return recognizeStr.replaceAll("\n", "").replaceAll("\r", "").replaceAll(" ", "");
 	}
 }

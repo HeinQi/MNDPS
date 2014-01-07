@@ -1,8 +1,14 @@
 package com.rsi.mengniu.retailer.service;
 
 import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +25,9 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
+import org.xml.sax.InputSource;
 
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -27,13 +35,20 @@ import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
-//http://supplierweb.carrefour.com.cn/
-public class CarrefourDataPull implements RetailerDataPull {
-	private static Log log = LogFactory.getLog(CarrefourDataPull.class);
+
+
+//http://vss.yonghui.cn:9999/vss/logon/logon.jsp
+public class YonghuiDataPull implements RetailerDataPull {
+	private static Log log = LogFactory.getLog(YonghuiDataPull.class);
 	private OCR ocr;
+	private String validateImgPath;
+	private Properties configs; 
 	
+
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+		
+		
 		String loginResult = null;
 		int loginCount = 0; // 如果验证码出错重新login,最多20次
 		try {
@@ -46,9 +61,9 @@ public class CarrefourDataPull implements RetailerDataPull {
 				return;
 			}
 			// receive
-			 getReceiveExcel(httpClient);
+			getReceive(httpClient);
 			 // order
-			getOrder(httpClient);
+			//getOrder(httpClient);
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
@@ -56,79 +71,88 @@ public class CarrefourDataPull implements RetailerDataPull {
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
-		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
+		HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/logon/logon.jsp");
+		CloseableHttpResponse loginPageResponse = httpClient.execute(httpGet);
+		String loginPageStr = EntityUtils.toString(loginPageResponse.getEntity());
+		Document loginPage = Jsoup.parse(loginPageStr);
+		loginPageResponse.close();
+		Element imageElement = loginPage.select("#img_checkcode").first();
+		String checkcodeUrl = imageElement.attr("src");
+		//checkcode1="+ 57646 
+		String checkcode1 = loginPageStr.substring(loginPageStr.indexOf("checkcode1=\"+")+13);
+		checkcode1 = checkcode1.substring(0,checkcode1.indexOf("+")).trim();
+		
+		HttpGet httpCheckcodeGet = new HttpGet("http://vss.yonghui.cn:9999/vss/"+checkcodeUrl.substring(checkcodeUrl.indexOf("DaemonLogonVender")));
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
-
 		FileOutputStream fos = new FileOutputStream(validateImgPath+"/" + imgName + ".jpg");
-		CloseableHttpResponse response = httpClient.execute(httpGet);
-		HttpEntity entity = response.getEntity();
+		CloseableHttpResponse checkcodeResponse = httpClient.execute(httpCheckcodeGet);
+		HttpEntity entity = checkcodeResponse.getEntity();
 		entity.writeTo(fos);
-		response.close();
+		checkcodeResponse.close();
 		fos.close();
-		String recognizeStr = ocr.recognizeText(validateImgPath+"/" + imgName + ".jpg",validateImgPath+"/"+ imgName,true);
-		// login /login.do?action=doLogin
+		Utils.binaryImage(validateImgPath+"/" + imgName );
+		String recognizeStr = ocr.recognizeText(validateImgPath+"/" + imgName + ".png",
+				"/Users/haibin/Documents/temp/" + imgName,false);
+		recognizeStr.replaceAll("'","").replaceAll(",", "").replaceAll(".", "");
+		//http://vss.yonghui.cn:9999/vss/DaemonLogonVender?action=logon&logonid=124746BJ&password=852963&checkcode1=57552&checkcode2=DEPM
+		//action:logon
+		//logonid:124746BJ
+		//password:852963
+		//checkcode1:57483
+		//checkcode2:YLRD
+		
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		formParams.add(new BasicNameValuePair("login", user.getUserId()));
-		formParams.add(new BasicNameValuePair("password", user.getPassword())); // 错误的密码
-		formParams.add(new BasicNameValuePair("validate", recognizeStr));
+		formParams.add(new BasicNameValuePair("action", "logon"));
+		formParams.add(new BasicNameValuePair("logonid", user.getUserId()));
+		formParams.add(new BasicNameValuePair("password", user.getPassword()));
+		formParams.add(new BasicNameValuePair("checkcode1", checkcode1));
+		formParams.add(new BasicNameValuePair("checkcode2", recognizeStr.toUpperCase())); //校验码无效
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://supplierweb.carrefour.com.cn/login.do?action=doLogin");
+		HttpPost httppost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonLogonVender");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = EntityUtils.toString(loginResponse.getEntity());
-		if (responseStr.contains("验证码失效")) {
-			log.error("验证码失效,Relogin...");
+		if (responseStr.contains("校验码无效") || responseStr.contains("checkcode2 not set")) {
+			log.error("校验码无效,Relogin...");
 			return "InvalidCode";
-		} else if (responseStr.contains("错误的密码")) {
-			log.error("错误的密码,退出!" + user);
+		} else if (responseStr.contains("登录失败,请检查登录名和密码")) {
+			log.error("登录失败,请检查登录名和密码!" + user);
 			return "InvalidPassword";
-		} else if (responseStr.contains("系统出错")) {
-			log.error("系统出错,退出!");
-			return "SystemError";
 		}
 		loginResponse.close();
 
 		return "Success";
 	}
 
-	public void getReceiveExcel(CloseableHttpClient httpClient) throws Exception {
-		// goMenu('inyr.do?action=query','14','预估进退查询')
-
-		// $('inyrForm').action="inyr.do?action=export";
-		// 供应商预估进退查询/Supplier Inyr Inquiry
+	public void getReceive(CloseableHttpClient httpClient) throws Exception {
+		// /vss/DaemonSearchSheet?docdate_min=2014-01-01&docdate_max=2014-10-05&sheetname=receipt
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
-		receiveformParams.add(new BasicNameValuePair("unitid", "ALL"));
-		receiveformParams.add(new BasicNameValuePair("butype", "byjv"));
-		receiveformParams.add(new BasicNameValuePair("systemdate", "2013/12/22")); // yyyy/mm/dd
+		receiveformParams.add(new BasicNameValuePair("docdate_min", "2014-01-01"));
+		receiveformParams.add(new BasicNameValuePair("docdate_max", "2014-01-05"));
+		receiveformParams.add(new BasicNameValuePair("sheetname", "receipt"));
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
-		HttpPost receivePost = new HttpPost("http://supplierweb.carrefour.com.cn/inyr.do?action=export");
+		HttpPost receivePost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonSearchSheet");
 		receivePost.setEntity(receiveFormEntity);
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
 		String responseStr = EntityUtils.toString(receiveRes.getEntity());
 		receiveRes.close();
-
-		if (responseStr.contains("Excel文档生成成功")) {
-			// Download Excel file
-			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
-			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
-			FileOutputStream receiveFos = new FileOutputStream("/Users/haibin/Documents/temp/" + inyrFileName);
-
-			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();
-			downloadformParams.add(new BasicNameValuePair("filename", inyrFileName));
-			downloadformParams.add(new BasicNameValuePair("filenamedownload", "excelpath"));
-			HttpEntity downloadFormEntity = new UrlEncodedFormEntity(downloadformParams, "UTF-8");
-			HttpPost downloadPost = new HttpPost("http://supplierweb.carrefour.com.cn/download.jsp");
-			downloadPost.setEntity(downloadFormEntity);
-			CloseableHttpResponse downloadRes = httpClient.execute(downloadPost);
-			downloadRes.getEntity().writeTo(receiveFos);
-			downloadRes.close();
-			receiveFos.close();
-
-		} else {
-			log.error("Carrefour export Excel Error!");
+		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
+		Elements sheetIdElements = xmlDoc.select("sheetid");
+		for (Element eSheetId: sheetIdElements) {
+			String sheetId = eSheetId.text();
+			HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid="+sheetId);
+			CloseableHttpResponse detailResponse = httpClient.execute(httpGet);
+			String detailStr = EntityUtils.toString(detailResponse.getEntity());
+			Document xmlDetailDoc = Jsoup.parse(detailStr, "", Parser.xmlParser());
 		}
-
+		
+		//http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid=50000001092014MB
+		
+		
+		
 	}
+		
+
 
 	public void getOrder(CloseableHttpClient httpClient) throws Exception {
 		// forward to PowerE2E Platform
@@ -141,7 +165,7 @@ public class CarrefourDataPull implements RetailerDataPull {
 		}
 		response.close();
 
-		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
+		// /vss/DaemonSearchSheet?docdate_min=2014-01-01&docdate_max=2014-10-05&sheetname=receipt
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
 		searchformParams.add(new BasicNameValuePair("receivedDateFrom", "01-12-2013"));
 		searchformParams.add(new BasicNameValuePair("receivedDateTo", "03-01-2014"));
@@ -234,20 +258,17 @@ public class CarrefourDataPull implements RetailerDataPull {
 			msgIdList.add(msgId.attr("value"));
 		}
 	}
-	private String validateImgPath;
-	
-	public String getValidateImgPath() {
-		return validateImgPath;
-	}
 
-	public void setValidateImgPath(String validateImgPath) {
-		this.validateImgPath = validateImgPath;
-	}
-	public OCR getOcr() {
-		return ocr;
-	}
 
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
+	}
+
+	public void setConfigs(Properties configs) {
+		this.configs = configs;
+	}
+	
+	public void setValidateImgPath(String validateImgPath) {
+		this.validateImgPath = validateImgPath;
 	}
 }

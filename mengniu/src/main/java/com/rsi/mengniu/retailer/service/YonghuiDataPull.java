@@ -141,6 +141,7 @@ public class YonghuiDataPull implements RetailerDataPull {
 			Document xmlDetailDoc = Jsoup.parse(detailStr, "", Parser.xmlParser());
 			String storeId = xmlDetailDoc.select("shopid").first().text();
 			String storeNm = xmlDetailDoc.select("shopname").first().text();
+			String orderNo = xmlDetailDoc.select("refsheetid").first().text();
 			String receiveDate = xmlDetailDoc.select("editdate").first().text();
 			Element bodyElement = xmlDetailDoc.select("body").first();
 			Elements rowElements= bodyElement.select("row");
@@ -148,6 +149,7 @@ public class YonghuiDataPull implements RetailerDataPull {
 				ReceivingNoteTO receiveTo = new ReceivingNoteTO();
 				receiveTo.setStoreNo(storeId);
 				receiveTo.setStoreName(storeNm);
+				receiveTo.setOrderNo(orderNo);
 				receiveTo.setReceivingDate(receiveDate);
 				receiveTo.setItemCode(row.select("goodsid").text());
 				receiveTo.setItemName(row.select("goodsname").text());
@@ -158,12 +160,7 @@ public class YonghuiDataPull implements RetailerDataPull {
 				receiveList.add(receiveTo);
 			}
 		}
-		FileUtil.exportReceivingInfoToTXT("yonghui", userID, receiveList);
-		
-		//http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid=50000001092014MB
-		
-		
-		
+		FileUtil.exportReceivingInfoToTXT("yonghui", user.getUserId(), receiveList);
 	}
 		
 

@@ -30,8 +30,8 @@ import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.FileUtil;
 
 //https://tesco.chinab2bi.com/security/login.hlt
-public class TescoDataPull implements RetailerDataPull {
-	private static Log log = LogFactory.getLog(TescoDataPull.class);
+public class TescoDataPullService implements RetailerDataPullService {
+	private static Log log = LogFactory.getLog(TescoDataPullService.class);
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -208,6 +208,7 @@ public class TescoDataPull implements RetailerDataPull {
 				if (!line.contains("DSD PO")) {
 					continue;
 				}
+				
 				String orderDate = line.substring(line.indexOf("订单日期")+6,line.indexOf("交货日期")).trim();
 				for (int i=0;i<10;i++) {
 					br.readLine();

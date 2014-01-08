@@ -5,10 +5,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
 public class Utils {
+	private static Properties properties; 
+
+	public void setProperties(Properties p) {
+		properties = p;
+	}
+	public static String getProperty(String key) {
+		return properties.getProperty(key);
+	}
 	public static String getTrace(Throwable t) {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(stringWriter);

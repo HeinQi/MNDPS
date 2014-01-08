@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.rsi.mengniu.retailer.module.User;
-import com.rsi.mengniu.retailer.service.RetailerDataPull;
+import com.rsi.mengniu.retailer.service.RetailerDataPullService;
 import com.rsi.mengniu.util.AppContextHelper;
 
 public class DataPullThread implements Runnable {
@@ -19,7 +19,7 @@ public class DataPullThread implements Runnable {
 		User user = DataPullTaskPool.getTask();
 		while (user != null) {
 			log.info(user);
-			RetailerDataPull dataPull = (RetailerDataPull) AppContextHelper.getBean(user.getRetailer());
+			RetailerDataPullService dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer());
 			dataPull.dataPull(user);
 			user = DataPullTaskPool.getTask();
 		}

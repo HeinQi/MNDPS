@@ -20,20 +20,21 @@
             </list>  
         </property>  
     </bean> 
-    
+    <bean id="utils" class="com.rsi.mengniu.util.Utils">
+        <property name="properties" ref="retailerConfigs"></property>
+    </bean>
     
     
 	<bean id ="applicationContextHelper" class="com.rsi.mengniu.util.AppContextHelper"></bean>
 	
-	<bean id ="carrefour" class="com.rsi.mengniu.retailer.service.CarrefourDataPull">
+	<bean id ="carrefour" class="com.rsi.mengniu.retailer.service.CarrefourDataPullService">
 	    <property name="ocr" ref="ocr"/>
 	    <property name="validateImgPath" value="${validate.image.path}"/>
 	</bean>
-	<bean id ="tesco" class="com.rsi.mengniu.retailer.service.TescoDataPull"></bean>
-	<bean id ="yonghui" class="com.rsi.mengniu.retailer.service.YonghuiDataPull">
+	<bean id ="tesco" class="com.rsi.mengniu.retailer.service.TescoDataPullService"></bean>
+	<bean id ="yonghui" class="com.rsi.mengniu.retailer.service.YonghuiDataPullService">
 	    <property name="ocr" ref="ocr"/>
 	    <property name="validateImgPath" value="${validate.image.path}"/>
-	    <property name="configs" ref="retailerConfigs"/>
 	</bean>
 	
 	

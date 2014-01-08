@@ -28,8 +28,8 @@ import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
 //http://supplierweb.carrefour.com.cn/
-public class CarrefourDataPull implements RetailerDataPull {
-	private static Log log = LogFactory.getLog(CarrefourDataPull.class);
+public class CarrefourDataPullService implements RetailerDataPullService {
+	private static Log log = LogFactory.getLog(CarrefourDataPullService.class);
 	private OCR ocr;
 	
 	public void dataPull(User user) {

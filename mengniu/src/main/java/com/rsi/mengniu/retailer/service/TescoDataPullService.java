@@ -28,6 +28,7 @@ import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.TescoOrderNotifyTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.FileUtil;
+import com.rsi.mengniu.util.Utils;
 
 //https://tesco.chinab2bi.com/security/login.hlt
 public class TescoDataPullService implements RetailerDataPullService {
@@ -93,16 +94,19 @@ public class TescoDataPullService implements RetailerDataPullService {
 		String vendorTaxRegistration = taxElement.attr("value");
 
 		// query.hlt
-		FileOutputStream receiveFos = new FileOutputStream("/Users/haibin/Documents/temp/test.zip");
+		
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("vendorTaxRegistration", vendorTaxRegistration));// 税号
 		receiveformParams.add(new BasicNameValuePair("transactionType", "01"));// 进货
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", "2013-12-18"));// 交易日期
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", "2014-01-04")); // 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", Utils.getProperty("tesco.startDate")));// 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", Utils.getProperty("tesco.endDate"))); // 交易日期
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("https://tesco.chinab2bi.com/tesco/sellGrnQry/exportDetail.hlt");
 		receivePost.setEntity(receiveFormEntity);
-		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
+		CloseableHttpResponse receiveRes = httpClient.execute(receivePost); //filename=20140108220149.zip
+		String fileNm = receiveRes.getFirstHeader("Content-Disposition").getValue();
+		fileNm = fileNm.substring(fileNm.indexOf("filename=")+9);
+		FileOutputStream receiveFos = new FileOutputStream("/Users/haibin/Documents/temp/"+fileNm);
 		receiveRes.getEntity().writeTo(receiveFos);
 		receiveFos.close();
 		receiveRes.close();
@@ -158,8 +162,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 		int totalPages = 1;
 		do {
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("orderDateStart", "2013-12-30"));// 通知日期
-		searchformParams.add(new BasicNameValuePair("orderDateEnd", "2014-01-05")); // 通知日期
+		searchformParams.add(new BasicNameValuePair("orderDateStart", Utils.getProperty("tesco.startDate")));// 通知日期
+		searchformParams.add(new BasicNameValuePair("orderDateEnd", Utils.getProperty("tesco.endDate"))); // 通知日期
 		searchformParams.add(new BasicNameValuePair("parentVendor", parentVendor));// parentVendor
 		searchformParams.add(new BasicNameValuePair("page.pageSize", "50"));// pageSize
 		searchformParams.add(new BasicNameValuePair("page.pageNo", String.valueOf(pageNo))); // pageSize

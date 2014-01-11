@@ -19,7 +19,8 @@ public class MengniuPulling {
 			//DataPullTaskPool.initTaskPool("ALL");
 			//DataPullTaskPool.initTaskPool("carrefour");
 			//DataPullTaskPool.initTaskPool("tesco");
-			DataPullTaskPool.initTaskPool("yonghui");
+			//DataPullTaskPool.initTaskPool("yonghui");
+			DataPullTaskPool.initTaskPool("metro");
 			int threadNum = 2;
 			final CountDownLatch mDoneSignal = new CountDownLatch(2); 
 

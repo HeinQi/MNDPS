@@ -32,11 +32,12 @@
 	    <property name="validateImgPath" value="${validate.image.path}"/>
 	</bean>
 	<bean id ="tesco" class="com.rsi.mengniu.retailer.service.TescoDataPullService"></bean>
+	
 	<bean id ="yonghui" class="com.rsi.mengniu.retailer.service.YonghuiDataPullService">
 	    <property name="ocr" ref="ocr"/>
 	    <property name="validateImgPath" value="${validate.image.path}"/>
 	</bean>
-	
+	<bean id ="metro" class="com.rsi.mengniu.retailer.service.MetroDataPullService"></bean>
 	
 	<bean id ="ocr" class="com.rsi.mengniu.util.OCR">
 	    <property name="tessPath" value="${tesseract.path}"/>

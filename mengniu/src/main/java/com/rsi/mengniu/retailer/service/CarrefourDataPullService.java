@@ -35,18 +35,18 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		String loginResult = null;
-		int loginCount = 0; // 如果验证码出错重新login,最多20次
+		int loginCount = 0; // 如果验证码出错重新login,最多15次
 		try {
 			do {
 				loginResult = login(httpClient, user);
 				loginCount++;
-			} while ("InvalidCode".equals(loginResult) && loginCount < 20);
+			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
 				return;
 			}
 			// receive
-			 getReceiveExcel(httpClient);
+			 getReceiveExcel(httpClient,user);
 			 // order
 			getOrder(httpClient);
 			httpClient.close();
@@ -56,6 +56,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
+		log.info(user+"开始登录...");
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
 
@@ -77,21 +78,21 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = EntityUtils.toString(loginResponse.getEntity());
 		if (responseStr.contains("验证码失效")) {
-			log.error("验证码失效,Relogin...");
+			log.info("验证码失效,Relogin...");
 			return "InvalidCode";
 		} else if (responseStr.contains("错误的密码")) {
-			log.error("错误的密码,退出!" + user);
+			log.info(user+"错误的密码,退出!");
 			return "InvalidPassword";
 		} else if (responseStr.contains("系统出错")) {
-			log.error("系统出错,退出!");
+			log.info("系统出错,退出!");
 			return "SystemError";
 		}
 		loginResponse.close();
-
+		log.info(user+"登录成功!");
 		return "Success";
 	}
 
-	public void getReceiveExcel(CloseableHttpClient httpClient) throws Exception {
+	public void getReceiveExcel(CloseableHttpClient httpClient,User user) throws Exception {
 		// goMenu('inyr.do?action=query','14','预估进退查询')
 
 		// $('inyrForm').action="inyr.do?action=export";
@@ -125,7 +126,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			receiveFos.close();
 
 		} else {
-			log.error("Carrefour export Excel Error!");
+			log.info("Carrefour export Excel Error!");
 		}
 
 	}

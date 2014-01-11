@@ -3,7 +3,6 @@ package com.rsi.mengniu.retailer.service;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,17 +17,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
-import org.jsoup.select.Elements;
 
-import com.rsi.mengniu.retailer.module.OrderTO;
-import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.User;
-import com.rsi.mengniu.util.FileUtil;
-import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
 //http://vss.yonghui.cn:9999/vss/logon/logon.jsp

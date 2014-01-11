@@ -9,18 +9,21 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.rsi.mengniu.retailer.service.RetailerDataConversionService;
 import com.rsi.mengniu.util.Utils;
 
 public class MengniuPulling {
 	private static Log log = LogFactory.getLog(MengniuPulling.class);
 	public static void main(String[] args) {
+		String retailerId = args[0];
 		try {
-			new ClassPathXmlApplicationContext("applicationContext.xml");
+			ApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
 			//DataPullTaskPool.initTaskPool("ALL");
 			//DataPullTaskPool.initTaskPool("carrefour");
 			//DataPullTaskPool.initTaskPool("tesco");
-			DataPullTaskPool.initTaskPool("yonghui");
+			//DataPullTaskPool.initTaskPool("yonghui");
 			//DataPullTaskPool.initTaskPool("metro");
+			DataPullTaskPool.initTaskPool(retailerId);
 			int threadNum = Integer.parseInt(Utils.getProperty("datapull.thread.amount"));
 			final CountDownLatch mDoneSignal = new CountDownLatch(threadNum); 
 
@@ -30,6 +33,21 @@ public class MengniuPulling {
 			}
 			exec.shutdown();
 			mDoneSignal.await(); // Wait all thread done
+			
+			if ("ALL".equalsIgnoreCase(retailerId)) {
+				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService)appContext.getBean("carrefour.data.conversion");
+				carrefourConversion.retailerDataProcessing();
+				RetailerDataConversionService tescoConversion = (RetailerDataConversionService)appContext.getBean("tesco.data.conversion");
+				tescoConversion.retailerDataProcessing();
+				RetailerDataConversionService yonhuiConversion = (RetailerDataConversionService)appContext.getBean("yonghui.data.conversion");
+				yonhuiConversion.retailerDataProcessing();
+				
+			} else {
+				RetailerDataConversionService dataConversion = (RetailerDataConversionService)appContext.getBean(retailerId+".data.conversion");
+				dataConversion.retailerDataProcessing();
+			}
+			
+			
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
 		}

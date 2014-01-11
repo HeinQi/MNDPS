@@ -11,20 +11,6 @@ import java.util.List;
 import com.rsi.mengniu.exception.BaseException;
 
 public class DateUtil {
-
-	public static DateUtil dateUtil;
-	public static DateUtil getInstance(){
-		synchronized(DateUtil.class){
-            //判断是否存在类实例如果不存在就实例化一个
-           if (dateUtil==null) {
-        	   dateUtil=new DateUtil();
-               
-            }
-		}
-		
-		return new DateUtil();
-	}
-	
 	
 	public static Date toDate(String dateStr) throws BaseException {
 		//TODO date format unify

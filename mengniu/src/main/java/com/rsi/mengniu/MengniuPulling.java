@@ -18,11 +18,11 @@ public class MengniuPulling {
 			new ClassPathXmlApplicationContext("applicationContext.xml");
 			//DataPullTaskPool.initTaskPool("ALL");
 			//DataPullTaskPool.initTaskPool("carrefour");
-			DataPullTaskPool.initTaskPool("tesco");
-			//DataPullTaskPool.initTaskPool("yonghui");
+			//DataPullTaskPool.initTaskPool("tesco");
+			DataPullTaskPool.initTaskPool("yonghui");
 			//DataPullTaskPool.initTaskPool("metro");
 			int threadNum = Integer.parseInt(Utils.getProperty("datapull.thread.amount"));
-			final CountDownLatch mDoneSignal = new CountDownLatch(2); 
+			final CountDownLatch mDoneSignal = new CountDownLatch(threadNum); 
 
 			ExecutorService exec = Executors.newFixedThreadPool(threadNum);
 			for (int i=0; i<threadNum; i++) {

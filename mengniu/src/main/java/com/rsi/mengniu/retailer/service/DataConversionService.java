@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -31,6 +32,7 @@ import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
+import com.rsi.mengniu.util.Utils;
 
 public class DataConversionService {
 
@@ -38,8 +40,8 @@ public class DataConversionService {
 
 	public static void main(String[] args) throws BaseException {
 		log.info("开始");
-		// retailerDataProcessing(Constants.RETAILER_CARREFOUR,
-		// DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
+		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
+				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
 
 		retailerDataProcessing(Constants.RETAILER_TESCO,
 				DateUtil.toDate("2013-12-30"), DateUtil.toDate("2014-01-05"));
@@ -142,20 +144,37 @@ public class DataConversionService {
 			}
 		}
 
+		for (Entry<String, List<ReceivingNoteTO>> entry : receivingByDateMap
+				.entrySet()) {
+			String key = entry.getKey();
+			List valueList = entry.getValue();
+
+			log.info("收货单日期：" + key + " 收货单数量:" + valueList.size());
+		}
+
 		return receivingByDateMap;
 	}
 
+	/**
+	 * Get Order Info
+	 * 
+	 * @param retailerID
+	 * @param orderNoSet
+	 * @return
+	 * @throws BaseException
+	 */
 	private static Map<String, OrderTO> getOrderInfo(String retailerID,
 			Set<String> orderNoSet) throws BaseException {
-		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
-		for (String orderNo : orderNoSet) {
-			// Get order info map
-			// Key: Store ID + Item Code
 
-			log.info("读取订单信息. 订单号:" + orderNo);
-			orderTOMap.putAll(getOrderInfo(retailerID, orderNo));
+		Map<String, OrderTO> orderTOMap = null;
 
-			log.info("读取订单信息结束. 订单号:" + orderNo);
+		if (retailerID.equals(Constants.RETAILER_CARREFOUR)
+				|| retailerID.equals(Constants.RETAILER_TESCO)) {
+			orderTOMap = getOrderInfoForCarrefour(retailerID, orderNoSet);
+		} else if (retailerID.equals(Constants.RETAILER_TESCO)) {
+			orderTOMap = getOrderInfoForTesco(retailerID, orderNoSet);
+		} else if (retailerID.equals(Constants.RETAILER_YONGHUI)) {
+			getOrderInfoForYonghui();
 		}
 		return orderTOMap;
 	}
@@ -163,17 +182,35 @@ public class DataConversionService {
 	/**
 	 * Get order info
 	 * 
-	 * @param retailID
+	 * @param retailerID
 	 * @param orderNo
 	 * @param writer
 	 * @param receivingNoteByStoreMap
 	 * @throws BaseException
 	 */
-	@SuppressWarnings("resource")
-	public static Map<String, OrderTO> getOrderInfo(String retailID,
-			String orderNo) throws BaseException {
-		String fileName = Constants.TEST_ROOT_PATH + retailID + "/order/Order_"
-				+ retailID + "_" + orderNo + ".txt";
+	public static Map<String, OrderTO> getOrderInfoForCarrefour(
+			String retailerID, Set<String> orderNoSet) throws BaseException {
+		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
+		for (String orderNo : orderNoSet) {
+			// Get order info map
+			// Key: Store ID + Item Code
+			Map<String, OrderTO> orderMap = null;
+			orderMap = getOrderInfoForCarrefour(orderNo);
+			log.info("读取订单信息. 订单号:" + orderNo);
+			orderTOMap.putAll(orderMap);
+
+			log.info("读取订单信息结束. 订单号:" + orderNo);
+		}
+
+		return orderTOMap;
+
+	}
+
+	private static Map<String, OrderTO> getOrderInfoForCarrefour(String orderNo)
+			throws BaseException {
+		String fileName = Constants.TEST_ROOT_PATH
+				+ Constants.RETAILER_CARREFOUR + "/order/Order_"
+				+ Constants.RETAILER_CARREFOUR + "_" + orderNo + ".txt";
 		File orderFile = new File(fileName);
 
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
@@ -191,18 +228,10 @@ public class DataConversionService {
 					String key = orderTO.getOrderNo()
 							+ orderTO.getStoreName().substring(3)
 							+ orderTO.getItemCode();
-					if (orderMap.containsKey(key)) {
-						log.error(key);
-						FileUtil.closeFileReader(reader);
-						throw new BaseException();
-					}
 					orderMap.put(key, orderTO);
 
 				}
 				// orderTOList.add(orderTO);
-
-				// Save merged file
-				// Save updated order file
 
 			} catch (FileNotFoundException e) {
 				log.error(e);
@@ -220,9 +249,192 @@ public class DataConversionService {
 			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
 
 		}
+		return orderMap;
+	}
+
+	/**
+	 * Get order info
+	 * 
+	 * @param retailerID
+	 * @param orderNo
+	 * @param writer
+	 * @param receivingNoteByStoreMap
+	 * @throws BaseException
+	 */
+	public static Map<String, OrderTO> getOrderInfoForTesco(String retailerID,
+			Set<String> orderNoSet) throws BaseException {
+		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
+		for (String orderNo : orderNoSet) {
+			// Get order info map
+			// Key: Store ID + Item Code
+			Map<String, OrderTO> orderMap = null;
+			orderMap = getOrderInfoForTesco(orderNo);
+			log.info("读取订单信息. 订单号:" + orderNo);
+			orderTOMap.putAll(orderMap);
+
+			log.info("读取订单信息结束. 订单号:" + orderNo);
+		}
+
+		return orderTOMap;
+
+	}
+
+	private static Map<String, OrderTO> getOrderInfoForTesco(String orderNo)
+			throws BaseException {
+		String fileName = Constants.TEST_ROOT_PATH + Constants.RETAILER_TESCO
+				+ "/order/Order_" + Constants.RETAILER_TESCO + "_" + orderNo
+				+ ".txt";
+		File orderFile = new File(fileName);
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+
+		if (orderFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				reader = new BufferedReader(new FileReader(orderFile));
+				reader.readLine();
+				// Read line by line
+				String orderLine = null;
+				while ((orderLine = reader.readLine()) != null) {
+					OrderTO orderTO = new OrderTO(orderLine);
+					String key = orderTO.getOrderNo() + orderTO.getStoreName()
+							+ orderTO.getItemCode();
+					orderMap.put(key, orderTO);
+
+				}
+				// orderTOList.add(orderTO);
+
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
+
+		}
+		return orderMap;
+	}
+
+	private static Map<String, OrderTO> getOrderInfoForYonghui()
+			throws BaseException {
+		File receivingInboundFolder = new File(Constants.TEST_ROOT_PATH
+				+ Constants.RETAILER_YONGHUI + "/order/");
+
+		File[] orderList = receivingInboundFolder.listFiles();
+
+		for (int i = 0; i < orderList.length; i++) {
+
+			File orderFile = orderList[i];
+			getOrderInfoForYonghui(orderFile);
+			log.info("订单文件名: " + orderFile.getName());
+
+		}
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
 
 		return orderMap;
+	}
 
+	private static Map<String, List<OrderTO>> getOrderInfoForYonghui(
+			File orderFile) throws BaseException {
+		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+		try {
+			InputStream sourceExcel = new FileInputStream(orderFile);
+
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+
+			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+				Row sourceRow = sourceSheet.getRow(i);
+				if (sourceRow == null) {
+					continue;
+				}
+
+				OrderTO orderTO = new OrderTO();
+				String orderNo = null;
+				List<OrderTO> orderTOList = null;
+
+				for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+
+					Cell sourceCell = sourceRow.getCell(j);
+
+					switch (j) {
+					case 1:
+						orderNo = sourceCell.getStringCellValue();
+						orderTO.setOrderNo(orderNo);
+
+						continue;
+					case 4:
+						String storeID = sourceCell.getStringCellValue();
+						orderTO.setStoreNo(storeID);
+
+						continue;
+					case 5:
+
+						String storeName = sourceCell.getStringCellValue();
+						orderTO.setStoreName(storeName);
+						continue;
+					case 6:
+						String orderDate = DateUtil.toString(sourceCell
+								.getDateCellValue());
+						orderTO.setOrderDate(orderDate);
+
+						continue;
+					case 8:
+						String itemCode = sourceCell.getStringCellValue();
+						orderTO.setItemCode(itemCode);
+
+						continue;
+					case 9:
+						String barcode = sourceCell.getStringCellValue();
+						orderTO.setBarcode(barcode);
+
+						continue;
+					case 10:
+
+						String itemName = sourceCell.getStringCellValue();
+						orderTO.setItemName(itemName);
+
+						continue;
+					case 12:
+						String quantity = Double.valueOf(
+								sourceCell.getNumericCellValue()).toString();
+						orderTO.setQuantity(quantity);
+
+						continue;
+					}
+
+				}
+				if (orderMap.containsKey(orderNo)) {
+					orderTOList = orderMap.get(orderNo);
+				} else {
+					orderTOList = new ArrayList<OrderTO>();
+					// Test the Hashmap
+					orderMap.put(orderNo, orderTOList);
+				}
+
+				log.debug("订单单详细条目: " + orderTO.toString());
+				orderTOList.add(orderTO);
+
+			}
+
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
+		}
+		return orderMap;
 	}
 
 	/**
@@ -268,7 +480,8 @@ public class DataConversionService {
 			receivingNoteMap = getReceivingInfoFromFileForTesco(receivingFile,
 					startDate, endDate);
 		} else if (retailerID.equals(Constants.RETAILER_YONGHUI)) {
-
+//			receivingNoteMap = getReceivingInfoFromFileForYonghui(receivingFile,
+//					startDate, endDate);
 		} else if (retailerID.equals(Constants.RETAILER_METRO)) {
 
 		}
@@ -311,8 +524,7 @@ public class DataConversionService {
 				Date receivingDate = DateUtil.toDate(receivingDateStr);
 
 				// If receivingDate is in the date range
-				if (receivingDate.before(endDate)
-						&& receivingDate.after(startDate)) {
+				if (DateUtil.isInDateRange(receivingDate, startDate, endDate)) {
 
 					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
 					String orderNo = null;
@@ -409,31 +621,27 @@ public class DataConversionService {
 			String receivingDateStr = null;
 			Date receivingDate = null;
 			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-			for (int i = 1; i < (sourceSheet.getPhysicalNumberOfRows()-1); i++) {
+			for (int i = 1; i < (sourceSheet.getPhysicalNumberOfRows() - 1); i++) {
 				Row sourceRow = sourceSheet.getRow(i);
 				if (sourceRow == null) {
 					continue;
 				}
 
-				log.info("i=" + i);
-				if(i==510){
-					log.info("Test");
-				}
-				
-				if (sourceRow.getCell(11).getStringCellValue() != null && !sourceRow.getCell(11).getStringCellValue().equals("")) {
+				if (sourceRow.getCell(11).getStringCellValue() != null
+						&& !sourceRow.getCell(11).getStringCellValue()
+								.equals("")) {
 
-					receivingDateStr = sourceRow.getCell(11).getStringCellValue();
+					receivingDateStr = sourceRow.getCell(11)
+							.getStringCellValue();
 					receivingDate = DateUtil.toDate(receivingDateStr);
 				}
 				// If receivingDate is in the date range
-				if (receivingDate.before(endDate)
-						&& receivingDate.after(startDate)) {
+				if (DateUtil.isInDateRange(receivingDate, startDate, endDate)) {
 
 					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
 					List<ReceivingNoteTO> receivingNoteTOList = null;
 
 					for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
-						log.info("j=" + j);
 						Cell sourceCell = sourceRow.getCell(j);
 						String sourceCellValue = null;
 
@@ -466,6 +674,8 @@ public class DataConversionService {
 
 							if (sourceCellValue != null
 									&& !sourceCellValue.equals("")) {
+								sourceCellValue = Utils
+										.trimPrefixZero(sourceCellValue);
 								orderNo = sourceCellValue;
 							}
 							receivingNoteTO.setOrderNo(orderNo);
@@ -510,7 +720,57 @@ public class DataConversionService {
 			log.error(e);
 			throw new BaseException(e);
 		}
+
+		for (Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap
+				.entrySet()) {
+			String key = entry.getKey();
+			List valueList = entry.getValue();
+
+			log.info("收货单对应订单编号：" + key + " 收货单数量:" + valueList.size());
+		}
+
 		return receivingNoteMap;
+	}
+	
+	
+	private static Map<String, ReceivingNoteTO> getReceivingInfoFromFileForYonghui(File receivingFile, Date startDate, Date endDate)
+			throws BaseException {
+		
+		Map<String, ReceivingNoteTO> receivingMap = new HashMap<String, ReceivingNoteTO>();
+
+		if (receivingFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				reader = new BufferedReader(new FileReader(receivingFile));
+				reader.readLine();
+				// Read line by line
+				String receivingLine = null;
+				while ((receivingLine = reader.readLine()) != null) {
+					ReceivingNoteTO receivingTO = new ReceivingNoteTO(receivingLine);
+					String key = receivingTO.getOrderNo() + receivingTO.getStoreName()
+							+ receivingTO.getItemCode();
+					receivingMap.put(key, receivingTO);
+
+				}
+
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:" + receivingMap.size());
+
+		}
+		return receivingMap;
 	}
 
 	/**
@@ -552,12 +812,19 @@ public class DataConversionService {
 	private static BufferedWriter initMergeFile(String retailerID,
 			String processDate) throws BaseException {
 		BufferedWriter writer;
-		String sourceFilePath = Constants.TEST_ROOT_PATH + retailerID
-				+ "/merged/" + retailerID + "_order_"
+		String mergeFolderPath = Constants.TEST_ROOT_PATH + retailerID
+				+ "/merged/";
+
+		String mergeFilePath = mergeFolderPath + retailerID + "_order_"
 				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
 				+ ".txt";
-		log.info("初始化整合文本文件. 文件名: " + sourceFilePath);
-		File mergeFile = new File(sourceFilePath);
+		log.info("初始化整合文本文件. 文件名: " + mergeFilePath);
+		File mergeFolder = new File(mergeFolderPath);
+		if (!mergeFolder.exists()) {
+			mergeFolder.mkdir();
+		}
+
+		File mergeFile = new File(mergeFilePath);
 
 		try {
 			writer = new BufferedWriter(new FileWriter(mergeFile));

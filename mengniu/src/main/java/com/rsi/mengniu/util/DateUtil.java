@@ -38,7 +38,19 @@ public class DateUtil {
 		}
 
 	}
-	
+
+	public static String toString(Date date){
+
+		DateFormat dateFormat = new SimpleDateFormat("yyy-yMM-dd");
+		return dateFormat.format(date);
+	}
+
+	public static String toString(Date date,String datePattern){
+
+		DateFormat dateFormat = new SimpleDateFormat(datePattern);
+		return dateFormat.format(date);
+	}
+
 	public static String toStringYYYYMMDD(Date date){
 
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -76,6 +88,13 @@ public class DateUtil {
     	        now.setTime(d);  
     	        now.set(Calendar.DATE, now.get(Calendar.DATE) + day);  
     	        return now.getTime();  
-    	    }  
+    	    }
+
+
+	public static boolean isInDateRange(Date verifyDate, Date startDate,
+			Date endDate) {
+		return (verifyDate.before(endDate)
+				&& verifyDate.after(startDate))||verifyDate.equals(startDate)|| verifyDate.equals(endDate);
+	}  
 
 }

@@ -41,4 +41,15 @@ public class Utils {
 		File newFile = new File(imageName + ".png");
 		ImageIO.write(grayImage, "png", newFile);
 	}
+	
+	public static String trimPrefixZero(String sourceStr){
+		int indexNo = sourceStr.indexOf("0");
+		if(indexNo==0){
+			sourceStr = sourceStr.substring(indexNo+1);
+			sourceStr = trimPrefixZero(sourceStr);
+			
+		}
+		
+		return sourceStr;
+	}
 }

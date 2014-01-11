@@ -37,8 +37,19 @@ public class FileUtil {
 	 */
 	public static void exportOrderInfoToTXT(String retailerID, String orderID,
 			List<OrderTO> orderList) throws BaseException {
-		File orderFile = new File(Constants.TEST_ROOT_PATH + retailerID
-				+ "/order/Order_" + retailerID + "_" + orderID + ".txt");
+
+		String orderFolderPath = Constants.TEST_ROOT_PATH + retailerID
+				+ "/order/";
+
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + orderID + ".txt";
+		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
+		File receivingInboundFolder = new File(orderFolderPath);
+		if (!receivingInboundFolder.exists()) {
+			receivingInboundFolder.mkdir();
+		}
+
+		File orderFile = new File(orderFilePath);
+		
 		BufferedWriter writer = null;
 		if (!orderFile.exists()) {
 			try {
@@ -54,6 +65,8 @@ public class FileUtil {
 			}
 		} else {
 			try {
+				
+				//TODO consider that re-run action
 				writer = new BufferedWriter(new FileWriter(orderFile, true));
 			} catch (IOException e) {
 
@@ -92,11 +105,21 @@ public class FileUtil {
 	public static void exportReceivingInfoToTXT(String retailerID,
 			String userID, List<ReceivingNoteTO> receivingList)
 			throws BaseException {
-		File receivingFile = new File(Constants.TEST_ROOT_PATH + retailerID
-				+ "/receiving/inbound/Receiving_" + retailerID + "_" + userID + "_"
-				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt");
+
+		String receivingInboundFolderPath = Constants.TEST_ROOT_PATH
+				+ retailerID + "/receiving/inbound/";
+
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
+				+ retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
+		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
+		File receivingInboundFolder = new File(receivingInboundFolderPath);
+		if (!receivingInboundFolder.exists()) {
+			receivingInboundFolder.mkdir();
+		}
+
+		File receivingFile = new File(receivingFilePath);
 		
-		//TODO validate if folder exist
 		BufferedWriter writer = null;
 
 		try {

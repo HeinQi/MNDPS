@@ -207,7 +207,7 @@ public abstract class RetailerDataConversionService {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		File receivingInboundFolder = new File(
-				Utils.getProperty(Constants.RETAILER_TESCO
+				Utils.getProperty(retailerID
 						+ Constants.RECEIVING_INBOUND_PATH));
 
 		File[] receivingList = receivingInboundFolder.listFiles();

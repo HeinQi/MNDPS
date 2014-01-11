@@ -7,7 +7,7 @@ public final class Constants {
 	public static final String RETAILER_METRO = "metro";
 
 	public static final String ORDER_PATH = ".order.filePath";
-	public static final String RECEIVING_INBOUND_PATH = ".receiving.inbound.filePath";
+	public static final String RECEIVING_INBOUND_PATH = ".receiving.source.filePath";
 	public static final String RECEIVING_PROCESSED_PATH = ".receiving.processed.filePath";
 	public static final String OUTPUT_PATH = ".output.filePath";
 	public static final String ORDER_HEADER = "order.header";

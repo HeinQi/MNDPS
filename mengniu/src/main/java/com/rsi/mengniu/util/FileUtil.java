@@ -42,17 +42,19 @@ public class FileUtil {
 	public static void exportOrderInfoToTXT(String retailerID, String orderID,
 			List<OrderTO> orderList) throws BaseException {
 
-		String orderFolderPath = Utils.getProperty(retailerID+Constants.ORDER_PATH);
-
-		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + orderID + ".txt";
+		String orderFolderPath = Utils.getProperty(retailerID
+				+ Constants.ORDER_PATH);
+		createFolder(orderFolderPath);
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_"
+				+ orderID + ".txt";
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
-		File receivingInboundFolder = new File(orderFolderPath);
-		if (!receivingInboundFolder.exists()) {
-			receivingInboundFolder.mkdir();
-		}
+		// File receivingInboundFolder = new File(orderFolderPath);
+		// if (!receivingInboundFolder.exists()) {
+		// receivingInboundFolder.mkdir();
+		// }
 
 		File orderFile = new File(orderFilePath);
-		
+
 		BufferedWriter writer = null;
 		if (!orderFile.exists()) {
 			try {
@@ -68,8 +70,8 @@ public class FileUtil {
 			}
 		} else {
 			try {
-				
-				//TODO consider that re-run action
+
+				// TODO consider that re-run action
 				writer = new BufferedWriter(new FileWriter(orderFile, true));
 			} catch (IOException e) {
 
@@ -109,19 +111,20 @@ public class FileUtil {
 			String userID, List<ReceivingNoteTO> receivingList)
 			throws BaseException {
 
-		String receivingInboundFolderPath = Utils.getProperty(retailerID+Constants.RECEIVING_INBOUND_PATH);
-
+		String receivingInboundFolderPath = Utils.getProperty(retailerID
+				+ Constants.RECEIVING_INBOUND_PATH);
+		createFolder(receivingInboundFolderPath);
 		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
 				+ retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
-		File receivingInboundFolder = new File(receivingInboundFolderPath);
-		if (!receivingInboundFolder.exists()) {
-			receivingInboundFolder.mkdir();
-		}
+		// File receivingInboundFolder = new File(receivingInboundFolderPath);
+		// if (!receivingInboundFolder.exists()) {
+		// receivingInboundFolder.mkdir();
+		// }
 
 		File receivingFile = new File(receivingFilePath);
-		
+
 		BufferedWriter writer = null;
 
 		try {
@@ -213,12 +216,14 @@ public class FileUtil {
 		}
 
 	}
+
 	public static void createFolder(String path) {
 		File fnewpath = new File(path);
 		// 判断文件夹是否存在
 		if (!fnewpath.exists())
-			fnewpath.mkdirs();		
+			fnewpath.mkdirs();
 	}
+
 	/**
 	 * Close File Writer
 	 * 
@@ -269,12 +274,13 @@ public class FileUtil {
 			zFile.setPassword(passwd.toCharArray()); // 设置密码
 		}
 		zFile.extractAll(dest); // 将文件抽出到解压目录(解压)
+		
+		zipFile.delete();
 	}
-	
-	public static void testFileAmount(String folderPath){
-		
-		
-		int j=0;
+
+	public static void testFileAmount(String folderPath) {
+
+		int j = 0;
 		File receivingInboundFolder = new File(folderPath);
 
 		File[] orderList = receivingInboundFolder.listFiles();
@@ -284,21 +290,21 @@ public class FileUtil {
 
 			File orderFile = orderList[i];
 			BufferedReader reader = null;
-				// Open the file
-				try {
-					reader = new BufferedReader(new FileReader(orderFile));
-					String orderLine;
-					while ((orderLine = reader.readLine()) != null) {
-						j++;
-					}
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			// Open the file
+			try {
+				reader = new BufferedReader(new FileReader(orderFile));
+				String orderLine;
+				while ((orderLine = reader.readLine()) != null) {
+					j++;
 				}
-				j = j -1;
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			j = j - 1;
 
 		}
 		System.out.println(j);

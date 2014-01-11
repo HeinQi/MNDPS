@@ -4,16 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd">
            
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>system.properties</value>
-            </list>
-        </property>
-    </bean>
     <bean id="retailerConfigs" class="org.springframework.beans.factory.config.PropertiesFactoryBean">  
         <property name="locations">  
             <list>  
+                <value>system.properties</value>
                 <value>carrefour.properties</value>
                 <value>tesco.properties</value>
                 <value>yonghui.properties</value>
@@ -29,18 +23,15 @@
 	
 	<bean id ="carrefour" class="com.rsi.mengniu.retailer.service.CarrefourDataPullService">
 	    <property name="ocr" ref="ocr"/>
-	    <property name="validateImgPath" value="${validate.image.path}"/>
 	</bean>
 	<bean id ="tesco" class="com.rsi.mengniu.retailer.service.TescoDataPullService"></bean>
 	
 	<bean id ="yonghui" class="com.rsi.mengniu.retailer.service.YonghuiDataPullService">
 	    <property name="ocr" ref="ocr"/>
-	    <property name="validateImgPath" value="${validate.image.path}"/>
 	</bean>
 	<bean id ="metro" class="com.rsi.mengniu.retailer.service.MetroDataPullService"></bean>
 	
 	<bean id ="ocr" class="com.rsi.mengniu.util.OCR">
-	    <property name="tessPath" value="${tesseract.path}"/>
 	</bean>
 	
 	

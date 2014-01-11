@@ -7,20 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OCR {
-	private String tessPath;
-
-	public String getTessPath() {
-		return tessPath;
-	}
-
-	public void setTessPath(String tessPath) {
-		this.tessPath = tessPath;
-	}
-
 	public String recognizeText(String imageFile, String outputName, boolean isDigits) throws Exception {
 		StringBuffer strB = new StringBuffer();
 		List<String> cmd = new ArrayList<String>();
-		cmd.add(tessPath + "/tesseract");
+		cmd.add(Utils.getProperty("tesseract.path") + "tesseract");
 		cmd.add("");
 		cmd.add(outputName);
 		if (isDigits) {

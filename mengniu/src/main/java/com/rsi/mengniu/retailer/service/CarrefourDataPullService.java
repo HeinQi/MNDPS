@@ -23,6 +23,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
@@ -48,7 +49,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			// receive
 			 getReceiveExcel(httpClient,user);
 			 // order
-			getOrder(httpClient);
+			getOrder(httpClient,user);
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
@@ -59,14 +60,14 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		log.info(user+"开始登录...");
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
-
-		FileOutputStream fos = new FileOutputStream(validateImgPath+"/" + imgName + ".jpg");
+		String validateImgPath = Utils.getProperty("validate.image.path");
+		FileOutputStream fos = new FileOutputStream(validateImgPath + imgName + ".jpg");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		entity.writeTo(fos);
 		response.close();
 		fos.close();
-		String recognizeStr = ocr.recognizeText(validateImgPath+"/" + imgName + ".jpg",validateImgPath+"/"+ imgName,true);
+		String recognizeStr = ocr.recognizeText(validateImgPath + imgName + ".jpg",validateImgPath+ imgName,true);
 		// login /login.do?action=doLogin
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("login", user.getUserId()));
@@ -84,7 +85,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			log.info(user+"错误的密码,退出!");
 			return "InvalidPassword";
 		} else if (responseStr.contains("系统出错")) {
-			log.info("系统出错,退出!");
+			log.info(user+"系统出错,退出!");
 			return "SystemError";
 		}
 		loginResponse.close();
@@ -93,6 +94,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	}
 
 	public void getReceiveExcel(CloseableHttpClient httpClient,User user) throws Exception {
+		log.info(user+"开始下载收货单...");
 		// goMenu('inyr.do?action=query','14','预估进退查询')
 
 		// $('inyrForm').action="inyr.do?action=export";
@@ -100,7 +102,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("unitid", "ALL"));
 		receiveformParams.add(new BasicNameValuePair("butype", "byjv"));
-		receiveformParams.add(new BasicNameValuePair("systemdate", "2013/12/22")); // yyyy/mm/dd
+		receiveformParams.add(new BasicNameValuePair("systemdate", DateUtil.toString(Utils.getEndDate(), "yyyy/MM/dd"))); // yyyy/mm/dd
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("http://supplierweb.carrefour.com.cn/inyr.do?action=export");
 		receivePost.setEntity(receiveFormEntity);
@@ -112,7 +114,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			// Download Excel file
 			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
 			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
-			FileOutputStream receiveFos = new FileOutputStream("/Users/haibin/Documents/temp/" + inyrFileName);
+			FileOutputStream receiveFos = new FileOutputStream(Utils.getProperty("carrefour.receive.filePath") + inyrFileName);
 
 			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();
 			downloadformParams.add(new BasicNameValuePair("filename", inyrFileName));
@@ -124,28 +126,30 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			downloadRes.getEntity().writeTo(receiveFos);
 			downloadRes.close();
 			receiveFos.close();
-
+			log.info(user+"家乐福收货单Excel下载成功!");
 		} else {
-			log.info("Carrefour export Excel Error!");
+			log.info(user+"家乐福收货单Excel下载失败!");
 		}
 
 	}
 
-	public void getOrder(CloseableHttpClient httpClient) throws Exception {
+	public void getOrder(CloseableHttpClient httpClient,User user) throws Exception {
+		log.info(user+"跳转到订单查询页面...");
+		
 		// forward to PowerE2E Platform
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/callSSO.jsp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		if (!EntityUtils.toString(entity).contains("PowerE2E Platform")) {
-			log.error("Carrefour get order error,cannot forward to PowerE2E Platform");
+			log.info(user+"订单查询页面加载出错,cannot forward to PowerE2E Platform");
 			return;
 		}
 		response.close();
 
 		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", "01-12-2013"));
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", "03-01-2014"));
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(), "dd-MM-yyyy"))); //"01-12-2013"
+		searchformParams.add(new BasicNameValuePair("receivedDateTo", DateUtil.toString(Utils.getEndDate(), "dd-MM-yyyy")));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/openInbox.htm?");
 		searchPost.setEntity(searchFormEntity);
@@ -160,8 +164,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		recordStr = recordStr.replaceAll(",", "");
 		int record = Integer.parseInt(recordStr);
 		int page = record % 10 > 0 ? record/10+1 : record/10;
-		System.out.println(page);
-				
+		log.info(user+"查询到从"+DateUtil.toString(Utils.getStartDate(), "dd-MM-yyyy")+"到"+DateUtil.toString(Utils.getEndDate(), "dd-MM-yyyy")+",共有"+record+"笔订单");				
 		Elements msgIds = doc.select("input[name=msgId]");
 		List<String> msgIdList = new ArrayList<String>();
 		for (Element msgId: msgIds) {
@@ -172,6 +175,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			getMsgIdByPage(page,msgIdList,httpClient);
 			page--;
 		}
+		int count = 0;
 		for (String msgId: msgIdList) {
 			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid="+msgId);
 			CloseableHttpResponse orderRes = httpClient.execute(httpOrderGet);
@@ -203,16 +207,10 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 				orderItems.add(orderTo);
 			}
 			FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
+			count++;
+			log.info(user+"成功下载订单["+count+"],订单号:"+orderNo);
 		}
-
-//		Element dataTable = doc.select("table.tbllist").first();
-//		for (Element row : dataTable.select("tr:gt(0)")) {
-//			Elements tds = row.select("td:not([rowspan])");
-//			System.out.println(tds.get(0).text() + "->" + tds.get(1).text());
-//		}
-		// viewMessage('/platform', 'C4net2--56f631-1435654b8f5-f528764d624db129b32c21fbca0cb8d6');
-		// location.href = (applicationContext + "/mailbox/performDocAction.htm?guid=" + guid + "&actionId=" + 1);
-
+		log.info(user+"订单数据下载成功!");
 	}
 
 //function gotoPage(page) {
@@ -234,15 +232,6 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		for (Element msgId: msgIds) {
 			msgIdList.add(msgId.attr("value"));
 		}
-	}
-	private String validateImgPath;
-	
-	public String getValidateImgPath() {
-		return validateImgPath;
-	}
-
-	public void setValidateImgPath(String validateImgPath) {
-		this.validateImgPath = validateImgPath;
 	}
 	public OCR getOcr() {
 		return ocr;

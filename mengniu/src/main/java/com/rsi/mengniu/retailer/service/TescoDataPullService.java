@@ -27,6 +27,7 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.TescoOrderNotifyTO;
 import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
@@ -38,7 +39,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			login(httpClient, user);
-			getReceiveExcel(httpClient);
+			getReceiveExcel(httpClient,user);
 
 			getOrder(httpClient);
 
@@ -50,7 +51,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
-
+		log.info(user+"开始登录...");
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("j_username", user.getUserId()));
 		formParams.add(new BasicNameValuePair("j_password", user.getPassword())); // 错误的密码
@@ -58,33 +59,28 @@ public class TescoDataPullService implements RetailerDataPullService {
 		HttpPost httppost = new HttpPost("https://tesco.chinab2bi.com/j_spring_security_check");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
+		String loginStr = EntityUtils.toString(loginResponse.getEntity());
+		if (loginStr.contains("密码错误")) {
+			 log.error(user+"错误的密码,退出!");
+		}
 		loginResponse.close();
 		// forward
 		HttpGet httpGet = new HttpGet(loginResponse.getFirstHeader("location").getValue());
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		if (!EntityUtils.toString(entity).contains("mainMenu.hlt")) {
-			log.error("Login Error!");
+			log.info(user+"系统出错,退出!");
 			return "Error";
 		}
 		response.close();
-		// if (responseStr.contains("验证码失效")) {
-		// log.error("验证码失效,Relogin...");
-		// return "InvalidCode";
-		// } else if (responseStr.contains("错误的密码")) {
-		// log.error("错误的密码,退出!" + user);
-		// return "InvalidPassword";
-		// } else if (responseStr.contains("系统出错")) {
-		// log.error("系统出错,退出!");
-		// return "SystemError";
-		// }
-
+		log.info(user+"登录成功!");
 		return "Success";
 	}
 
-	public void getReceiveExcel(CloseableHttpClient httpClient) throws Exception {
+	public void getReceiveExcel(CloseableHttpClient httpClient,User user) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sellGrnQry/init.hlt
 		// get vendorTaxRegistration
+		log.info(user+"开始下载收货单...");
 		HttpGet httpGet = new HttpGet("https://tesco.chinab2bi.com/tesco/sellGrnQry/init.hlt");
 		CloseableHttpResponse formResponse = httpClient.execute(httpGet);
 		HttpEntity taxEntity = formResponse.getEntity();
@@ -98,18 +94,20 @@ public class TescoDataPullService implements RetailerDataPullService {
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("vendorTaxRegistration", vendorTaxRegistration));// 税号
 		receiveformParams.add(new BasicNameValuePair("transactionType", "01"));// 进货
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", Utils.getProperty("tesco.startDate")));// 交易日期
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", Utils.getProperty("tesco.endDate"))); // 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd")));// 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd"))); // 交易日期
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("https://tesco.chinab2bi.com/tesco/sellGrnQry/exportDetail.hlt");
 		receivePost.setEntity(receiveFormEntity);
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost); //filename=20140108220149.zip
 		String fileNm = receiveRes.getFirstHeader("Content-Disposition").getValue();
 		fileNm = fileNm.substring(fileNm.indexOf("filename=")+9);
-		FileOutputStream receiveFos = new FileOutputStream("/Users/haibin/Documents/temp/"+fileNm);
+		FileOutputStream receiveFos = new FileOutputStream(Utils.getProperty("tesco.receive.filePath")+fileNm);
 		receiveRes.getEntity().writeTo(receiveFos);
 		receiveFos.close();
 		receiveRes.close();
+		
+		log.info(user+"Tesco收货单Excel下载成功!");
 	}
 
 	public void getOrder(CloseableHttpClient httpClient) throws Exception {

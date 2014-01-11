@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,6 +19,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import nl.fountain.xelem.excel.ss.XLWorkbook;
+import nl.fountain.xelem.lex.ExcelReader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -25,6 +31,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.xml.sax.SAXException;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
@@ -40,11 +48,16 @@ public class DataConversionService {
 
 	public static void main(String[] args) throws BaseException {
 		log.info("开始");
-		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
-				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
-
-		retailerDataProcessing(Constants.RETAILER_TESCO,
-				DateUtil.toDate("2013-12-30"), DateUtil.toDate("2014-01-05"));
+		
+		FileUtil.testFileAmount("C:/root/yonghui/merged/");
+//		retailerDataProcessing(Constants.RETAILER_CARREFOUR,
+//				DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
+//
+//		retailerDataProcessing(Constants.RETAILER_TESCO,
+//				DateUtil.toDate("2013-12-30"), DateUtil.toDate("2014-01-05"));
+//
+//		retailerDataProcessing(Constants.RETAILER_YONGHUI,
+//				DateUtil.toDate("2013-12-25"), DateUtil.toDate("2014-01-11"));
 		log.info("结束");
 	}
 
@@ -168,13 +181,12 @@ public class DataConversionService {
 
 		Map<String, OrderTO> orderTOMap = null;
 
-		if (retailerID.equals(Constants.RETAILER_CARREFOUR)
-				|| retailerID.equals(Constants.RETAILER_TESCO)) {
+		if (retailerID.equals(Constants.RETAILER_CARREFOUR)) {
 			orderTOMap = getOrderInfoForCarrefour(retailerID, orderNoSet);
 		} else if (retailerID.equals(Constants.RETAILER_TESCO)) {
 			orderTOMap = getOrderInfoForTesco(retailerID, orderNoSet);
 		} else if (retailerID.equals(Constants.RETAILER_YONGHUI)) {
-			getOrderInfoForYonghui();
+			orderTOMap = getOrderInfoForYonghui();
 		}
 		return orderTOMap;
 	}
@@ -331,109 +343,111 @@ public class DataConversionService {
 
 		File[] orderList = receivingInboundFolder.listFiles();
 
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
 		for (int i = 0; i < orderList.length; i++) {
 
 			File orderFile = orderList[i];
-			getOrderInfoForYonghui(orderFile);
+			orderMap.putAll(getOrderInfoForYonghui(orderFile));
 			log.info("订单文件名: " + orderFile.getName());
 
 		}
 
-		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-
 		return orderMap;
 	}
 
-	private static Map<String, List<OrderTO>> getOrderInfoForYonghui(
-			File orderFile) throws BaseException {
-		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+	private static Map<String, OrderTO> getOrderInfoForYonghui(File orderFile)
+			throws BaseException {
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+
+		ExcelReader excelReader = null;
 		try {
-			InputStream sourceExcel = new FileInputStream(orderFile);
+			excelReader = new ExcelReader();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		nl.fountain.xelem.excel.Workbook wb = null;
+		try {
+			wb = excelReader.getWorkbook(orderFile.getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+		nl.fountain.xelem.excel.Worksheet sourceSheet = wb.getWorksheetAt(0);
 
-			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
-				Row sourceRow = sourceSheet.getRow(i);
-				if (sourceRow == null) {
+		for (int i = 2; i <= sourceSheet.lastRow; i++) {
+			nl.fountain.xelem.excel.Row sourceRow = sourceSheet.getRowAt(i);
+			if (sourceRow == null) {
+				continue;
+			}
+
+			OrderTO orderTO = new OrderTO();
+			String orderNo = null;
+
+			for (int j = 1; j <= sourceRow.maxCellIndex(); j++) {
+
+				nl.fountain.xelem.excel.Cell sourceCell = sourceRow
+						.getCellAt(j);
+
+				switch (j) {
+				case 2:
+					orderNo = sourceCell.getData$();
+					orderTO.setOrderNo(orderNo);
+
+					continue;
+				case 5:
+					String storeID = sourceCell.getData$();
+					orderTO.setStoreNo(storeID);
+
+					continue;
+				case 6:
+
+					String storeName = sourceCell.getData$();
+					orderTO.setStoreName(storeName);
+					continue;
+				case 7:
+					String orderDate =  sourceCell.getData$();
+					orderTO.setOrderDate(orderDate);
+
+					continue;
+				case 9:
+					String itemCode =  sourceCell.getData$();
+					orderTO.setItemCode(itemCode);
+
+					continue;
+				case 10:
+					String barcode = sourceCell.getData$();
+					orderTO.setBarcode(barcode);
+
+					continue;
+				case 11:
+
+					String itemName = sourceCell.getData$();
+					orderTO.setItemName(itemName);
+
+					continue;
+				case 13:
+					String quantity = sourceCell.getData$();
+					orderTO.setQuantity(quantity);
+
 					continue;
 				}
 
-				OrderTO orderTO = new OrderTO();
-				String orderNo = null;
-				List<OrderTO> orderTOList = null;
-
-				for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
-
-					Cell sourceCell = sourceRow.getCell(j);
-
-					switch (j) {
-					case 1:
-						orderNo = sourceCell.getStringCellValue();
-						orderTO.setOrderNo(orderNo);
-
-						continue;
-					case 4:
-						String storeID = sourceCell.getStringCellValue();
-						orderTO.setStoreNo(storeID);
-
-						continue;
-					case 5:
-
-						String storeName = sourceCell.getStringCellValue();
-						orderTO.setStoreName(storeName);
-						continue;
-					case 6:
-						String orderDate = DateUtil.toString(sourceCell
-								.getDateCellValue());
-						orderTO.setOrderDate(orderDate);
-
-						continue;
-					case 8:
-						String itemCode = sourceCell.getStringCellValue();
-						orderTO.setItemCode(itemCode);
-
-						continue;
-					case 9:
-						String barcode = sourceCell.getStringCellValue();
-						orderTO.setBarcode(barcode);
-
-						continue;
-					case 10:
-
-						String itemName = sourceCell.getStringCellValue();
-						orderTO.setItemName(itemName);
-
-						continue;
-					case 12:
-						String quantity = Double.valueOf(
-								sourceCell.getNumericCellValue()).toString();
-						orderTO.setQuantity(quantity);
-
-						continue;
-					}
-
-				}
-				if (orderMap.containsKey(orderNo)) {
-					orderTOList = orderMap.get(orderNo);
-				} else {
-					orderTOList = new ArrayList<OrderTO>();
-					// Test the Hashmap
-					orderMap.put(orderNo, orderTOList);
-				}
-
-				log.debug("订单单详细条目: " + orderTO.toString());
-				orderTOList.add(orderTO);
-
 			}
 
-		} catch (FileNotFoundException e) {
-			log.error(e);
-			throw new BaseException(e);
-		} catch (IOException e) {
-			log.error(e);
-			throw new BaseException(e);
+			String key = orderTO.getOrderNo() + orderTO.getStoreName()
+					+ orderTO.getItemCode();
+			orderMap.put(key, orderTO);
+
 		}
+
 		return orderMap;
 	}
 
@@ -480,8 +494,8 @@ public class DataConversionService {
 			receivingNoteMap = getReceivingInfoFromFileForTesco(receivingFile,
 					startDate, endDate);
 		} else if (retailerID.equals(Constants.RETAILER_YONGHUI)) {
-//			receivingNoteMap = getReceivingInfoFromFileForYonghui(receivingFile,
-//					startDate, endDate);
+			receivingNoteMap = getReceivingInfoFromFileForYonghui(
+					receivingFile, startDate, endDate);
 		} else if (retailerID.equals(Constants.RETAILER_METRO)) {
 
 		}
@@ -731,12 +745,12 @@ public class DataConversionService {
 
 		return receivingNoteMap;
 	}
-	
-	
-	private static Map<String, ReceivingNoteTO> getReceivingInfoFromFileForYonghui(File receivingFile, Date startDate, Date endDate)
+
+	private static Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFileForYonghui(
+			File receivingFile, Date startDate, Date endDate)
 			throws BaseException {
-		
-		Map<String, ReceivingNoteTO> receivingMap = new HashMap<String, ReceivingNoteTO>();
+
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		if (receivingFile.exists()) {
 			BufferedReader reader = null;
@@ -747,10 +761,21 @@ public class DataConversionService {
 				// Read line by line
 				String receivingLine = null;
 				while ((receivingLine = reader.readLine()) != null) {
-					ReceivingNoteTO receivingTO = new ReceivingNoteTO(receivingLine);
-					String key = receivingTO.getOrderNo() + receivingTO.getStoreName()
-							+ receivingTO.getItemCode();
-					receivingMap.put(key, receivingTO);
+					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO(
+							receivingLine);
+					String orderNo = receivingNoteTO.getOrderNo();
+
+					List<ReceivingNoteTO> receivingNoteTOList = null;
+					if (receivingNoteMap.containsKey(orderNo)) {
+						receivingNoteTOList = receivingNoteMap.get(orderNo);
+					} else {
+						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+						// Test the Hashmap
+						receivingNoteMap.put(orderNo, receivingNoteTOList);
+					}
+
+					log.debug("收货单详细条目: " + receivingNoteTO.toString());
+					receivingNoteTOList.add(receivingNoteTO);
 
 				}
 
@@ -767,10 +792,11 @@ public class DataConversionService {
 				FileUtil.closeFileReader(reader);
 			}
 
-			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:" + receivingMap.size());
+			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:"
+					+ receivingNoteMap.size());
 
 		}
-		return receivingMap;
+		return receivingNoteMap;
 	}
 
 	/**
@@ -926,7 +952,7 @@ public class DataConversionService {
 						+ orderTO.getTotalPrice() + "\t"
 						+ receivingNoteTO.getQuantity() + "\t"
 						+ receivingNoteTO.getTotalPrice() + "\t"
-						+ orderTO.getUnitPrice();
+						+ ((orderTO.getUnitPrice().equals(""))?receivingNoteTO.getUnitPrice():orderTO.getUnitPrice());
 				try {
 					writer.write(mergedLine);
 

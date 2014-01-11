@@ -3,11 +3,15 @@ package com.rsi.mengniu.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -262,6 +266,39 @@ public class FileUtil {
 			zFile.setPassword(passwd.toCharArray()); // 设置密码
 		}
 		zFile.extractAll(dest); // 将文件抽出到解压目录(解压)
+	}
+	
+	public static void testFileAmount(String folderPath){
+		
+		
+		int j=0;
+		File receivingInboundFolder = new File(folderPath);
+
+		File[] orderList = receivingInboundFolder.listFiles();
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+		for (int i = 0; i < orderList.length; i++) {
+
+			File orderFile = orderList[i];
+			BufferedReader reader = null;
+				// Open the file
+				try {
+					reader = new BufferedReader(new FileReader(orderFile));
+					String orderLine;
+					while ((orderLine = reader.readLine()) != null) {
+						j++;
+					}
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				j = j -1;
+
+		}
+		System.out.println(j);
 	}
 
 }

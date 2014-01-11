@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Date;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+
+import com.rsi.mengniu.exception.BaseException;
 
 public class Utils {
 	private static Properties properties; 
@@ -20,6 +22,20 @@ public class Utils {
 		return properties.getProperty(key);
 	}
 
+	public static Date getStartDate() throws BaseException {
+		if ("N".equalsIgnoreCase(getProperty("daterange.enable"))) {
+			return DateUtil.getDateAfter(new Date(), -1);
+		} else {
+			return DateUtil.toDate(getProperty("daterange.startDate"));
+		}
+	}
+	public static Date getEndDate() throws BaseException {
+		if ("N".equalsIgnoreCase(getProperty("daterange.enable"))) {
+			return DateUtil.getDateAfter(new Date(), -1);
+		} else {
+			return DateUtil.toDate(getProperty("daterange.endDate"));
+		}		
+	}
 	public static String getTrace(Throwable t) {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(stringWriter);

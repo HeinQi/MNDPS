@@ -1,0 +1,651 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>PowerE2E Platform</title>
+
+<link href="/platform/css/style.css" rel="stylesheet" type="text/css">
+<!--[if IE 6]>
+<link href="/platform/css/iehack.css" rel="stylesheet" type="text/css">
+<![endif]-->
+
+<script language="javaScript" src="/platform/javaScript/sessionTimer.js"></script>
+<script language="javaScript" src="/platform/javaScript/Calendar.js"></script>
+<script language="javaScript" src="/platform/javaScript/common.js"></script>
+<script language="javaScript"
+	src="/platform/javaScript/alerts//zh_pageAlerts.js"></script>
+<script language="javaScript"
+	src="/platform/javaScript/zh_datePicker.js"></script>
+<script language="javaScript"
+	src="/platform/javaScript/mailbox/mailbox.js"></script>
+<script language="javaScript"
+	src="/platform/javaScript/rolloverPopup.js"></script>
+
+
+<script language="javascript">
+	window.top.helpFileName = 'help' + '_zh.html';
+
+	function showDocumentDot(id) {
+		var dotId = id + "dot";
+		document.getElementById(dotId).src = '/platform/images/activeFolder.gif';
+	}
+	function hideDocumentDot(id) {
+		var dotId = id + "dot";
+		document.getElementById(dotId).src = '/platform/images/darkblue.gif';
+	}
+	function showDocumentLine(id) {
+		var lineId = id + "line";
+		document.getElementById(lineId).src = '/platform/images/yellow_line.gif';
+	}
+	function hideDocumentLine(id) {
+		var lineId = id + "line";
+		document.getElementById(lineId).src = '/platform/images/blue_line.gif';
+	}
+</script>
+</head>
+<body onload="beginTimer('/platform');">
+	<div id="TipLayer"
+		style="z-index: 1000; visibility: hidden; position: absolute; top: 0px;"></div>
+	<div class="leftPage" style="position: absolute;">
+		<!-- $Id$ -->
+
+
+
+
+
+
+
+
+
+
+		<table width="100%" border="0" cellpadding="4" cellspacing="0">
+			<tr>
+				<td valign="top">
+					<!-- processing -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td width="6"><img src="/platform/images/groupL.gif"
+								width="6" height="16"></td>
+							<td background="/platform/images/groupM.gif" width="*"
+								height="16" class="content"><p class="boxHeader">正在处理中</p></td>
+							<td width="6"><img src="/platform/images/groupR.gif"
+								width="6" height="16"></td>
+						</tr>
+					</table>
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td class="boxContent" colspan="3" width="100%" height="16px">
+								<!-- loop in here -->
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+									<tr class="menu2item" id="yback"
+										onMouseOver="javascript:showDocumentDot(this.id)"
+										onMouseOut="javascript:hideDocumentDot(this.id)">
+										<td><img id="ybackdot"
+											src="/platform/images/darkblue.gif"></td>
+										<td><a class="content"
+											href="/platform/mailbox/closeMessage.htm">返回 收件箱</a></td>
+									</tr>
+
+
+								</table> <!-- end of loop -->
+							</td>
+						</tr>
+					</table> <!-- end of processing -->
+				</td>
+			</tr>
+			<tr>
+				<td valign="top">
+					<!-- print -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td width="6"><img src="/platform/images/groupL.gif"
+								width="6" height="16"></td>
+							<td background="/platform/images/groupM.gif" width="*"
+								height="16" class="content"><p class="boxHeader">打印</p></td>
+							<td width="6"><img src="/platform/images/groupR.gif"
+								width="6" height="16"></td>
+						</tr>
+					</table>
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td class="boxContent" colspan="3" width="*" height="16px">
+
+								<!-- loop in here -->
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+									<tr class="menu2item" id="y20"
+										onMouseOver="javascript:showDocumentDot(this.id)"
+										onMouseOut="javascript:hideDocumentDot(this.id)">
+										<td><img id="y20dot" src="/platform/images/darkblue.gif"></td>
+										<td><a class="content" href="#"
+											onclick="viewPrintable('/platform', 'C4net1--56f631-14356565cf5-f528764d624db129b32c21fbca0cb8d6', 20);"
+											onmouseOver="window.status='查看可否打印'; return true;">查看可否打印</a>
+										</td>
+									</tr>
+
+
+
+
+
+
+
+								</table> <!-- end of loop -->
+							</td>
+						</tr>
+					</table> <!-- end of print-->
+				</td>
+			</tr>
+
+			<!-- plus package -->
+
+			<!-- end of plus package -->
+
+			<tr>
+				<td valign="top">
+					<!-- document history -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td width="6"><img src="/platform/images/groupL.gif"
+								width="6" height="16"></td>
+							<td background="/platform/images/groupM.gif" width="*"
+								height="16" class="content"><p class="boxHeader">日志</p></td>
+							<td width="6"><img src="/platform/images/groupR.gif"
+								width="6" height="16"></td>
+						</tr>
+					</table>
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td class="boxContent" colspan="3" width="*" height="16px">
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+									<tr class="menu2item" id="ylog"
+										onMouseOver="javascript:showDocumentDot(this.id)"
+										onMouseOut="javascript:hideDocumentDot(this.id)">
+										<td><img id="ylogdot" src="/platform/images/darkblue.gif"></td>
+										<td><a class="content" href="#"
+											onclick="showDocumentHistory('/platform', 'C4net1--56f631-14356565cf5-f528764d624db129b32c21fbca0cb8d6');"
+											onmouseOver="window.status=''; return true;">历史文档</a></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table> <!-- end of document history-->
+				</td>
+			</tr>
+		</table>
+
+	</div>
+	<div class="contentPage">
+
+
+
+
+
+		<form name="mailboxForm" method="POST" action="">
+			<input type="hidden" name="guid"
+				value="C4net1--56f631-14356565cf5-f528764d624db129b32c21fbca0cb8d6">
+			<input type="hidden" name="actionId" value="">
+			<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>订单：15ZFJ9138</title>
+<style>
+.po_header_table {
+	padding: 1pt;
+	spacing: 2pt;
+}
+
+.po_lineitem_table {
+	
+}
+
+.tableheader {
+	border-style: solid;
+	border-width: 0;
+	border-collapse: collapse;
+	border-color: #C0C0C0;
+}
+
+.tab2 {
+	border-color: #0C1B6F;
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+}
+
+.tab4 {
+	border-color: #0C1B6F;
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+}
+
+.tableheader2 {
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-style: solid;
+	border-top-width: 0;
+	border-color: #C0C0C0;
+	border-bottom-width: 0;
+	font-family: verdana;
+	font-size: 11px;
+	color: white;
+	font-weight: bold;
+	background: #576CC0;
+	text-decoration: none;
+}
+
+.tableheader3 {
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-style: solid;
+	border-top-width: 0;
+	border-bottom-style: solid;
+	border-bottom-width: 0;
+	border-color: #C0C0C0;
+	font-family: verdana;
+	font-size: 11px;
+	color: white;
+	font-weight: bold;
+	background: #576CC0;
+	text-decoration: none;
+}
+
+.tableheader4 {
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-color: #C0C0C0;
+	font-family: verdana;
+	font-size: 11px;
+	color: white;
+	font-weight: bold;
+	background: #576CC0;
+	text-decoration: none;
+}
+
+.tableitem {
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-style: solid;
+	border-top-width: 0;
+	border-bottom-width: 0;
+	border-color: #C0C0C0;
+	background: #F4F4F4;
+}
+
+.tableitem2 {
+	align: center;
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-width: 0;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-color: #C0C0C0;
+	background: #F4F4F4;
+	color: #060C5D;
+	font-size: 10pt;
+	font-family: Verdana;
+	vertical-align: top;
+}
+
+.table2 {
+	align: center;
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-width: 0;
+	border-bottom-style: solid;
+	border-bottom-width: 0px;
+	border-color: #C0C0C0;
+	background: #F4F4F4;
+	color: #060C5D;
+	font-size: 10pt;
+	font-family: Verdana;
+	vertical-align: top;
+}
+
+.table3 {
+	align: center;
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-width: 0px;
+	border-color: #C0C0C0;
+	background: #F4F4F4;
+	color: #060C5D;
+	font-size: 10pt;
+	font-family: Verdana;
+	vertical-align: top;
+}
+
+.tableitem3 {
+	align: center;
+	border-left-style: solid;
+	border-left-width: 0;
+	border-right-style: solid;
+	border-right-width: 0;
+	border-top-width: 0;
+	border-bottom-style: solid;
+	border-bottom-width: 0px;
+	border-color: #C0C0C0;
+	background: #F4F4F4;
+	color: #060C5D;
+	font-size: 10pt;
+	font-family: Verdana;
+	vertical-align: top;
+}
+
+.fieldlabel {
+	font-family: verdana;
+	font-size: 11px;
+	color: white;
+	font-weight: bold;
+	background: #576CC0;
+	text-decoration: none;
+	vertical-align: top;
+}
+
+.fieldlabel2 {
+	font-family: verdana;
+	font-size: 10px;
+	color: white;
+	font-weight: normal;
+	background: #576CC0;
+	text-decoration: none;
+	vertical-align: top;
+}
+
+.content {
+	color: #060C5D;
+	font-family: Verdana;
+	font-size: 10pt;
+	text-decoration: none;
+	vertical-align: top;
+}
+
+.title1 {
+	font-family: verdana;
+	color: #0C1B6F;
+	font-size: 20pt;
+	font-weight: bold;
+}
+
+.title2 {
+	font-family: verdana;
+	color: #0C1B6F;
+	font-size: 16pt;
+	font-weight: bold;
+}
+
+.title3 {
+	font-family: verdana;
+	color: #0C1B6F;
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+.title4 {
+	font-family: verdana;
+	color: #FF0033;
+	font-size: 8pt;
+	font-weight: bold;
+}
+
+.label {
+	font-family: verdana;
+	font-size: 11px;
+	color: #0C1B6F;
+	text-decoration: none;
+	vertical-align: top;
+}
+</style>
+</head>
+<body>
+	<table width="100%">
+		<tr>
+			<td rowspan="2" colspan="2" align="left"><img
+				src="../images/carrefour_logo.jpg"></td>
+		</tr>
+	</table>
+	<table width="100%">
+		<tr>
+			<td width="100%" align="center"><span class="title2">家乐福订单</span>&nbsp;&nbsp;<span
+				class="title3">Carrefour Purchase Order</span></td>
+		</tr>
+	</table>
+	<br>
+	<table width="100%" cellspacing="0" cellpadding="0" border="0"
+		class="tab2">
+		<tr>
+			<td height="16" class="fieldlabel" width="30%">家乐福信息&nbsp;&nbsp;Carrefour
+				Info</td>
+			<td height="16" class="fieldlabel" width="20%"></td>
+			<td height="16" class="fieldlabel" width="25%">供应商信息&nbsp;&nbsp;Supplier
+				Info</td>
+			<td height="16" class="fieldlabel" width="25%"></td>
+		</tr>
+		<tr>
+			<td class="label" width="30%">家乐福北京马家堡店</td>
+			<td class="label" width="20%">BeiJing Ma Jia Pu Store</td>
+			<td class="label" width="25%">部门&nbsp;&nbsp;Dept</td>
+			<td class="label" width="25%">15 冷冻冷藏</td>
+		</tr>
+		<tr>
+			<td class="label" width="30%">订单号码&nbsp;&nbsp;Order No</td>
+			<td class="label" width="20%">15ZFJ9138</td>
+			<td class="label" width="25%">编号&nbsp;&nbsp;Code</td>
+			<td class="label" width="25%">ZFJ9</td>
+		</tr>
+		<tr>
+			<td class="label" width="30%">订单日期时间&nbsp;&nbsp;Order Date Time</td>
+			<td class="label" width="20%">03/01/2014</td>
+			<td class="label" width="25%">公司名称&nbsp;&nbsp;Name</td>
+			<td class="label" width="25%">北京蒙牛乳业商贸有限公司</td>
+		</tr>
+		<tr>
+			<td class="label" width="30%">期望到货日&nbsp;&nbsp;Expected Receive
+				Date</td>
+			<td class="label" width="20%">04/01/2014</td>
+			<td class="label" width="25%"></td>
+			<td class="label" width="25%">BeijinMengniuruyeshangmao</td>
+		</tr>
+		<tr>
+			<td class="label" width="30%">预计取消日期&nbsp;Expected Cancel Date</td>
+			<td class="label" width="20%"></td>
+			<td class="label" width="25%">电话号码&nbsp;&nbsp;Tel No</td>
+			<td class="label" width="25%">85766620</td>
+		</tr>
+		<tr>
+			<td class="label" width="30%"></td>
+			<td class="label" width="20%"></td>
+			<td class="label" width="25%">传真号码&nbsp;&nbsp;Fax No</td>
+			<td class="label" width="25%">85766620</td>
+		</tr>
+		<tr>
+			<td height="15" width="30%"></td>
+			<td height="15" width="20%"></td>
+			<td height="15" width="25%"></td>
+			<td height="15" width="25%"></td>
+		</tr>
+	</table>
+	<br>
+	<table width="100%" cellspacing="0" cellpadding="0" border="0"
+		class="tab2">
+		<tr align="center">
+			<td align="left" height="10" width="12%" class="tableheader2">单品号<br>
+			<span class="fieldlabel2">Item Code</span></td>
+			<td align="left" height="10" width="18%" class="tableheader2">条形码<br>
+			<span class="fieldlabel2">Barcode</span><br></td>
+			<td align="left" height="10" width="20%" class="tableheader2">单品名称<br>
+			<span class="fieldlabel2">Item Name</span></td>
+			<td align="left" height="10" width="10%" class="tableheader2">包装规格</td>
+			<td colspan="2" height="10" width="16%" class="tableheader3">订货数量<br>
+			<span class="fieldlabel2">Ordered Qty.</span></td>
+			<td rowspan="2" height="20" width="8%" class="tableheader2">总计数量<br>
+			<span class="fieldlabel2">Total Qty.</span><br>
+			<span class="fieldlabel2">个(SKU)</span></td>
+			<td rowspan="2" height="20" width="8%" class="tableheader2">单价<br>
+			<span class="fieldlabel2">(不含税)</span><br>
+			<span class="fieldlabel2">Unit Price</span></td>
+			<td align="right" rowspan="2" height="20" width="8%"
+				class="tableheader2">总金额<br>
+			<span class="fieldlabel2">(不含税)</span><br>
+			<span class="fieldlabel2">Total Amt</span></td>
+		</tr>
+		<tr align="center">
+			<td align="left" height="10" width="12%" class="tableheader4">字代码/单元码<br>
+			<span class="fieldlabel2">Sub/Unit</span></td>
+			<td align="left" height="10" width="18%" class="tableheader4">容量<br>
+			<span class="fieldlabel2">Capacity</span></td>
+			<td align="left" height="10" width="20%" class="tableheader4">字代码名称<br>
+			<span class="fieldlabel2">Sub Code Name</span></td>
+			<td align="left" height="10" width="10%" class="tableheader4">每箱数量<br>
+			<span class="fieldlabel2">Qty. / Pack</span></td>
+			<td height="10" width="10%" class="tableheader4"><span
+				class="fieldlabel2">Normal</span><br>
+			<span align="left" class="tableheader4">正常商品</span><br>
+			<span class="fieldlabel2">箱(Pack)</span></td>
+			<td height="10" width="6%" class="tableheader4"><span
+				class="fieldlabel2">Free</span><br>
+			<span class="tableheader4"> 赠品</span><br>
+			<span class="fieldlabel2">个(SKU)</span></td>
+		</tr>
+		<tr>
+		<tr>
+			<td class="table3" align="left" height="18"><span>020029</span><br>
+			<span class="table2">001/01</span></td>
+			<td class="table3" align="left" height="18"><span>6934665087189</span><br>
+			<span class="table2">180.00 g</span></td>
+			<td align="left" class="table3" height="18">蒙牛谷物酸牛奶燕麦+ 黄桃001</td>
+			<td class="table3" align="center" height="18">24</td>
+			<td class="table3" height="18" align="center">N 1</td>
+			<td class="table3" height="18" align="center">0</td>
+			<td class="table3" height="18" align="center">24</td>
+			<td class="table3" height="18" align="center">5.1709</td>
+			<td class="table3" height="18" align="right">124.10</td>
+		</tr>
+		<tr>
+			<td class="table3" align="left" height="18"><span>030227</span><br>
+			<span class="table2">001/01</span></td>
+			<td class="table3" align="left" height="18"><span>6934665081224</span><br>
+			<span class="table2">100.00 g</span></td>
+			<td align="left" class="table3" height="18">蒙牛LABS原味酸奶001</td>
+			<td class="table3" align="center" height="18">1</td>
+			<td class="table3" height="18" align="center">N 12</td>
+			<td class="table3" height="18" align="center">0</td>
+			<td class="table3" height="18" align="center">12</td>
+			<td class="table3" height="18" align="center">11.1111</td>
+			<td class="table3" height="18" align="right">133.33</td>
+		</tr>
+		<tr>
+			<td class="table3" align="left" height="18"><span>030255</span><br>
+			<span class="table2">001/01</span></td>
+			<td class="table3" align="left" height="18"><span>6934665085284</span><br>
+			<span class="table2">100.00 g</span></td>
+			<td align="left" class="table3" height="18">蒙牛冠益乳原味八连杯001</td>
+			<td class="table3" align="center" height="18">9</td>
+			<td class="table3" height="18" align="center">N 2</td>
+			<td class="table3" height="18" align="center">0</td>
+			<td class="table3" height="18" align="center">18</td>
+			<td class="table3" height="18" align="center">17.5214</td>
+			<td class="table3" height="18" align="right">315.39</td>
+		</tr>
+		<tr>
+			<td class="table3" align="left" height="18"><span>034159</span><br>
+			<span class="table2">001/01</span></td>
+			<td class="table3" align="left" height="18"><span>6934665083518</span><br>
+			<span class="table2">160.00 g</span></td>
+			<td align="left" class="table3" height="18">百利袋木糖醇酸牛奶1&times;160G001</td>
+			<td class="table3" align="center" height="18">15</td>
+			<td class="table3" height="18" align="center">N 10</td>
+			<td class="table3" height="18" align="center">0</td>
+			<td class="table3" height="18" align="center">150</td>
+			<td class="table3" height="18" align="center">1.5128</td>
+			<td class="table3" height="18" align="right">226.92</td>
+		</tr>
+		</tr>
+	</table>
+	<table width="100%" cellspacing="0" cellpadding="0" border="0"
+		class="tab4">
+		<tr>
+			<td height="16" class="fieldlabel" width="40%">
+				订单总金额&nbsp;&nbsp;<span class="fieldlabel2">Grand total amount
+					of this PO</span>
+			</td>
+			<td class="table2" height="16" width="40%"></td>
+			<td align="right" height="16" class="table2" width="10%">799.74</td>
+		</tr>
+	</table>
+	<br>
+	<table>
+		<tr>
+			<td width="10%"></td>
+			<td class="content" width="90%">* 送货时请携带订单 Please bring purchase
+				order when deliver goods</td>
+		</tr>
+	</table>
+</body>
+			</html>
+		</form>
+	</div>
+</body>
+</html>

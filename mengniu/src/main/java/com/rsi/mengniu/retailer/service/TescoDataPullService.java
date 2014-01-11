@@ -102,7 +102,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost); // filename=20140108220149.zip
 		String fileNm = receiveRes.getFirstHeader("Content-Disposition").getValue();
 		fileNm = fileNm.substring(fileNm.indexOf("filename=") + 9);
-		String receiveFilePath = Utils.getProperty("tesco.receive.filePath");
+		String receiveFilePath = Utils.getProperty("tesco.receive.source.filePath");
+		FileUtil.createFolder(receiveFilePath);
 		FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + fileNm);
 		receiveRes.getEntity().writeTo(receiveFos);
 		receiveFos.close();

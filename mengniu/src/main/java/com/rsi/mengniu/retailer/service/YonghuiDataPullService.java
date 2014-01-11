@@ -2,6 +2,7 @@ package com.rsi.mengniu.retailer.service;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -171,7 +172,10 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String startDate = DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd");
 		String endDate = DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd");
-		FileOutputStream orderFos = new FileOutputStream("/Users/haibin/Documents/temp/order.xls");
+		String orderPath = Utils.getProperty("yonghui.order.filePath");
+		FileUtil.createFolder(orderPath);
+		String fileNm = "Order_"+user.getRetailer()+"_"+user.getUserId()+DateUtil.toStringYYYYMMDD(new Date())+".xls";
+		FileOutputStream orderFos = new FileOutputStream(orderPath+fileNm);
 		String url = "http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=" + startDate + "&orderdate_max=" + endDate
 				+ "&operation=eptOrderSheet";
 		HttpGet httpGet = new HttpGet(url);

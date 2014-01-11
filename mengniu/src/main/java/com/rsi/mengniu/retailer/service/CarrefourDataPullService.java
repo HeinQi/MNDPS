@@ -115,7 +115,9 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			// Download Excel file
 			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
 			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
-			FileOutputStream receiveFos = new FileOutputStream(Utils.getProperty("carrefour.receive.filePath") + inyrFileName);
+			String receiveFilePath = Utils.getProperty("carrefour.receive.source.filePath");
+			FileUtil.createFolder(receiveFilePath);
+			FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + inyrFileName);
 
 			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();
 			downloadformParams.add(new BasicNameValuePair("filename", inyrFileName));

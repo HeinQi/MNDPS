@@ -174,7 +174,6 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		FileOutputStream orderFos = new FileOutputStream("/Users/haibin/Documents/temp/order.xls");
 		String url = "http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=" + startDate + "&orderdate_max=" + endDate
 				+ "&operation=eptOrderSheet";
-		System.out.println(url);
 		HttpGet httpGet = new HttpGet(url);
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		response.getEntity().writeTo(orderFos);

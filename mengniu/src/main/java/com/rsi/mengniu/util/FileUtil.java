@@ -42,8 +42,7 @@ public class FileUtil {
 	public static void exportOrderInfoToTXT(String retailerID, String orderID,
 			List<OrderTO> orderList) throws BaseException {
 
-		String orderFolderPath = Constants.TEST_ROOT_PATH + retailerID
-				+ "/order/";
+		String orderFolderPath = Utils.getProperty(retailerID+Constants.ORDER_PATH);
 
 		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + orderID + ".txt";
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
@@ -58,7 +57,7 @@ public class FileUtil {
 		if (!orderFile.exists()) {
 			try {
 				orderFile.createNewFile();
-				String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
+				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
 				writer = new BufferedWriter(new FileWriter(orderFile, true));
 				writer.write(orderHeader);
 				writer.newLine();
@@ -110,8 +109,7 @@ public class FileUtil {
 			String userID, List<ReceivingNoteTO> receivingList)
 			throws BaseException {
 
-		String receivingInboundFolderPath = Constants.TEST_ROOT_PATH
-				+ retailerID + "/receiving/inbound/";
+		String receivingInboundFolderPath = Utils.getProperty(retailerID+Constants.RECEIVING_INBOUND_PATH);
 
 		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
 				+ retailerID + "_" + userID + "_"
@@ -128,7 +126,7 @@ public class FileUtil {
 
 		try {
 			receivingFile.createNewFile();
-			String orderHeader = "Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price";
+			String orderHeader = Utils.getProperty(Constants.RECEIVING_HEADER);
 			writer = new BufferedWriter(new FileWriter(receivingFile));
 			writer.write(orderHeader);
 			writer.newLine();

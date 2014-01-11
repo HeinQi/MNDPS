@@ -34,5 +34,14 @@
 	<bean id ="ocr" class="com.rsi.mengniu.util.OCR">
 	</bean>
 	
+	<bean id ="carrefour.data.conversion" class="com.rsi.mengniu.retailer.service.CarrefourDataConversionService">
+	</bean>
+	
+	<bean id ="tesco.data.conversion" class="com.rsi.mengniu.retailer.service.TescoDataConversionService">
+	</bean>
+	
+	<bean id ="yonghui.data.conversion" class="com.rsi.mengniu.retailer.service.YonghuiDataConversionService">
+	</bean>
+	
 	
 </beans>

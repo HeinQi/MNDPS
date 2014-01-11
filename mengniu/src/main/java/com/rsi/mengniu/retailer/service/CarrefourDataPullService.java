@@ -2,6 +2,7 @@ package com.rsi.mengniu.retailer.service;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -21,6 +22,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
@@ -115,9 +117,10 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			// Download Excel file
 			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
 			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
-			String receiveFilePath = Utils.getProperty("carrefour.receive.source.filePath");
+			String receiveFilePath = Utils.getProperty(user.getRetailer()+Constants.RECEIVING_INBOUND_PATH);
 			FileUtil.createFolder(receiveFilePath);
-			FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + inyrFileName);
+			String receiveFileNm = "Receiving_"+user.getRetailer()+"_"+user.getUserId()+"_"+DateUtil.toStringYYYYMMDD(new Date());
+			FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + receiveFileNm);
 
 			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();
 			downloadformParams.add(new BasicNameValuePair("filename", inyrFileName));
@@ -222,8 +225,8 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 //}
 	private void getMsgIdByPage(int page,List<String> msgIdList,CloseableHttpClient httpClient) throws Exception {
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", "03-01-2014"));
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", "03-01-2014"));
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(), "dd-MM-yyyy")));
+		searchformParams.add(new BasicNameValuePair("receivedDateTo", DateUtil.toString(Utils.getEndDate(), "dd-MM-yyyy")));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/navigateInbox.htm?gotoPage="+page);
 		searchPost.setEntity(searchFormEntity);

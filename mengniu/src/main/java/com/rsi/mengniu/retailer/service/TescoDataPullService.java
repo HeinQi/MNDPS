@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.TescoOrderNotifyTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -102,7 +103,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost); // filename=20140108220149.zip
 		String fileNm = receiveRes.getFirstHeader("Content-Disposition").getValue();
 		fileNm = fileNm.substring(fileNm.indexOf("filename=") + 9);
-		String receiveFilePath = Utils.getProperty("tesco.receive.source.filePath");
+		String receiveFilePath = Utils.getProperty(user.getRetailer()+Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receiveFilePath);
 		FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + fileNm);
 		receiveRes.getEntity().writeTo(receiveFos);

@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
+import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
@@ -172,7 +173,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String startDate = DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd");
 		String endDate = DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd");
-		String orderPath = Utils.getProperty("yonghui.order.filePath");
+		String orderPath = Utils.getProperty(user.getRetailer()+Constants.ORDER_PATH);
 		FileUtil.createFolder(orderPath);
 		String fileNm = "Order_"+user.getRetailer()+"_"+user.getUserId()+DateUtil.toStringYYYYMMDD(new Date())+".xls";
 		FileOutputStream orderFos = new FileOutputStream(orderPath+fileNm);

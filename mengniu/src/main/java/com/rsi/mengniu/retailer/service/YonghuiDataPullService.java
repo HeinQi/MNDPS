@@ -72,7 +72,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		String checkcode1 = loginPageStr.substring(loginPageStr.indexOf("checkcode1=\"+") + 13);
 		checkcode1 = checkcode1.substring(0, checkcode1.indexOf("+")).trim();
 		String validateImgPath = Utils.getProperty("validate.image.path");
-
+		FileUtil.createFolder(validateImgPath);
 		HttpGet httpCheckcodeGet = new HttpGet("http://vss.yonghui.cn:9999/vss/" + checkcodeUrl.substring(checkcodeUrl.indexOf("DaemonLogonVender")));
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
 		FileOutputStream fos = new FileOutputStream(validateImgPath + imgName + ".jpg");

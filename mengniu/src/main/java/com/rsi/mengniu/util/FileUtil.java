@@ -213,7 +213,12 @@ public class FileUtil {
 		}
 
 	}
-
+	public static void createFolder(String path) {
+		File fnewpath = new File(path);
+		// 判断文件夹是否存在
+		if (!fnewpath.exists())
+			fnewpath.mkdirs();		
+	}
 	/**
 	 * Close File Writer
 	 * 

@@ -11,10 +11,22 @@ import java.util.List;
 import com.rsi.mengniu.exception.BaseException;
 
 public class DateUtil {
-	
+
 	public static Date toDate(String dateStr) throws BaseException {
 		//TODO date format unify
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			Date receivingDate = dateFormat.parse(dateStr);
+			return receivingDate;
+		} catch (ParseException e) {
+			System.out.println(dateStr);
+			throw new BaseException(e);
+		}
+
+	}
+	public static Date toDate(String dateStr,String datePattern) throws BaseException {
+		//TODO date format unify
+		DateFormat dateFormat = new SimpleDateFormat(datePattern);
 		try {
 			Date receivingDate = dateFormat.parse(dateStr);
 			return receivingDate;

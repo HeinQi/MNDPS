@@ -47,8 +47,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 
 			httpClient.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(Utils.getTrace(e));
 		}
 	}
 

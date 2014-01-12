@@ -63,7 +63,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String loginStr = EntityUtils.toString(loginResponse.getEntity());
 		if (loginStr.contains("密码错误")) {
-			log.error(user + "错误的密码,退出!");
+			log.info(user + "错误的密码,退出!");
 		}
 		loginResponse.close();
 		// forward

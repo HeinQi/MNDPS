@@ -126,7 +126,7 @@
                 <goal>jar</goal>
             </goals>
             <configuration>
-                <classifier>lib</classifier>
+                <jarName>mengniu</jarName>
                 <excludes>
                     <exclude>*.properties</exclude>
                     <exclude>*.xls</exclude>

@@ -40,14 +40,19 @@ public class TescoDataPullService implements RetailerDataPullService {
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
-			login(httpClient, user);
+			String loginResult = login(httpClient, user);
+			// Invalid Password and others
+			if (!"Success".equals(loginResult)) {
+				return;
+			}
+
 			getReceiveExcel(httpClient, user);
 
 			getOrder(httpClient, user);
 
 			httpClient.close();
 		} catch (Exception e) {
-			log.error(user+Utils.getTrace(e));
+			log.error(user + Utils.getTrace(e));
 		}
 	}
 
@@ -63,6 +68,10 @@ public class TescoDataPullService implements RetailerDataPullService {
 		String loginStr = EntityUtils.toString(loginResponse.getEntity());
 		if (loginStr.contains("密码错误")) {
 			log.info(user + "错误的密码,退出!");
+			return "Error";
+		} else if (loginStr.contains("用户不存在")) {
+			log.info(user + "用户不存在,退出!");
+			return "Error";
 		}
 		loginResponse.close();
 		// forward
@@ -103,7 +112,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost); // filename=20140108220149.zip
 		String fileNm = receiveRes.getFirstHeader("Content-Disposition").getValue();
 		fileNm = fileNm.substring(fileNm.indexOf("filename=") + 9);
-		String receiveFilePath = Utils.getProperty(user.getRetailer()+Constants.RECEIVING_INBOUND_PATH);
+		String receiveFilePath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receiveFilePath);
 		FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + fileNm);
 		receiveRes.getEntity().writeTo(receiveFos);
@@ -126,9 +135,9 @@ public class TescoDataPullService implements RetailerDataPullService {
 		String parentVendor = parentVendorElement.attr("value");
 		List<TescoOrderNotifyTO> notifyList = new ArrayList<TescoOrderNotifyTO>();
 
-		getNotifyList(httpClient, parentVendor, notifyList,user);
+		getNotifyList(httpClient, parentVendor, notifyList, user);
 		// get order detail
-		int count =0;
+		int count = 0;
 		for (TescoOrderNotifyTO notify : notifyList) {
 			String url = "https://tesco.chinab2bi.com/tesco/sp/purOrder/pdfView.hlt?seed&fileName=" + notify.getFileName() + "&createDate="
 					+ notify.getCreateDate() + "&poId=" + notify.getPoId() + "&parentVendor=" + notify.getParentVendor();
@@ -140,9 +149,9 @@ public class TescoDataPullService implements RetailerDataPullService {
 			BufferedReader br = new BufferedReader(new StringReader(orderStr));
 			orderDetailResponse.close();
 			count++;
-			log.info(user+"成功下载订单通知明细["+count+"]");
-			readOrder(br,user);
-			log.info(user+"订单数据下载成功!");
+			log.info(user + "成功下载订单通知明细[" + count + "]");
+			readOrder(br, user);
+			log.info(user + "订单数据下载成功!");
 		}
 
 		/*
@@ -161,7 +170,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 
 	}
 
-	private void getNotifyList(CloseableHttpClient httpClient, String parentVendor, List<TescoOrderNotifyTO> notifyList,User user) throws Exception {
+	private void getNotifyList(CloseableHttpClient httpClient, String parentVendor, List<TescoOrderNotifyTO> notifyList, User user) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sp/purOrder/sellPubOrderQry.hlt
 		log.info(user + "查询订单通知...");
 		int pageNo = 1;
@@ -202,15 +211,15 @@ public class TescoDataPullService implements RetailerDataPullService {
 			}
 			pageNo++;
 		} while (pageNo <= totalPages);
-		log.info(user+"查询到从"+DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd")+"到"+DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd")+",共有"+notifyList.size()+"条订单通知");				
-		
-		
+		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd") + "到" + DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd")
+				+ ",共有" + notifyList.size() + "条订单通知");
+
 	}
 
-	private void readOrder(BufferedReader br,User user) throws Exception {
-		log.info(user+"读取订单通知明细");
+	private void readOrder(BufferedReader br, User user) throws Exception {
+		log.info(user + "读取订单通知明细");
 		String line = null;
-		int count =0;
+		int count = 0;
 		while ((line = br.readLine()) != null) {
 			if (line.contains("TESCO 乐  购  商  品  订  单")) {
 				line = br.readLine(); // 店别: 大连友好店 页1 页
@@ -231,11 +240,11 @@ public class TescoDataPullService implements RetailerDataPullService {
 				List<OrderTO> orderItems = new ArrayList<OrderTO>();
 				readOrderItem(br, orderItems, storeNm, orderNo, orderDate);
 				FileUtil.exportOrderInfoToTXT("tesco", orderNo, orderItems);
-				log.info(user+"成功读取订单,订单号:"+orderNo);
+				log.info(user + "成功读取订单,订单号:" + orderNo);
 				count++;
 			}
 		}
-		log.info(user+"此订单通知明细共有"+count+"订单");
+		log.info(user + "此订单通知明细共有" + count + "订单");
 	}
 
 	private void readOrderItem(BufferedReader br, List<OrderTO> orderItems, String storeNm, String orderNo, String orderDate) throws IOException {

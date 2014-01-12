@@ -120,7 +120,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
 			String receiveFilePath = Utils.getProperty(user.getRetailer()+Constants.RECEIVING_INBOUND_PATH);
 			FileUtil.createFolder(receiveFilePath);
-			String receiveFileNm = "Receiving_"+user.getRetailer()+"_"+user.getUserId()+"_"+DateUtil.toStringYYYYMMDD(new Date());
+			String receiveFileNm = "Receiving_"+user.getRetailer()+"_"+user.getUserId()+"_"+DateUtil.toStringYYYYMMDD(new Date())+".xls";
 			FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + receiveFileNm);
 
 			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();

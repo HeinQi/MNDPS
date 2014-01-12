@@ -68,6 +68,11 @@ public class DataPullTaskPool {
 
 	public static synchronized User getTask() {
 		List<User> userList = (List<User>) taskPool.get(a % retailerCount);
+		while (userList.size() == 0 && retailerCount > 1) {
+			taskPool.remove(a % retailerCount);
+			retailerCount--;
+			userList = (List<User>) taskPool.get(a % retailerCount);
+		}
 		a++;
 		int userSize = userList.size();
 		if (userSize > 0) {

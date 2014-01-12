@@ -99,7 +99,6 @@ public class ReceivingNoteTO extends BaseTO {
 	public ReceivingNoteTO(String receivingString) {
 		String[] receivingFieldArray = receivingString.split("\t");
 
-		System.out.println(receivingFieldArray);
 		this.setOrderNo(receivingFieldArray[0]);
 		this.setReceivingDate(receivingFieldArray[1]);
 		this.setStoreNo(receivingFieldArray[2]);

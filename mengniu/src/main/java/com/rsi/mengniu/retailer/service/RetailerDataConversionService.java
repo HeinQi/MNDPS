@@ -63,8 +63,6 @@ public abstract class RetailerDataConversionService {
 
 	protected abstract String getRetailerID();
 
-
-
 	protected abstract Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File receivingFile)
 			throws BaseException;
@@ -78,7 +76,8 @@ public abstract class RetailerDataConversionService {
 	 * @throws BaseException
 	 */
 	protected abstract Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException ;
+			Set<String> orderNoSet) throws BaseException;
+
 	/**
 	 * Process Data by time range
 	 * 
@@ -189,10 +188,6 @@ public abstract class RetailerDataConversionService {
 		return receivingByDateMap;
 	}
 
-	
-
-
-
 	/**
 	 * Get receiving data
 	 * 
@@ -206,27 +201,25 @@ public abstract class RetailerDataConversionService {
 			throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
-		File receivingInboundFolder = new File(
-				Utils.getProperty(retailerID
-						+ Constants.RECEIVING_INBOUND_PATH));
+		File receivingInboundFolder = new File(Utils.getProperty(retailerID
+				+ Constants.RECEIVING_INBOUND_PATH));
 
 		File[] receivingList = receivingInboundFolder.listFiles();
+		if (receivingList != null) {
+			for (int i = 0; i < receivingList.length; i++) {
 
-		for (int i = 0; i < receivingList.length; i++) {
+				File receivingFile = receivingList[i];
+				log.info("收货单文件名: " + receivingFile.getName());
+				Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(
+						retailerID, startDate, endDate, receivingFile);
 
-			File receivingFile = receivingList[i];
-			log.info("收货单文件名: " + receivingFile.getName());
-			Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(
-					retailerID, startDate, endDate, receivingFile);
-
-			receivingNoteMap.putAll(receivingNoteSingleMap);
+				receivingNoteMap.putAll(receivingNoteSingleMap);
+			}
 		}
 
 		return receivingNoteMap;
 
 	}
-
-
 
 	/**
 	 * Process Data of defined date

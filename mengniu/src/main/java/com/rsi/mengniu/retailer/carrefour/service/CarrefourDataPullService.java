@@ -55,7 +55,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			getOrder(httpClient,user);
 			httpClient.close();
 		} catch (Exception e) {
-			log.error(Utils.getTrace(e));
+			log.error(user+Utils.getTrace(e));
 		}
 	}
 

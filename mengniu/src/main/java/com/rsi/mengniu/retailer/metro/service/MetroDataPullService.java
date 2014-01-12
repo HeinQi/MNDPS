@@ -38,7 +38,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			// getOrder(httpClient);
 			httpClient.close();
 		} catch (Exception e) {
-			log.error(Utils.getTrace(e));
+			log.error(user+Utils.getTrace(e));
 		}
 	}
 

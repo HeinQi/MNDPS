@@ -1,4 +1,4 @@
-package com.rsi.mengniu.retailer.service;
+package com.rsi.mengniu.retailer.common.service;
 
 import com.rsi.mengniu.retailer.module.User;
 

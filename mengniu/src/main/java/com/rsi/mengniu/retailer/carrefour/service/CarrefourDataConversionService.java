@@ -1,4 +1,4 @@
-package com.rsi.mengniu.retailer.service;
+package com.rsi.mengniu.retailer.carrefour.service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -25,22 +24,18 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
+import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
-public class TescoDataConversionService extends RetailerDataConversionService {
+public class CarrefourDataConversionService extends
+		RetailerDataConversionService {
 
-	private Log log = LogFactory.getLog(TescoDataConversionService.class);
-
-	@Override
-	protected String getRetailerID() {
-
-		return Constants.RETAILER_TESCO;
-	}
-
+	private Log log = LogFactory.getLog(CarrefourDataConversionService.class);
+	
 	@Override
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File receivingFile)
@@ -50,90 +45,73 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
 			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-			String orderNo = null;
-			String storeID = null;
-			String storeName = null;
-			String receivingDateStr = null;
-			Date receivingDate = null;
+			/*
+			 * Workbook wb = null; if (fileType.equals("xls")) { wb = new
+			 * HSSFWorkbook(); } else if(fileType.equals("xlsx")) { wb = new
+			 * XSSFWorkbook(); }
+			 */
 			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-			for (int i = 1; i < (sourceSheet.getPhysicalNumberOfRows() - 1); i++) {
+			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 				Row sourceRow = sourceSheet.getRow(i);
 				if (sourceRow == null) {
 					continue;
 				}
 
-				if (sourceRow.getCell(11).getStringCellValue() != null
-						&& !sourceRow.getCell(11).getStringCellValue()
-								.equals("")) {
+				String receivingDateStr = sourceRow.getCell(6)
+						.getStringCellValue();
+				Date receivingDate = DateUtil.toDate(receivingDateStr);
 
-					receivingDateStr = sourceRow.getCell(11)
-							.getStringCellValue();
-					receivingDate = DateUtil.toDate(receivingDateStr);
-				}
 				// If receivingDate is in the date range
 				if (DateUtil.isInDateRange(receivingDate, startDate, endDate)) {
 
 					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
+					String orderNo = null;
 					List<ReceivingNoteTO> receivingNoteTOList = null;
 
 					for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+
 						Cell sourceCell = sourceRow.getCell(j);
-						String sourceCellValue = null;
 
-						int cellType = sourceCell.getCellType();
-						if (cellType == Cell.CELL_TYPE_NUMERIC) {
-							sourceCellValue = Double.valueOf(
-									sourceCell.getNumericCellValue())
-									.toString();
-						} else {
+						String sourceCellValue = sourceCell
+								.getStringCellValue();
 
-							sourceCellValue = sourceCell.getStringCellValue();
-						}
 						switch (j) {
+						case 2:
+							receivingNoteTO.setStoreNo(sourceCellValue);
+
+							continue;
 						case 3:
-							if (sourceCellValue != null
-									&& !sourceCellValue.equals("")) {
-								storeID = sourceCellValue;
-							}
-							receivingNoteTO.setStoreNo(storeID);
-							continue;
-						case 4:
+							receivingNoteTO.setStoreName(sourceCellValue);
 
-							if (sourceCellValue != null
-									&& !sourceCellValue.equals("")) {
-								storeName = sourceCellValue;
-							}
-							receivingNoteTO.setStoreName(storeName);
 							continue;
-						case 5:
+						case 6:
+							receivingNoteTO.setReceivingDate(sourceCellValue);
 
-							if (sourceCellValue != null
-									&& !sourceCellValue.equals("")) {
-								sourceCellValue = Utils
-										.trimPrefixZero(sourceCellValue);
-								orderNo = sourceCellValue;
-							}
-							receivingNoteTO.setOrderNo(orderNo);
+							continue;
+						case 7:
+							receivingNoteTO.setOrderNo(sourceCellValue);
+							orderNo = sourceCellValue;
+
+							continue;
+						case 8:
+							receivingNoteTO.setItemCode(sourceCellValue);
+
+							continue;
+						case 9:
+							receivingNoteTO.setItemName(sourceCellValue);
+
 							continue;
 						case 11:
-							receivingNoteTO.setReceivingDate(receivingDateStr);
-							continue;
-						case 14:
-							receivingNoteTO.setItemCode(sourceCellValue);
-							continue;
-						case 15:
-							receivingNoteTO.setItemName(sourceCellValue);
-							continue;
-						case 16:
 							receivingNoteTO.setQuantity(sourceCellValue);
+
 							continue;
-						case 17:
-							receivingNoteTO.setUnitPrice(sourceCellValue);
-							continue;
-						case 18:
+						case 12:
 							receivingNoteTO.setTotalPrice(sourceCellValue);
+
 							continue;
+
 						}
+
 					}
 					if (receivingNoteMap.containsKey(orderNo)) {
 						receivingNoteTOList = receivingNoteMap.get(orderNo);
@@ -155,18 +133,13 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 			log.error(e);
 			throw new BaseException(e);
 		}
-
-		for (Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap
-				.entrySet()) {
-			String key = entry.getKey();
-			List valueList = entry.getValue();
-
-			log.info("收货单对应订单编号：" + key + " 收货单数量:" + valueList.size());
-		}
-
 		return receivingNoteMap;
 	}
-
+	@Override
+	protected String getRetailerID() {
+		
+		return Constants.RETAILER_CARREFOUR;
+	}
 	@Override
 	protected Map<String, OrderTO> getOrderInfo(String retailerID,
 			Set<String> orderNoSet) throws BaseException {
@@ -187,9 +160,13 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 	
 	private Map<String, OrderTO> getOrderInfo(String orderNo)
 			throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_TESCO
+		String fileName = Utils.getProperty(Constants.RETAILER_CARREFOUR
 				+ Constants.ORDER_PATH)
-				+ "Order_" + Constants.RETAILER_TESCO + "_" + orderNo + ".txt";
+				+ "Order_"
+				+ Constants.RETAILER_CARREFOUR
+				+ "_"
+				+ orderNo
+				+ ".txt";
 		File orderFile = new File(fileName);
 
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
@@ -204,7 +181,8 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getOrderNo() + orderTO.getStoreName()
+					String key = orderTO.getOrderNo()
+							+ orderTO.getStoreName().substring(3)
 							+ orderTO.getItemCode();
 					orderMap.put(key, orderTO);
 
@@ -229,5 +207,11 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 		}
 		return orderMap;
 	}
+
+	@Override
+	protected Log getLog() {
+		return log;
+	}
+
 
 }

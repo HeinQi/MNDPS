@@ -21,26 +21,26 @@
     
 	<bean id ="applicationContextHelper" class="com.rsi.mengniu.util.AppContextHelper"></bean>
 	
-	<bean id ="carrefour" class="com.rsi.mengniu.retailer.service.CarrefourDataPullService">
+	<bean id ="carrefour" class="com.rsi.mengniu.retailer.carrefour.service.CarrefourDataPullService">
 	    <property name="ocr" ref="ocr"/>
 	</bean>
-	<bean id ="tesco" class="com.rsi.mengniu.retailer.service.TescoDataPullService"></bean>
+	<bean id ="tesco" class="com.rsi.mengniu.retailer.tesco.service.TescoDataPullService"></bean>
 	
-	<bean id ="yonghui" class="com.rsi.mengniu.retailer.service.YonghuiDataPullService">
+	<bean id ="yonghui" class="com.rsi.mengniu.retailer.yonghui.service.YonghuiDataPullService">
 	    <property name="ocr" ref="ocr"/>
 	</bean>
-	<bean id ="metro" class="com.rsi.mengniu.retailer.service.MetroDataPullService"></bean>
+	<bean id ="metro" class="com.rsi.mengniu.retailer.metro.service.MetroDataPullService"></bean>
 	
 	<bean id ="ocr" class="com.rsi.mengniu.util.OCR">
 	</bean>
 	
-	<bean id ="carrefour.data.conversion" class="com.rsi.mengniu.retailer.service.CarrefourDataConversionService">
+	<bean id ="carrefour.data.conversion" class="com.rsi.mengniu.retailer.carrefour.service.CarrefourDataConversionService">
 	</bean>
 	
-	<bean id ="tesco.data.conversion" class="com.rsi.mengniu.retailer.service.TescoDataConversionService">
+	<bean id ="tesco.data.conversion" class="com.rsi.mengniu.retailer.tesco.service.TescoDataConversionService">
 	</bean>
 	
-	<bean id ="yonghui.data.conversion" class="com.rsi.mengniu.retailer.service.YonghuiDataConversionService">
+	<bean id ="yonghui.data.conversion" class="com.rsi.mengniu.retailer.yonghui.service.YonghuiDataConversionService">
 	</bean>
 	
 	

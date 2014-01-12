@@ -1,4 +1,4 @@
-package com.rsi.mengniu.retailer.service;
+package com.rsi.mengniu.retailer.carrefour.service;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;

@@ -1,4 +1,4 @@
-package com.rsi.mengniu.retailer.service;
+package com.rsi.mengniu.retailer.yonghui.service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
+import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.util.FileUtil;
@@ -205,4 +206,11 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 
 		return orderMap;
 	}
+
+
+	@Override
+	protected Log getLog() {
+		return log;
+	}
+
 }

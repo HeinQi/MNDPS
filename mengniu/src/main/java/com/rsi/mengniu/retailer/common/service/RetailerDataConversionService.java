@@ -1,15 +1,9 @@
-package com.rsi.mengniu.retailer.service;
+package com.rsi.mengniu.retailer.common.service;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -19,20 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import nl.fountain.xelem.excel.ss.XLWorkbook;
-import nl.fountain.xelem.lex.ExcelReader;
-
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.xml.sax.SAXException;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
@@ -44,10 +25,9 @@ import com.rsi.mengniu.util.Utils;
 
 public abstract class RetailerDataConversionService {
 
-	private Log log = LogFactory.getLog(RetailerDataConversionService.class);
 
 	// private void main(String[] args) throws BaseException {
-	// log.info("开始");
+	// getLog().info("开始");
 	//
 	// FileUtil.testFileAmount("C:/root/yonghui/merged/");
 	// retailerDataProcessing(Constants.RETAILER_CARREFOUR,
@@ -58,7 +38,7 @@ public abstract class RetailerDataConversionService {
 	//
 	// retailerDataProcessing(Constants.RETAILER_YONGHUI,
 	// DateUtil.toDate("2013-12-25"), DateUtil.toDate("2014-01-11"));
-	// log.info("结束");
+	// getLog().info("结束");
 	// }
 
 	protected abstract String getRetailerID();
@@ -66,6 +46,8 @@ public abstract class RetailerDataConversionService {
 	protected abstract Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File receivingFile)
 			throws BaseException;
+	
+	protected abstract Log getLog();
 
 	/**
 	 * Get Order Info
@@ -91,14 +73,14 @@ public abstract class RetailerDataConversionService {
 		Date startDate = Utils.getStartDate();
 		Date endDate = Utils.getEndDate();
 
-		log.info("开始处理数据");
+		getLog().info("开始处理数据");
 
-		log.info("读取收货单数据:" + retailerID);
+		getLog().info("读取收货单数据:" + retailerID);
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, startDate, endDate);
 
-		log.info("读取收货单数据结束:" + retailerID);
+		getLog().info("读取收货单数据结束:" + retailerID);
 
 		// Get Order No. List
 
@@ -118,12 +100,12 @@ public abstract class RetailerDataConversionService {
 			List<ReceivingNoteTO> receivingList = receivingByDateMap
 					.get(processDateStr);
 
-			log.info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
+			getLog().info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
 					+ "订单数量:" + receivingList.size());
 			retailerDataProcessing(retailerID, processDateStr, receivingList,
 					orderTOMap);
 
-			log.info("整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
+			getLog().info("整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
 					+ "订单数量:" + receivingList.size() + "\n");
 		}
 
@@ -151,7 +133,7 @@ public abstract class RetailerDataConversionService {
 		 * } catch (ParseException e) { throw new BaseException(e); }
 		 */
 
-		log.info("数据处理结束");
+		getLog().info("数据处理结束");
 
 	}
 
@@ -182,7 +164,7 @@ public abstract class RetailerDataConversionService {
 			String key = entry.getKey();
 			List valueList = entry.getValue();
 
-			log.info("收货单日期：" + key + " 收货单数量:" + valueList.size());
+			getLog().info("收货单日期：" + key + " 收货单数量:" + valueList.size());
 		}
 
 		return receivingByDateMap;
@@ -209,7 +191,7 @@ public abstract class RetailerDataConversionService {
 			for (int i = 0; i < receivingList.length; i++) {
 
 				File receivingFile = receivingList[i];
-				log.info("收货单文件名: " + receivingFile.getName());
+				getLog().info("收货单文件名: " + receivingFile.getName());
 				Map<String, List<ReceivingNoteTO>> receivingNoteSingleMap = getReceivingInfoFromFile(
 						retailerID, startDate, endDate, receivingFile);
 
@@ -236,21 +218,21 @@ public abstract class RetailerDataConversionService {
 		// Convert Receiving info list to map
 		// Key: Store ID + Item Code
 
-		log.info("转换订单信息。 零售商: " + retailerID + " 日期:" + processDate
+		getLog().info("转换订单信息。 零售商: " + retailerID + " 日期:" + processDate
 				+ " 转换前的收货单数量:" + receivingList.size());
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseReceivingListToMap(receivingList);
 
-		log.info("转换订单信息。 零售商代码: " + retailerID + " 日期:" + processDate
+		getLog().info("转换订单信息。 零售商代码: " + retailerID + " 日期:" + processDate
 				+ " 合并后的收货单数量:" + receivingList.size());
 
 		// Get matched receiving note by iterate order txt file
 		// Merge to one record
 		// Write to merged txt file
 
-		log.info("开始整合订单和收货单信息. 零售商: " + retailerID + " 日期:" + processDate);
+		getLog().info("开始整合订单和收货单信息. 零售商: " + retailerID + " 日期:" + processDate);
 		mergeOrderAndReceiving(writer, receivingNoteByStoreMap, orderTOMap);
 
-		log.info("整合订单和收货单信息结束. 零售商: " + retailerID + " 日期:" + processDate);
+		getLog().info("整合订单和收货单信息结束. 零售商: " + retailerID + " 日期:" + processDate);
 
 		// Close the opened file
 		FileUtil.closeFileWriter(writer);
@@ -266,7 +248,7 @@ public abstract class RetailerDataConversionService {
 		String mergeFilePath = mergeFolderPath + retailerID + "_order_"
 				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
 				+ ".txt";
-		log.info("初始化整合文本文件. 文件名: " + mergeFilePath);
+		getLog().info("初始化整合文本文件. 文件名: " + mergeFilePath);
 		File mergeFolder = new File(mergeFolderPath);
 		if (!mergeFolder.exists()) {
 			mergeFolder.mkdir();
@@ -314,10 +296,10 @@ public abstract class RetailerDataConversionService {
 				existTO.setTotalPrice(String.valueOf(Double
 						.parseDouble(receivingNoteByStoreTO.getTotalPrice())
 						+ Double.parseDouble(existTO.getTotalPrice())));
-				log.info("整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity()
+				getLog().info("整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity()
 						+ " 原始总价: " + receivingNoteByStoreTO.getTotalPrice());
 
-				log.info("整合收货单: 整合后数量: " + existTO.getQuantity() + " 整合后总价: "
+				getLog().info("整合收货单: 整合后数量: " + existTO.getQuantity() + " 整合后总价: "
 						+ existTO.getTotalPrice());
 			} else {
 				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
@@ -395,12 +377,12 @@ public abstract class RetailerDataConversionService {
 					throw new BaseException(e);
 				}
 			} else {
-				log.info("警告! 查不到收货单对应的订单信息. 收货单信息为: "
+				getLog().info("警告! 查不到收货单对应的订单信息. 收货单信息为: "
 						+ receivingNoteTO.toString());
 				failedCount++;
 			}
 		}
 
-		log.info("收货单整合失败数量: " + failedCount);
+		getLog().info("收货单整合失败数量: " + failedCount);
 	}
 }

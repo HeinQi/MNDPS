@@ -5,8 +5,8 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.User;
-import com.rsi.mengniu.retailer.service.RetailerDataPullService;
 import com.rsi.mengniu.util.AppContextHelper;
 
 public class DataPullThread implements Runnable {

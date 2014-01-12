@@ -1,4 +1,4 @@
-package com.rsi.mengniu.retailer.service;
+package com.rsi.mengniu.retailer.tesco.service;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.TescoOrderNotifyTO;
 import com.rsi.mengniu.retailer.module.User;

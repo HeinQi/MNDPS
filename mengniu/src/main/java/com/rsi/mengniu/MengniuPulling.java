@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.rsi.mengniu.retailer.service.RetailerDataConversionService;
+import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
 import com.rsi.mengniu.util.Utils;
 
 public class MengniuPulling {

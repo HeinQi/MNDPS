@@ -106,7 +106,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = EntityUtils.toString(loginResponse.getEntity());
 		if (responseStr.contains("校验码无效") || responseStr.contains("checkcode2 not set")) {
-			log.info("校验码无效,Relogin...");
+			log.info(user+"校验码无效,Relogin...");
 			return "InvalidCode";
 		} else if (responseStr.contains("登录失败,请检查登录名和密码")) {
 			log.info(user + "登录失败,请检查登录名和密码!");
@@ -163,7 +163,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 				receiveList.add(receiveTo);
 			}
 			count++;
-			log.info(user + "成功下载收货单[" + count + "], 验收单号:" + sheetId);
+			log.info(user + "成功下载收货单[" + count + "],验收单号:" + sheetId);
 		}
 		FileUtil.exportReceivingInfoToTXT("yonghui", user.getUserId(), receiveList);
 		log.info(user + "收货单数据下载成功!");

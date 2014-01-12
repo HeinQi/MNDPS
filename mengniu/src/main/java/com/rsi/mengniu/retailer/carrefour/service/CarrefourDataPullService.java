@@ -83,7 +83,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = EntityUtils.toString(loginResponse.getEntity());
 		if (responseStr.contains("验证码失效")) {
-			log.info("验证码失效,Relogin...");
+			log.info(user+"验证码失效,Relogin...");
 			return "InvalidCode";
 		} else if (responseStr.contains("错误的密码")) {
 			log.info(user+"错误的密码,退出!");

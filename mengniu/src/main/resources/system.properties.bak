@@ -1,0 +1,33 @@
+
+#数据处理是否为日期区间段
+#Y - 使用日期区间段
+#N - 使用昨天的日期
+daterange.enable=Y
+
+#日期区间段开始日期
+daterange.startDate=2013-12-15
+
+#日期区间段结束日期
+daterange.endDate=2014-01-08
+
+#系统执行线程总数
+datapull.thread.amount=1
+
+#Tesseract软件安装目录
+tesseract.path=C:/Tesseract/
+
+#验证码图片的临时存放目录
+validate.image.path=c:/mengniu/temp/
+
+#系统运行时处理的订单文件格式
+#不可自行修改
+order.header=Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price
+
+#系统运行时处理的收货单文件格式
+#不可自行修改
+receving.header=Order_No	Order_Date	Store_No	Store_Name	Item_Code	Item_Name	Barcode	Quantity	Unit_Price	Total_Price
+
+
+#合并后的文件格式
+#不可自行修改
+output.header=Order_No	Store_No	Receiving_Date	Item_Code	Barcode	Item_Name	Order_Qty	Order_Total_Price	Receiving_Qty	Receiving_Total_Price	Unit_Price

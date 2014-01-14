@@ -24,11 +24,7 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 public class FileUtil {
 
 	public static void main(String[] args) throws BaseException {
-		try {
-			unzip("C:/test/source/20140106214712.zip", "C:/test/dest/", "");
-		} catch (ZipException e) {
-			throw new BaseException(e);
-		}
+		testFileAmount("C:/mengniu/yonghui/output/");
 	}
 
 	/**

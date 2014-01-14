@@ -116,9 +116,9 @@ public abstract class RetailerDataConversionService {
 		;
 		// Copy processed receiving note from inbound to processed folder
 		// TODO
-		// FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath),
-		// sourceFilePath,
-		// destPath);
+		 FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath),
+		 sourceFilePath,
+		 destPath);
 
 		// create file by date
 		// populate the new receiving map: key:storename+itemid
@@ -223,7 +223,7 @@ public abstract class RetailerDataConversionService {
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = parseReceivingListToMap(receivingList);
 
 		getLog().info("转换订单信息。 零售商代码: " + retailerID + " 日期:" + processDate
-				+ " 合并后的收货单数量:" + receivingList.size());
+				+ " 合并后的收货单数量:" + receivingNoteByStoreMap.size());
 
 		// Get matched receiving note by iterate order txt file
 		// Merge to one record

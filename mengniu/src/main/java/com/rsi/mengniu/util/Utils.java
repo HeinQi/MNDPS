@@ -22,18 +22,18 @@ public class Utils {
 		return properties.getProperty(key);
 	}
 
-	public static Date getStartDate() throws BaseException {
-		if ("N".equalsIgnoreCase(getProperty("daterange.enable"))) {
+	public static Date getStartDate(String retailerId) throws BaseException {
+		if ("N".equalsIgnoreCase(getProperty(retailerId+".daterange.enable"))) {
 			return DateUtil.getDateAfter(new Date(), -1);
 		} else {
-			return DateUtil.toDate(getProperty("daterange.startDate"));
+			return DateUtil.toDate(getProperty(retailerId+".daterange.startDate"));
 		}
 	}
-	public static Date getEndDate() throws BaseException {
-		if ("N".equalsIgnoreCase(getProperty("daterange.enable"))) {
+	public static Date getEndDate(String retailerId) throws BaseException {
+		if ("N".equalsIgnoreCase(getProperty(retailerId+".daterange.enable"))) {
 			return DateUtil.getDateAfter(new Date(), -1);
 		} else {
-			return DateUtil.toDate(getProperty("daterange.endDate"));
+			return DateUtil.toDate(getProperty(retailerId+".daterange.endDate"));
 		}		
 	}
 	public static String getTrace(Throwable t) {

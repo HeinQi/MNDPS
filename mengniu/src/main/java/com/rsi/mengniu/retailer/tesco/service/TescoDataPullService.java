@@ -104,8 +104,10 @@ public class TescoDataPullService implements RetailerDataPullService {
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("vendorTaxRegistration", vendorTaxRegistration));// 税号
 		receiveformParams.add(new BasicNameValuePair("transactionType", "01"));// 进货
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd")));// 交易日期
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd"))); // 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO),
+				"yyyy-MM-dd")));// 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_TESCO),
+				"yyyy-MM-dd"))); // 交易日期
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("https://tesco.chinab2bi.com/tesco/sellGrnQry/exportDetail.hlt");
 		receivePost.setEntity(receiveFormEntity);
@@ -177,8 +179,9 @@ public class TescoDataPullService implements RetailerDataPullService {
 		int totalPages = 1;
 		do {
 			List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-			searchformParams.add(new BasicNameValuePair("orderDateStart", DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd")));// 通知日期
-			searchformParams.add(new BasicNameValuePair("orderDateEnd", DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd"))); // 通知日期
+			searchformParams.add(new BasicNameValuePair("orderDateStart", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO),
+					"yyyy-MM-dd")));// 通知日期
+			searchformParams.add(new BasicNameValuePair("orderDateEnd", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_TESCO), "yyyy-MM-dd"))); // 通知日期
 			searchformParams.add(new BasicNameValuePair("parentVendor", parentVendor));// parentVendor
 			searchformParams.add(new BasicNameValuePair("page.pageSize", "50"));// pageSize
 			searchformParams.add(new BasicNameValuePair("page.pageNo", String.valueOf(pageNo))); // pageSize
@@ -211,8 +214,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 			}
 			pageNo++;
 		} while (pageNo <= totalPages);
-		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd") + "到" + DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd")
-				+ ",共有" + notifyList.size() + "条订单通知");
+		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + "到"
+				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + ",共有" + notifyList.size() + "条订单通知");
 
 	}
 

@@ -121,8 +121,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		log.info(user + "开始下载收货单...");
 		// /vss/DaemonSearchSheet?docdate_min=2014-01-01&docdate_max=2014-10-05&sheetname=receipt
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
-		receiveformParams.add(new BasicNameValuePair("docdate_min", DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd")));
-		receiveformParams.add(new BasicNameValuePair("docdate_max", DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd")));
+		receiveformParams.add(new BasicNameValuePair("docdate_min", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd")));
+		receiveformParams.add(new BasicNameValuePair("docdate_max", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd")));
 		receiveformParams.add(new BasicNameValuePair("sheetname", "receipt"));
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonSearchSheet");
@@ -132,7 +132,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		receiveRes.close();
 		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
 		Elements sheetIdElements = xmlDoc.select("sheetid");
-		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd") + "到" + DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd")
+		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd") + "到" + DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd")
 				+ ",共有" + sheetIdElements.size() + "条收货单");
 		int count = 0;
 		List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
@@ -172,8 +172,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 	public void getOrder(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "订单数据下载...");
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
-		String startDate = DateUtil.toString(Utils.getStartDate(), "yyyy-MM-dd");
-		String endDate = DateUtil.toString(Utils.getEndDate(), "yyyy-MM-dd");
+		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
+		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
 		String orderPath = Utils.getProperty(user.getRetailer()+Constants.ORDER_PATH);
 		FileUtil.createFolder(orderPath);
 		String fileNm = "Order_"+user.getRetailer()+"_"+user.getUserId()+DateUtil.toStringYYYYMMDD(new Date())+".xls";

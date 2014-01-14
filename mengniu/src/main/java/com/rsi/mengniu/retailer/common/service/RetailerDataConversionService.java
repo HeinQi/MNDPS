@@ -70,8 +70,8 @@ public abstract class RetailerDataConversionService {
 	 */
 	public void retailerDataProcessing() throws BaseException {
 		String retailerID = this.getRetailerID();
-		Date startDate = Utils.getStartDate();
-		Date endDate = Utils.getEndDate();
+		Date startDate = Utils.getStartDate(retailerID);
+		Date endDate = Utils.getEndDate(retailerID);
 
 		getLog().info("开始处理数据");
 

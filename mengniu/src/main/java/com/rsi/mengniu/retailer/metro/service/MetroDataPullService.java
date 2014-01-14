@@ -17,12 +17,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.Utils;
 
-//http://vss.yonghui.cn:9999/vss/logon/logon.jsp
 public class MetroDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(MetroDataPullService.class);
 
@@ -108,7 +109,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		//httpGet1.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		CloseableHttpResponse response1 = httpClient.execute(httpGet1);
 		String responseStr1 = EntityUtils.toString(response1.getEntity());
-		System.out.println(responseStr1);
+		//System.out.println(responseStr1);
 		response1.close();
 		/**
 		 * 
@@ -123,23 +124,90 @@ public class MetroDataPullService implements RetailerDataPullService {
 		*/
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("NavigationTarget", "navurl://c81bab1e37e8bb37e6c6ba0a74c170ef"));
+		receiveformParams.add(new BasicNameValuePair("Command", "SUSPEND"));
+		receiveformParams.add(new BasicNameValuePair("Embedded", "true"));
+		receiveformParams.add(new BasicNameValuePair("SessionKeysAvailable", "true"));
+		
+		
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		String url2 ="https://portal.metro-link.com/irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fevery_user!2fgeneral!2fdefaultAjaxframeworkContent!2fcom.sap.portal.contentarea?ExecuteLocally=true&CurrentWindowId=WID1389359093558&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&windowId=WID1389359093558&NavMode=0&PrevNavTarget=navurl%3A%2F%2Ff0a962e1bd92af95fc8eba4691680ae4";
+		                                           // /irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fevery_user!2fgeneral!2fdefaultAjaxframeworkContent!2fcom.sap.portal.contentarea?ExecuteLocally=true&CurrentWindowId=WID1389359093558&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&windowId=WID1389359093558&NavMode=0&PrevNavTarget=navurl%3A%2F%2Ff0a962e1bd92af95fc8eba4691680ae4
 		HttpPost receivePost = new HttpPost(url2);
 		receivePost.addHeader("Accept-Language", "zh-CN");
 		receivePost.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		
 		receivePost.setEntity(receiveFormEntity);
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
-		Header[] heads = receiveRes.getAllHeaders();
-		for (Header head : heads) {
-			System.out.println(head.getName());
-			System.out.println(head.getValue());
-
-		}
-		responseStr = EntityUtils.toString(receiveRes.getEntity());
-		System.out.println(responseStr);
+		String responseStr2 = EntityUtils.toString(receiveRes.getEntity());
+		//System.out.println(responseStr2);
 		receiveRes.close();
+		Document doc1 = Jsoup.parse(responseStr2);
+		String sap_ext_sid = doc1.select("input[name=sap-ext-sid]").first().attr("value");//sap-ext-sid
+		String sap_wd_cltwndid = doc1.select("input[name=sap-wd-cltwndid]").first().attr("value");//sap-wd-cltwndid
+		String sap_wd_tstamp = doc1.select("input[name=sap-wd-tstamp]").first().attr("value");//sap-wd-tstamp
+		String PagePath = doc1.select("input[name=PagePath]").first().attr("value");		//PagePath" 
+		String sap_wd_app_namespace = doc1.select("input[name=sap-wd-app-namespace]").first().attr("value"); 	//sap-wd-app-namespace"  
+		String sap_ep_version = doc1.select("input[name=sap-ep-version]").first().attr("value");		//sap-ep-version"  
+		String sap_locale = doc1.select("input[name=sap-locale]").first().attr("value"); //sap-locale"  
+		String sap_accessibility = doc1.select("input[name=sap-accessibility]").first().attr("value");		//sap-accessibility"  
+		String sap_rtl = doc1.select("input[name=sap-rtl]").first().attr("value"); //sap-rtl"
+		String sap_explanation = doc1.select("input[name=sap-explanation]").first().attr("value"); //sap-explanation"
+		String sap_cssurl = doc1.select("input[name=sap-cssurl]").first().attr("value"); //sap-cssurl" 
+		String sap_cssversion = doc1.select("input[name=sap-cssversion]").first().attr("value"); //sap-cssversion" 
+		String sap_epcm_guid = doc1.select("input[name=sap-epcm-guid]").first().attr("value");//sap-epcm-guid" 
+		String restart = doc1.select("input[name=com.sap.portal.reserved.wd.pb.restart]").first().attr("value");//com.sap.portal.reserved.wd.pb.restart" 
+		String dynamicParameter = doc1.select("input[name=DynamicParameter]").first().attr("value");		//DynamicParameter" 
+		String supportInitialNavNodesFilter = doc1.select("input[name=supportInitialNavNodesFilter]").first().attr("value");//supportInitialNavNodesFilter" 
+		String navigationTarget = doc1.select("input[name=NavigationTarget]").first().attr("value");		//NavigationTarget" 
+		String navMode = doc1.select("input[name=NavMode]").first().attr("value");//NavMode" 
+		String executeLocally = doc1.select("input[name=ExecuteLocally]").first().attr("value");		//ExecuteLocally" 
+		String filterViewIdList = doc1.select("input[name=filterViewIdList]").first().attr("value");//filterViewIdList"  
+		String currentWindowId = doc1.select("input[name=CurrentWindowId]").first().attr("value");		//CurrentWindowId" 
+		String prevNavTarget = doc1.select("input[name=PrevNavTarget]").first().attr("value");		//PrevNavTarget"  
+		
+		
+		List<NameValuePair> receiveformParams3 = new ArrayList<NameValuePair>();
+		receiveformParams3.add(new BasicNameValuePair("sap-ext-sid",sap_ext_sid));
+		receiveformParams3.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
+		receiveformParams3.add(new BasicNameValuePair("sap-wd-tstamp", sap_wd_tstamp));
+		receiveformParams3.add(new BasicNameValuePair("PagePath", PagePath));
+		receiveformParams3.add(new BasicNameValuePair("sap-wd-app-namespace", sap_wd_app_namespace));
+		receiveformParams3.add(new BasicNameValuePair("sap-ep-version", sap_ep_version));
+		receiveformParams3.add(new BasicNameValuePair("sap-locale", sap_locale));
+		receiveformParams3.add(new BasicNameValuePair("sap-accessibility", sap_accessibility));
+		receiveformParams3.add(new BasicNameValuePair("sap-rtl", sap_rtl));
+		receiveformParams3.add(new BasicNameValuePair("sap-explanation", sap_explanation));
+		receiveformParams3.add(new BasicNameValuePair("sap-cssurl", sap_cssurl));
+		receiveformParams3.add(new BasicNameValuePair("sap-cssversion",sap_cssversion ));
+		receiveformParams3.add(new BasicNameValuePair("sap-epcm-guid", sap_epcm_guid));
+		receiveformParams3.add(new BasicNameValuePair("com.sap.portal.reserved.wd.pb.restart",restart ));
+		receiveformParams3.add(new BasicNameValuePair("DynamicParameter", dynamicParameter));
+		receiveformParams3.add(new BasicNameValuePair("supportInitialNavNodesFilter", supportInitialNavNodesFilter));
+		receiveformParams3.add(new BasicNameValuePair("NavigationTarget", navigationTarget));
+		receiveformParams3.add(new BasicNameValuePair("NavMode", navMode));
+		receiveformParams3.add(new BasicNameValuePair("ExecuteLocally",executeLocally ));
+		receiveformParams3.add(new BasicNameValuePair("filterViewIdList", filterViewIdList));
+		receiveformParams3.add(new BasicNameValuePair("CurrentWindowId", currentWindowId));
+		receiveformParams3.add(new BasicNameValuePair("PrevNavTarget", prevNavTarget));
+		
+		
+		HttpEntity receiveFormEntity3 = new UrlEncodedFormEntity(receiveformParams3, "UTF-8");
+		String url3 ="https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
+		HttpPost receivePost3 = new HttpPost(url3);
+		receivePost3.addHeader("Accept-Language", "zh-CN");
+		receivePost3.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		
+		receivePost3.setEntity(receiveFormEntity3);
+		CloseableHttpResponse receiveRes3 = httpClient.execute(receivePost3);
+		String responseStr3 = EntityUtils.toString(receiveRes3.getEntity());
+		receiveRes3.close();		
+        System.out.println(responseStr3);        
+        Document doc3 = Jsoup.parse(responseStr3);
+		String sap_wd_secure_id = doc3.select("input[name=sap-wd-secure-id]").first().attr("value");//sap-wd-secure-id
+		System.out.println(sap_wd_secure_id);
+		
+		
+		
  
 	}
 

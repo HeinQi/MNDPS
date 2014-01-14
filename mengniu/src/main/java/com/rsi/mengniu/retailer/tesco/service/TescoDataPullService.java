@@ -65,7 +65,12 @@ public class TescoDataPullService implements RetailerDataPullService {
 		HttpPost httppost = new HttpPost("https://tesco.chinab2bi.com/j_spring_security_check");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		String loginStr = EntityUtils.toString(loginResponse.getEntity());
+		loginResponse.close();
+		// forward
+		HttpGet httpGet = new HttpGet(loginResponse.getFirstHeader("location").getValue());
+		CloseableHttpResponse response = httpClient.execute(httpGet);
+		HttpEntity entity = response.getEntity();
+		String loginStr = EntityUtils.toString(entity);
 		if (loginStr.contains("密码错误")) {
 			log.info(user + "错误的密码,退出!");
 			return "Error";
@@ -73,12 +78,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			log.info(user + "用户不存在,退出!");
 			return "Error";
 		}
-		loginResponse.close();
-		// forward
-		HttpGet httpGet = new HttpGet(loginResponse.getFirstHeader("location").getValue());
-		CloseableHttpResponse response = httpClient.execute(httpGet);
-		HttpEntity entity = response.getEntity();
-		if (!EntityUtils.toString(entity).contains("mainMenu.hlt")) {
+		if (!loginStr.contains("mainMenu.hlt")) {
 			log.info(user + "系统出错,退出!");
 			return "Error";
 		}

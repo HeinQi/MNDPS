@@ -94,6 +94,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		}
 		loginResponse.close();
 		log.info(user + "登录成功!");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 		return "Success";
 	}
 
@@ -113,7 +114,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
 		String responseStr = EntityUtils.toString(receiveRes.getEntity());
 		receiveRes.close();
-
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 		if (responseStr.contains("Excel文档生成成功")) {
 			// Download Excel file
 			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
@@ -137,6 +138,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		} else {
 			log.info(user + "家乐福收货单Excel下载失败!");
 		}
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 
 	}
 
@@ -152,7 +154,8 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			return;
 		}
 		response.close();
-
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
+		
 		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
 		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy"))); // "01-12-2013"
@@ -180,11 +183,13 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		}
 		// 取得每页的MsgId
 		while (page > 1) {
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 			getMsgIdByPage(page, msgIdList, httpClient);
 			page--;
 		}
 		int count = 0;
 		for (String msgId : msgIdList) {
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid=" + msgId);
 			CloseableHttpResponse orderRes = httpClient.execute(httpOrderGet);
 			String orderDetail = EntityUtils.toString(orderRes.getEntity());

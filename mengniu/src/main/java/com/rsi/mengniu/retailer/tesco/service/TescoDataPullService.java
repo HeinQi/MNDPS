@@ -84,6 +84,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		}
 		response.close();
 		log.info(user + "登录成功!");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 		return "Success";
 	}
 
@@ -98,7 +99,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		Element taxElement = doc.select("#vendorTaxRegistration").first();
 		formResponse.close();
 		String vendorTaxRegistration = taxElement.attr("value");
-
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 		// query.hlt
 
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
@@ -122,6 +123,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		receiveRes.close();
 		FileUtil.unzip(receiveFilePath + fileNm, receiveFilePath, "");
 		log.info(user + "Tesco收货单Excel下载成功!");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 	}
 
 	public void getOrder(CloseableHttpClient httpClient, User user) throws Exception {
@@ -141,6 +143,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		// get order detail
 		int count = 0;
 		for (TescoOrderNotifyTO notify : notifyList) {
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 			String url = "https://tesco.chinab2bi.com/tesco/sp/purOrder/pdfView.hlt?seed&fileName=" + notify.getFileName() + "&createDate="
 					+ notify.getCreateDate() + "&poId=" + notify.getPoId() + "&parentVendor=" + notify.getParentVendor();
 			url = url.replaceAll(" ", "%20");
@@ -178,6 +181,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		int pageNo = 1;
 		int totalPages = 1;
 		do {
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 			List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
 			searchformParams.add(new BasicNameValuePair("orderDateStart", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO),
 					"yyyy-MM-dd")));// 通知日期

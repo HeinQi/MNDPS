@@ -36,6 +36,9 @@ public class Utils {
 			return DateUtil.toDate(getProperty(retailerId+".daterange.endDate"));
 		}		
 	}
+	public static int getSleepTime(String retailerId) {
+		return Integer.parseInt(getProperty(retailerId+".sleep.time"));
+	}
 	public static String getTrace(Throwable t) {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(stringWriter);

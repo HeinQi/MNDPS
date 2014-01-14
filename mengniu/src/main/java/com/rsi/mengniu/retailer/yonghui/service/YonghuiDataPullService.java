@@ -93,7 +93,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		// password:852963
 		// checkcode1:57483
 		// checkcode2:YLRD
-
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("action", "logon"));
 		formParams.add(new BasicNameValuePair("logonid", user.getUserId()));
@@ -114,6 +114,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		}
 		loginResponse.close();
 		log.info(user + "登录成功!");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		return "Success";
 	}
 
@@ -137,6 +138,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		int count = 0;
 		List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
 		for (Element eSheetId : sheetIdElements) {
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 			String sheetId = eSheetId.text();
 			HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid=" + sheetId);
 			CloseableHttpResponse detailResponse = httpClient.execute(httpGet);
@@ -171,6 +173,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 
 	public void getOrder(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "订单数据下载...");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
 		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");

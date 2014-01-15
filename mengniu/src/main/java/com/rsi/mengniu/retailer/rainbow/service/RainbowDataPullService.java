@@ -45,6 +45,8 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		}
 
 	}
+	
+	
 
 	private String login(CloseableHttpClient httpClient, User user)
 			throws Exception {

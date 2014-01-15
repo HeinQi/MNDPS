@@ -43,8 +43,8 @@ public class MengniuPulling {
 				yonhuiConversion.retailerDataProcessing();
 				
 			} else {
-				//RetailerDataConversionService dataConversion = (RetailerDataConversionService)appContext.getBean(retailerId+".data.conversion");
-				//dataConversion.retailerDataProcessing();
+				RetailerDataConversionService dataConversion = (RetailerDataConversionService)appContext.getBean(retailerId+".data.conversion");
+				dataConversion.retailerDataProcessing();
 			}
 			
 			

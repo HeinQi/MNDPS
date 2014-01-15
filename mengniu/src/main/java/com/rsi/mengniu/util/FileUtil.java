@@ -3,10 +3,13 @@ package com.rsi.mengniu.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,7 +27,9 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 public class FileUtil {
 
 	public static void main(String[] args) throws BaseException {
-		testFileAmount("C:/mengniu/yonghui/output/");
+		//testFileAmount("C:/mengniu/yonghui/output/");
+		List<String> stringList = getAllFile("C:/mengniu/carrefour/receiving/inbound/");
+		copyFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
 	}
 
 	/**
@@ -157,6 +162,7 @@ public class FileUtil {
 
 			for (File receivingFile : receivingList) {
 				String receivingFileName = receivingFile.getName();
+				
 				fileNameList.add(receivingFileName);
 			}
 		}
@@ -192,23 +198,27 @@ public class FileUtil {
 	 * @param sourceFileNameList
 	 * @param sourcePath
 	 * @param destPath
+	 * @throws BaseException 
 	 */
 	public static void copyFiles(List<String> sourceFileNameList,
-			String sourcePath, String destPath) {
+			String sourcePath, String destPath) throws BaseException {
 
 		for (String sourceFileName : sourceFileNameList) {
-
-			// 文件原地址
+			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
+//			// 文件原地址
 			File oldFile = new File(sourcePath + sourceFileName);
-			// 文件新（目标）地址
-			// new一个新文件夹
-			File fnewpath = new File(destPath);
-			// 判断文件夹是否存在
-			if (!fnewpath.exists())
-				fnewpath.mkdirs();
-			// 将文件移到新文件里
-			File fnew = new File(destPath + oldFile.getName());
-			oldFile.renameTo(fnew);
+			
+			oldFile.delete();
+//			// 文件新（目标）地址
+//			// new一个新文件夹
+//			File fnewpath = new File(destPath);
+//			// 判断文件夹是否存在
+//			if (!fnewpath.exists())
+//				fnewpath.mkdirs();
+//			// 将文件移到新文件里
+//			File fnew = new File(destPath + oldFile.getName());
+//			
+//			oldFile.renameTo(fnew);
 		}
 
 	}
@@ -220,6 +230,32 @@ public class FileUtil {
 			fnewpath.mkdirs();
 	}
 
+	public static void copyFile( String oldPath, String newPath ) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            File oldfile = new File( oldPath );
+            if ( oldfile.exists() ) { //文件存在时
+               InputStream inStream = new FileInputStream( oldPath ); //读入原文件
+               FileOutputStream fs = new FileOutputStream( newPath );
+                byte[] buffer = new byte[1444];
+                int length;
+                while ( ( byteread = inStream.read( buffer ) ) != - 1 ) {
+                    bytesum += byteread; //字节数 文件大小
+                   
+                    fs.write( buffer, 0, byteread );
+                }
+                inStream.close();
+            }
+        } catch ( Exception e ) {
+            System.out.println( "复制单个文件操作出错" );
+            e.printStackTrace();
+
+        }
+
+    }
+
+	
 	/**
 	 * Close File Writer
 	 * 

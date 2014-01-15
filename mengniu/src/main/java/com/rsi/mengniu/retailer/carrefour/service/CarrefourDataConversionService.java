@@ -81,6 +81,8 @@ public class CarrefourDataConversionService extends
 
 							continue;
 						case 3:
+
+							sourceCellValue = sourceCellValue.substring(sourceCellValue.indexOf("-") + 1);
 							receivingNoteTO.setStoreName(sourceCellValue);
 
 							continue;

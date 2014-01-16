@@ -31,6 +31,8 @@ public class FileUtil {
 		List<String> stringList = getAllFile("C:/mengniu/carrefour/receiving/inbound/");
 		copyFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
 	}
+	
+	
 
 	/**
 	 * Export Order info from list to txt file
@@ -204,6 +206,8 @@ public class FileUtil {
 			String sourcePath, String destPath) throws BaseException {
 
 		for (String sourceFileName : sourceFileNameList) {
+			File fnewpath = new File(destPath);
+			if (!fnewpath.exists())	fnewpath.mkdirs();
 			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
 //			// 文件原地址
 			File oldFile = new File(sourcePath + sourceFileName);

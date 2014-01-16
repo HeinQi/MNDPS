@@ -19,6 +19,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
@@ -33,7 +37,12 @@ public class RainbowDataPullService implements RetailerDataPullService {
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
-			this.login(httpClient, user);
+			String returnType = this.login(httpClient, user);
+			if (!"Success".equals(returnType)) {
+				return;
+			}
+
+
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
 		}
@@ -45,13 +54,14 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		}
 
 	}
-	
-	
 
 	private String login(CloseableHttpClient httpClient, User user)
 			throws Exception {
 		log.info(user + "开始登录...");
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		formParams.add(new BasicNameValuePair("loginfile",
+				"/login/Login.jsp?logintype=1"));
+		formParams.add(new BasicNameValuePair("logintype", "1"));
 		formParams.add(new BasicNameValuePair("loginid", user.getUserId()));
 		formParams.add(new BasicNameValuePair("userpassword", user
 				.getPassword())); // 错误的密码
@@ -63,22 +73,22 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
 		loginResponse.close();
+
 		// forward
+		log.info(loginResponse.getFirstHeader("location").getValue());
 		HttpGet httpGet = new HttpGet(loginResponse.getFirstHeader("location")
 				.getValue());
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
-		String loginStr = EntityUtils.toString(entity);
+		String forwardStr = EntityUtils.toString(entity);
 
-		log.info("登录信息：" + loginStr);
-		if (loginStr.contains("密码错误")) {
-			log.info(user + "错误的密码,退出!");
-			return "Error";
-		} else if (loginStr.contains("用户不存在")) {
-			log.info(user + "用户不存在,退出!");
+		if (forwardStr.contains("用户名或密码错误")) {
+			log.info(user + "用户名或密码错误,退出!");
 			return "Error";
 		}
-		if (!loginStr.contains("欢迎您")) {
+
+
+		if (!forwardStr.contains("欢迎您")) {
 			log.info(user + "系统出错,退出!");
 			return "Error";
 		}
@@ -92,22 +102,32 @@ public class RainbowDataPullService implements RetailerDataPullService {
 	private void getReceiving(CloseableHttpClient httpClient, User user)
 			throws Exception {
 
-		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		formParams.add(new BasicNameValuePair("where", " and 收货日期>=to_date('"
-				+ DateUtil.toString(Utils
-						.getStartDate(Constants.RETAILER_RAINBOW))
-				+ "','yyyy-mm-dd') and 收货日期<=to_date('"
-				+ DateUtil.toString(Utils
-						.getEndDate(Constants.RETAILER_RAINBOW))
-				+ "','yyyy-mm-dd')"));
-		formParams
-				.add(new BasicNameValuePair("j_password", user.getPassword())); // 错误的密码
-		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(
-				"https://tesco.chinab2bi.com/j_spring_security_check");
-		httppost.setEntity(loginEntity);
-		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		loginResponse.close();
+		HttpGet httpGet = new HttpGet(
+				"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
+						+ "?rptId=3124"
+						+ "&showSelectionModel=false"
+						+ "&html=Y"
+						+ "&sqlWhere=&where=%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3E=to_date('"
+						+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RAINBOW))
+						+ "','yyyy-mm-dd')%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3C=to_date('"
+						+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))
+						+ "','yyyy-mm-dd')");
+		CloseableHttpResponse response = httpClient.execute(httpGet);
+		HttpEntity entity = response.getEntity();
+		String responseStr = EntityUtils.toString(entity);
+		log.info(responseStr);
+		
+		response.close();
+		
+		
+		Document doc = Jsoup.parse(responseStr);
+		Elements rowsElements = doc.select("#dataTable").first().select("tr:gt(0)");
+		
+		for(Element rowElement : rowsElements){
+			Elements tdElements = rowElement.select("td");
+			
+		}
+		
 
 	}
 }

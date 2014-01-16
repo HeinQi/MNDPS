@@ -39,7 +39,7 @@ public class DateUtil {
 
 	public static String toString(Date date){
 
-		DateFormat dateFormat = new SimpleDateFormat("yyy-yMM-dd");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		return dateFormat.format(date);
 	}
 

@@ -6,10 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,7 +63,8 @@ public class FileUtil {
 			try {
 				orderFile.createNewFile();
 				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
-				writer = new BufferedWriter(new FileWriter(orderFile, true));
+				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 				writer.write(orderHeader);
 				writer.newLine();
 			} catch (IOException e) {
@@ -75,7 +76,8 @@ public class FileUtil {
 			try {
 
 				// TODO consider that re-run action
-				writer = new BufferedWriter(new FileWriter(orderFile, true));
+				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 			} catch (IOException e) {
 
 				closeFileWriter(writer);
@@ -132,9 +134,11 @@ public class FileUtil {
 
 		try {
 			receivingFile.createNewFile();
-			String orderHeader = Utils.getProperty(Constants.RECEIVING_HEADER);
-			writer = new BufferedWriter(new FileWriter(receivingFile));
-			writer.write(orderHeader);
+			String receivingHeader = Utils.getProperty(Constants.RECEIVING_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(receivingHeader);
 			writer.newLine();
 
 			for (int i = 0; i < receivingList.size(); i++) {
@@ -328,7 +332,10 @@ public class FileUtil {
 			BufferedReader reader = null;
 			// Open the file
 			try {
-				reader = new BufferedReader(new FileReader(orderFile));
+				FileInputStream fileInput = new FileInputStream(orderFile);
+				InputStreamReader inputStrReader = new InputStreamReader(
+						fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
 				String orderLine;
 				while ((orderLine = reader.readLine()) != null) {
 					j++;

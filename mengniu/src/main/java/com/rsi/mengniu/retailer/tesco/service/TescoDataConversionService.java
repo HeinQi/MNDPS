@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 						case 3:
 							if (sourceCellValue != null
 									&& !sourceCellValue.equals("")) {
-								storeID = sourceCellValue;
+								storeID = sourceCellValue.substring(0, sourceCellValue.indexOf("."));
 							}
 							receivingNoteTO.setStoreNo(storeID);
 							continue;
@@ -199,7 +199,10 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 			BufferedReader reader = null;
 			try {
 				// Open the file
-				reader = new BufferedReader(new FileReader(orderFile));
+				FileInputStream fileInput = new FileInputStream(orderFile);
+				InputStreamReader inputStrReader = new InputStreamReader(
+						fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
 				reader.readLine();
 				// Read line by line
 				String orderLine = null;

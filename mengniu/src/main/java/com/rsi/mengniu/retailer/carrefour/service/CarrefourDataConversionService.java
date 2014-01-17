@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class CarrefourDataConversionService extends
 		RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(CarrefourDataConversionService.class);
-	
+
 	@Override
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File receivingFile)
@@ -82,7 +82,8 @@ public class CarrefourDataConversionService extends
 							continue;
 						case 3:
 
-							sourceCellValue = sourceCellValue.substring(sourceCellValue.indexOf("-") + 1);
+							sourceCellValue = sourceCellValue
+									.substring(sourceCellValue.indexOf("-") + 1);
 							receivingNoteTO.setStoreName(sourceCellValue);
 
 							continue;
@@ -137,11 +138,13 @@ public class CarrefourDataConversionService extends
 		}
 		return receivingNoteMap;
 	}
+
 	@Override
 	protected String getRetailerID() {
-		
+
 		return Constants.RETAILER_CARREFOUR;
 	}
+
 	@Override
 	protected Map<String, OrderTO> getOrderInfo(String retailerID,
 			Set<String> orderNoSet) throws BaseException {
@@ -159,7 +162,7 @@ public class CarrefourDataConversionService extends
 
 		return orderTOMap;
 	}
-	
+
 	private Map<String, OrderTO> getOrderInfo(String orderNo)
 			throws BaseException {
 		String fileName = Utils.getProperty(Constants.RETAILER_CARREFOUR
@@ -177,7 +180,10 @@ public class CarrefourDataConversionService extends
 			BufferedReader reader = null;
 			try {
 				// Open the file
-				reader = new BufferedReader(new FileReader(orderFile));
+				FileInputStream fileInput = new FileInputStream(orderFile);
+				InputStreamReader inputStrReader = new InputStreamReader(
+						fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
 				reader.readLine();
 				// Read line by line
 				String orderLine = null;
@@ -214,6 +220,5 @@ public class CarrefourDataConversionService extends
 	protected Log getLog() {
 		return log;
 	}
-
 
 }

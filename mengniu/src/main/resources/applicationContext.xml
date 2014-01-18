@@ -11,7 +11,9 @@
                 <value>carrefour.properties</value>
                 <value>tesco.properties</value>
                 <value>yonghui.properties</value>
+                <value>metro.properties</value>
                 <value>rainbow.properties</value>
+                <value>hualian.properties</value>
             </list>  
         </property>  
     </bean> 
@@ -33,6 +35,7 @@
 	<bean id ="metro" class="com.rsi.mengniu.retailer.metro.service.MetroDataPullService"></bean>
 	
 	<bean id ="rainbow" class="com.rsi.mengniu.retailer.rainbow.service.RainbowDataPullService"></bean>
+	<bean id ="hualian" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
 	
 	<bean id ="ocr" class="com.rsi.mengniu.util.OCR">
 	</bean>

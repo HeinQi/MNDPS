@@ -146,7 +146,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		log.info(user + "跳转到订单查询页面...");
 
 		// forward to PowerE2E Platform
-		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/callSSO.jsp");
+		HttpGet httpGet = new HttpGet("https://supplierweb.carrefour.com.cn/callSSO.jsp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		if (!EntityUtils.toString(entity).contains("PowerE2E Platform")) {

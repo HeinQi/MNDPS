@@ -2,8 +2,10 @@ package com.rsi.mengniu.retailer.common.service;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -261,7 +263,8 @@ public abstract class RetailerDataConversionService {
 		File mergeFile = new File(mergeFilePath);
 
 		try {
-			writer = new BufferedWriter(new FileWriter(mergeFile));
+			FileOutputStream fileOutput = new FileOutputStream(mergeFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 		} catch (IOException e) {
 			throw new BaseException(e);
 		}

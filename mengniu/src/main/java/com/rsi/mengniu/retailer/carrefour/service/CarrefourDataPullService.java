@@ -88,7 +88,10 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		} else if (responseStr.contains("错误的密码")) {
 			log.info(user + "错误的密码,退出!");
 			return "InvalidPassword";
-		} else if (responseStr.contains("系统出错")) {
+		} else if (responseStr.contains("错误的用户名")) {
+			log.info(user + "错误的用户名,退出!");
+			return "InvalidPassword"; 
+		} else if (responseStr.contains("系统出错") || !responseStr.contains("Welcome")) {
 			log.info(user + "系统出错,退出!");
 			return "SystemError";
 		}

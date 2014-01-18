@@ -7,6 +7,7 @@ public final class Constants {
 	public static final String RETAILER_METRO = "metro";
 	public static final String RETAILER_HUALIAN = "hualian";
 	public static final String RETAILER_RAINBOW = "rainbow";
+	public static final String RETAILER_RENRENLE = "renrenle";
 
 	public static final String ORDER_PATH = ".order.filePath";
 	public static final String RECEIVING_INBOUND_PATH = ".receiving.inbound.filePath";

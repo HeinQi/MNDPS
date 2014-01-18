@@ -111,6 +111,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		} else if (responseStr.contains("登录失败,请检查登录名和密码")) {
 			log.info(user + "登录失败,请检查登录名和密码!");
 			return "InvalidPassword";
+		} else if (!responseStr.contains("订退货管理")) {
+			log.info(user + "系统出错,退出!");
 		}
 		loginResponse.close();
 		log.info(user + "登录成功!");

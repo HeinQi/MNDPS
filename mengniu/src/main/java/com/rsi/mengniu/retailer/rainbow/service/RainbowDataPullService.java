@@ -38,6 +38,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String returnType = this.login(httpClient, user);
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 			if (!"Success".equals(returnType)) {
 				return;
 			}
@@ -102,6 +103,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 	private void getReceiving(CloseableHttpClient httpClient, User user)
 			throws Exception {
 
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 		HttpGet httpGet = new HttpGet(
 				"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
 						+ "?rptId=3124"
@@ -115,7 +117,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String responseStr = EntityUtils.toString(entity);
-		log.info(responseStr);
+		//log.info(responseStr);
 		
 		response.close();
 		
@@ -123,8 +125,44 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		Document doc = Jsoup.parse(responseStr);
 		Elements rowsElements = doc.select("#dataTable").first().select("tr:gt(0)");
 		
+		
+//		<tr>
+//		0	<td style="display: ">
+//				<a href='javascript:void(0);'
+//					onclick="doJump('/gysp/orderdetail.jsp?SHDH=REC-050140104000060','')">REC-050140104000060</a>
+//			</td>
+//		1	<td style="display: ">观澜天虹</td>
+//		2	<td style="display: ">天虹商场股份有限公司</td>
+//		3	<td style="display: ">天虹商场股份有限公司</td>
+//		4	<td style="display: ">2014-01-04</td>
+//		5	<td style="display: ">ORD-050140102000052</td>
+//		6	<td style="display: ">2014-01-04</td>
+//		7	<td style="display: ">4103.03</td>
+//		8	<td style="display: ">N</td>
+//		9	<td style="display: ">正常</td>
+//		10	<td style="display: ">未读</td>
+//		</tr>
 		for(Element rowElement : rowsElements){
 			Elements tdElements = rowElement.select("td");
+			String receivingNo = tdElements.get(0).text();
+			log.info(user + "收货单编号：" + receivingNo);
+
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
+			HttpGet receivingDetailHTTPGet = new HttpGet(
+					"http://vd.rainbow.cn:8080//gysp/orderdetail.jsp?SHDH="
+							+ receivingNo);
+			CloseableHttpResponse receivingResponse =  httpClient.execute(receivingDetailHTTPGet);
+			HttpEntity receivingEntity = receivingResponse.getEntity();
+			String receivingResponseStr = EntityUtils.toString(receivingEntity);
+			//log.info(receivingResponseStr);
+			receivingResponse.close();
+			
+			Document receivingDetailDoc = Jsoup.parse(receivingResponseStr);
+			Elements receivingDetailTableElements = receivingDetailDoc.select("#table152").first().select("tr:gt(0)");
+			
+			for(Element receivingDetailRowElement : receivingDetailTableElements){
+				//Elements receiving
+			}
 			
 		}
 		

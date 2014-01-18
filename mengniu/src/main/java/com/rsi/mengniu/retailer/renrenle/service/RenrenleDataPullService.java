@@ -50,9 +50,9 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 				return;
 			}
 			// receive
-			getReceiveExcel(httpClient, user);
+			//getReceiveExcel(httpClient, user);
 			// order
-			getOrder(httpClient, user);
+			//getOrder(httpClient, user);
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
@@ -61,6 +61,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		HttpGet httpGet = new HttpGet("http://www.renrenle.cn/scm/verifyCode.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
 		String validateImgPath = Utils.getProperty("validate.image.path");
@@ -75,30 +76,28 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		// login /login.do?action=doLogin
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("name", user.getUserId()));
-		formParams.add(new BasicNameValuePair("password", user.getPassword()));
+		formParams.add(new BasicNameValuePair("password",user.getPassword()));
 		formParams.add(new BasicNameValuePair("shopID", "RRL001")); //必须选人人乐集团
-		formParams.add(new BasicNameValuePair("verifyCode", user.getPassword())); 
+		formParams.add(new BasicNameValuePair("verifyCode", recognizeStr)); 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://supplierweb.carrefour.com.cn/login.do?action=doLogin");
+		HttpPost httppost = new HttpPost("http://www.renrenle.cn/scm/login.do?method=login");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		String responseStr = EntityUtils.toString(loginResponse.getEntity());
-		if (responseStr.contains("验证码失效")) {
-			log.info(user + "验证码失效,Relogin...");
+		String responseStr = new String (EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),"GBK");
+		
+		if (responseStr.contains("验证码输入不正确")) {
+			log.info(user + "验证码输入不正确,Relogin...");
 			return "InvalidCode";
-		} else if (responseStr.contains("错误的密码")) {
-			log.info(user + "错误的密码,退出!");
-			return "InvalidPassword";
-		} else if (responseStr.contains("错误的用户名")) {
-			log.info(user + "错误的用户名,退出!");
+		} else if (responseStr.contains("您的用户名或密码输入有误")) {
+			log.info(user + "您的用户名或密码输入有误,退出!");
 			return "InvalidPassword"; 
-		} else if (responseStr.contains("系统出错") || !responseStr.contains("Welcome")) {
+		} else if (!responseStr.contains("mainAction")) {
 			log.info(user + "系统出错,退出!");
 			return "SystemError";
 		}
 		loginResponse.close();
 		log.info(user + "登录成功!");
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
+		
 		return "Success";
 	}
 
@@ -146,110 +145,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 	}
 
-	public void getOrder(CloseableHttpClient httpClient, User user) throws Exception {
-		log.info(user + "跳转到订单查询页面...");
 
-		// forward to PowerE2E Platform
-		HttpGet httpGet = new HttpGet("https://supplierweb.carrefour.com.cn/callSSO.jsp");
-		CloseableHttpResponse response = httpClient.execute(httpGet);
-		HttpEntity entity = response.getEntity();
-		if (!EntityUtils.toString(entity).contains("PowerE2E Platform")) {
-			log.info(user + "订单查询页面加载出错,cannot forward to PowerE2E Platform");
-			return;
-		}
-		response.close();
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
-		
-		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
-		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy"))); // "01-12-2013"
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy")));
-		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
-		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/openInbox.htm?");
-		searchPost.setEntity(searchFormEntity);
-		CloseableHttpResponse searchRes = httpClient.execute(searchPost);
-		String responseStr = EntityUtils.toString(searchRes.getEntity());
-		searchRes.close();
-		Document doc = Jsoup.parse(responseStr);
-		Element mailboxForm = doc.select("form[name=mailboxForm]").first();
-		Element table = mailboxForm.select("table").first();
-		String recordStr = table.select("tr[align=right]").select("td").get(0).text();
-		recordStr = recordStr.substring(recordStr.indexOf("共") + 1, recordStr.indexOf("记"));
-		recordStr = recordStr.replaceAll(",", "");
-		int record = Integer.parseInt(recordStr);
-		int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
-		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy") + "到"
-				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy") + ",共有" + record + "笔订单");
-		Elements msgIds = doc.select("input[name=msgId]");
-		List<String> msgIdList = new ArrayList<String>();
-		for (Element msgId : msgIds) {
-			msgIdList.add(msgId.attr("value"));
-		}
-		// 取得每页的MsgId
-		while (page > 1) {
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
-			getMsgIdByPage(page, msgIdList, httpClient);
-			page--;
-		}
-		int count = 0;
-		for (String msgId : msgIdList) {
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
-			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid=" + msgId);
-			CloseableHttpResponse orderRes = httpClient.execute(httpOrderGet);
-			String orderDetail = EntityUtils.toString(orderRes.getEntity());
-			orderRes.close();
-			if (!orderDetail.contains("Carrefour Purchase Order")) {
-				continue;
-			}
-			List<OrderTO> orderItems = new ArrayList<OrderTO>();
-			Document orderDoc = Jsoup.parse(orderDetail);
-			Element orderTable = orderDoc.select("table.tab2").first();
-			String storeName = orderTable.select("tr:eq(1)").select("td").get(0).text();// store
-			String orderNo = orderTable.select("tr:eq(2)").select("td").get(1).text();// 订单号码
-			String orderDate = orderTable.select("tr:eq(3)").select("td").get(1).text();// 订单日期时间
-			Element orderItemTable = orderDoc.select("table.tab2").last();
-
-			for (Element row : orderItemTable.select("tr:gt(2)")) {
-				Elements tds = row.select("td");
-				OrderTO orderTo = new OrderTO();
-				orderTo.setStoreName(storeName);
-				orderTo.setOrderNo(orderNo);
-				orderTo.setOrderDate(orderDate);
-				orderTo.setItemCode(tds.get(0).select("span").first().text());// 单品号
-				orderTo.setBarcode(tds.get(1).select("span").first().text()); // 条形码
-				orderTo.setItemName(tds.get(2).text());// 单品名称
-				orderTo.setQuantity(tds.get(6).text());// 总计数量
-				orderTo.setUnitPrice(tds.get(7).text()); // 单价
-				orderTo.setTotalPrice(tds.get(8).text());// 总金额
-				orderItems.add(orderTo);
-			}
-			FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
-			count++;
-			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
-		}
-		log.info(user + "订单数据下载成功!");
-	}
-
-	// function gotoPage(page) {
-	// document.forms[0].action = "/platform/mailbox/navigateInbox.htm?gotoPage="+ page;
-	// document.forms[0].submit();
-	// }
-	private void getMsgIdByPage(int page, List<String> msgIdList, CloseableHttpClient httpClient) throws Exception {
-		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy")));
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy")));
-		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
-		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/navigateInbox.htm?gotoPage=" + page);
-		searchPost.setEntity(searchFormEntity);
-		CloseableHttpResponse searchRes = httpClient.execute(searchPost);
-		String responseStr = EntityUtils.toString(searchRes.getEntity());
-		searchRes.close();
-		Document doc = Jsoup.parse(responseStr);
-		Elements msgIds = doc.select("input[name=msgId]");
-		for (Element msgId : msgIds) {
-			msgIdList.add(msgId.attr("value"));
-		}
-	}
 
 	public OCR getOcr() {
 		return ocr;

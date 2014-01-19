@@ -86,7 +86,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = new String (EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),"GBK");
-		
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		if (responseStr.contains("验证码输入不正确")) {
 			log.info(user + "验证码输入不正确,Relogin...");
 			return "InvalidCode";
@@ -105,6 +105,19 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 	public void getSalesExcel(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
+		
+		// /scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401
+		// 销售查询
+		HttpGet httpGet = new HttpGet("http://www.renrenle.cn/scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401");
+		CloseableHttpResponse searchRes = httpClient.execute(httpGet);
+		HttpEntity searchEntity = searchRes.getEntity();
+		String searchStr = new String (EntityUtils.toString(searchEntity).getBytes("ISO_8859_1"),"GBK");
+		searchRes.close();		
+		Document searchDoc = Jsoup.parse(searchStr);
+		Element token = searchDoc.select("input[name=org.apache.struts.taglib.html.TOKEN]").first();
+		String tokenStr = token.attr("value");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
+		
 		//http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
 		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_PATH);
 		FileUtil.createFolder(salesFilePath);
@@ -117,6 +130,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		salesformParams.add(new BasicNameValuePair("searchType", "0"));
 		salesformParams.add(new BasicNameValuePair("saleType", "0"));
 		salesformParams.add(new BasicNameValuePair("orderASC", "false"));
+		salesformParams.add(new BasicNameValuePair("forward", "byShopList"));
+		salesformParams.add(new BasicNameValuePair("org.apache.struts.taglib.html.TOKEN", tokenStr));
 		HttpEntity salesFormEntity = new UrlEncodedFormEntity(salesformParams, "UTF-8");
 		HttpPost salesPost = new HttpPost("http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1");
 		salesPost.setEntity(salesFormEntity);
@@ -128,8 +143,6 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 
 	}
-
-
 
 	public OCR getOcr() {
 		return ocr;

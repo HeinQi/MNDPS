@@ -22,6 +22,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.Utils;
@@ -88,16 +89,17 @@ public class HualianDataPullService implements RetailerDataPullService {
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"),"GBK"));
 		Element storeElement = doc.select("#store").first();
 		formResponse.close();
+		List<SalesTO> salesList = new ArrayList<SalesTO>();
 		Elements sElements = storeElement.select("option[value]");
 		for (Element store:sElements) {
 			String storeId = store.attr("value");
-			getSalesByStore(httpClient,user,storeId);
+			getSalesByStore(httpClient,user,storeId,salesList);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}
 	
 	///suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user,String storeId) throws Exception {
+	private void getSalesByStore(CloseableHttpClient httpClient, User user,String storeId,List<SalesTO> salesList) throws Exception {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_HUALIAN),"yyyyMMdd");
 		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_HUALIAN),"yyyyMMdd");
@@ -114,6 +116,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 		Elements rows = dataTable.select("tr:gt(2)");
 		for (int i=0; i<rows.size()-1; i++) {
 			Elements tds = rows.select("td");
+			SalesTO sales = new SalesTO();
 			log.info(tds.get(0).text());
 			log.info(tds.get(1).text());
 			log.info(tds.get(2).text());

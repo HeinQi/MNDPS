@@ -554,8 +554,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
 				getOrderDetail(detailStr,startRow,record,orderList);
 			}
+			for (OrderTO order : orderList) {
+				//FileUtil.exportOrderInfoToTXT(Constants.RETAILER_METRO, order);
+			}
 			
-			FileUtil.exportOrderInfoToTXT(Constants.RETAILER_METRO, "xxxxx", orderList);
 			log.info(user + "下载未交货订单明细成功!");
 		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
 			log.info(user+"没有查询到符合条件的未交货订单明细!");
@@ -602,7 +604,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 				getOrderDetail(detailStr,startRow,record,orderList);
 			}
 			
-			FileUtil.exportOrderInfoToTXT(Constants.RETAILER_METRO, "BBBB", orderList);
+			for (OrderTO order : orderList) {
+				//FileUtil.exportOrderInfoToTXT(Constants.RETAILER_METRO, order);
+			}
+			
 			log.info(user + "下载已交货订单明细成功!");
 		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
 			log.info(user+"没有查询到符合条件的已交货订单明细!");

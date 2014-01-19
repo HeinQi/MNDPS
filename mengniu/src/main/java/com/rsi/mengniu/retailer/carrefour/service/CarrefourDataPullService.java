@@ -214,7 +214,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 				orderTo.setStoreName(storeName);
 				orderTo.setOrderNo(orderNo);
 				orderTo.setOrderDate(orderDate);
-				orderTo.setItemCode(tds.get(0).select("span").first().text());// 单品号
+				orderTo.setItemID(tds.get(0).select("span").first().text());// 单品号
 				orderTo.setBarcode(tds.get(1).select("span").first().text()); // 条形码
 				orderTo.setItemName(tds.get(2).text());// 单品名称
 				orderTo.setQuantity(tds.get(6).text());// 总计数量

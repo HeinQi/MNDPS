@@ -280,7 +280,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			String itemNm2 = line.substring(0, line.indexOf(" "));
 			line = line.substring(line.indexOf(" ")).trim(); // 国际条码
 			String barcode = line.substring(0, line.indexOf(" "));
-			orderTo.setItemCode(itemId);
+			orderTo.setItemID(itemId);
 			orderTo.setItemName(itemName + itemNm2);
 			orderTo.setUnitPrice(unitPrice);
 			orderTo.setTotalPrice(totalPrice);

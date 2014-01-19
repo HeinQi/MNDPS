@@ -119,7 +119,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		
 		//http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
-		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_PATH);
+		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesFilePath);
 		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(Utils.getStartDate(Constants.RETAILER_RENRENLE)) + ".xls";
 		FileOutputStream salseFos = new FileOutputStream(salesFilePath + receiveFileNm);

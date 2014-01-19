@@ -24,6 +24,7 @@ import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 
 public class FileUtil {
 
@@ -191,7 +192,7 @@ public class FileUtil {
 
 		try {
 			receivingFile.createNewFile();
-			String receivingHeader = Utils.getProperty(Constants.OUTPUT_HEADER);
+			String receivingHeader = Utils.getProperty(Constants.OUTPUT_ORDER_HEADER);
 
 			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
 			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
@@ -215,7 +216,62 @@ public class FileUtil {
 
 	}
 
-	
+
+
+	/**
+	 * Export Receiving Info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param userID
+	 * @param receivingList
+	 * @throws BaseException
+	 */
+	public static void exportSalesInfoToTXT(String retailerID,
+			String userID, List<SalesTO> salesList)
+			throws BaseException {
+
+		String salesInboundFolderPath = Utils.getProperty(retailerID
+				+ Constants.RECEIVING_INBOUND_PATH);
+		createFolder(salesInboundFolderPath);
+		String salesFilePath = salesInboundFolderPath + "Sales_"
+				+ retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
+		// log.info("初始化整合文本文件. 文件名: " + salesInboundFolderPath);
+		// File salesInboundFolder = new File(salesInboundFolderPath);
+		// if (!salesInboundFolder.exists()) {
+		// salesInboundFolder.mkdir();
+		// }
+
+		File salesFile = new File(salesFilePath);
+
+		BufferedWriter writer = null;
+
+		try {
+			salesFile.createNewFile();
+			String salesHeader = Utils.getProperty(Constants.SALES_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(salesFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(salesHeader);
+			writer.newLine();
+
+			for (int i = 0; i < salesList.size(); i++) {
+				SalesTO salesTO = (SalesTO) salesList.get(i);
+				String salesRow = salesTO.toString();
+				writer.write(salesRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			closeFileWriter(writer);
+
+		}
+
+	}
+
 	
 	public static List<String> getAllFile(String folderPath) {
 		File receivingInboundFolder = new File(folderPath);

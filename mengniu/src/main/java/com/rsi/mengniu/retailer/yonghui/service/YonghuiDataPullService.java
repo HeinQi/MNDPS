@@ -154,11 +154,11 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			Elements rowElements = bodyElement.select("row");
 			for (Element row : rowElements) {
 				ReceivingNoteTO receiveTo = new ReceivingNoteTO();
-				receiveTo.setStoreNo(storeId);
+				receiveTo.setStoreID(storeId);
 				receiveTo.setStoreName(storeNm);
 				receiveTo.setOrderNo(orderNo);
 				receiveTo.setReceivingDate(receiveDate);
-				receiveTo.setItemCode(row.select("goodsid").text());
+				receiveTo.setItemID(row.select("goodsid").text());
 				receiveTo.setItemName(row.select("goodsname").text());
 				receiveTo.setBarcode(row.select("barcode").text());
 				receiveTo.setQuantity(row.select("rcvqty").text());

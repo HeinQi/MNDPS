@@ -366,10 +366,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 			Elements dataElements = detailResult.select("tr[rr="+i+"]");
 			Elements tds = dataElements.first().select("td");
 			ReceivingNoteTO receiveingTo = new ReceivingNoteTO();
-			receiveingTo.setStoreNo(tds.get(2).select("span").first().text()); // 门店编号
+			receiveingTo.setStoreID(tds.get(2).select("span").first().text()); // 门店编号
 			receiveingTo.setOrderNo(tds.get(3).select("span").first().text()); // 订单编号
 			receiveingTo.setReceivingDate(tds.get(6).select("span").first().text()); // 收货日期
-			receiveingTo.setItemCode(tds.get(8).select("span").first().text()); // 商品编号
+			receiveingTo.setItemID(tds.get(8).select("span").first().text()); // 商品编号
 			receiveingTo.setBarcode(tds.get(9).select("span").first().text()); // 条形码
 			receiveingTo.setItemName(tds.get(10).select("span").first().text()); // 商品描述
 			receiveingTo.setUnitPrice(tds.get(13).select("span").first().text()); // 进货价格
@@ -686,7 +686,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			orderTo.setStoreNo(tds.get(2).select("span").first().text()); // 门店编号
 			orderTo.setOrderNo(tds.get(3).select("span").first().text()); // 订单编号
 			orderTo.setOrderDate(tds.get(4).select("span").first().text()); // 订货日期
-			orderTo.setItemCode(tds.get(7).select("span").first().text()); // 商品编号
+			orderTo.setItemID(tds.get(7).select("span").first().text()); // 商品编号
 			orderTo.setBarcode(tds.get(8).select("span").first().text()); // 条形码
 			orderTo.setItemName(tds.get(9).select("span").first().text()); // 商品描述
 			orderTo.setQuantity(tds.get(12).select("span").first().text()); // 订货数量

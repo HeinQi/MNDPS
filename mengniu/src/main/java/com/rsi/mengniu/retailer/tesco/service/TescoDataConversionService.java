@@ -96,7 +96,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 									&& !sourceCellValue.equals("")) {
 								storeID = sourceCellValue.substring(0, sourceCellValue.indexOf("."));
 							}
-							receivingNoteTO.setStoreNo(storeID);
+							receivingNoteTO.setStoreID(storeID);
 							continue;
 						case 4:
 
@@ -120,7 +120,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 							receivingNoteTO.setReceivingDate(receivingDateStr);
 							continue;
 						case 14:
-							receivingNoteTO.setItemCode(sourceCellValue);
+							receivingNoteTO.setItemID(sourceCellValue);
 							continue;
 						case 15:
 							receivingNoteTO.setItemName(sourceCellValue);
@@ -209,7 +209,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
 					String key = orderTO.getOrderNo() + orderTO.getStoreName()
-							+ orderTO.getItemCode();
+							+ orderTO.getItemID();
 					orderMap.put(key, orderTO);
 
 				}

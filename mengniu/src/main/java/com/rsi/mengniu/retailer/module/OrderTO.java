@@ -48,12 +48,12 @@ public class OrderTO extends BaseTO {
 		this.storeName = storeName;
 	}
 
-	public String getItemCode() {
+	public String getItemID() {
 		return itemID;
 	}
 
-	public void setItemCode(String itemCode) {
-		this.itemID = itemCode;
+	public void setItemID(String itemID) {
+		this.itemID = itemID;
 	}
 
 	public String getItemName() {
@@ -121,7 +121,7 @@ public class OrderTO extends BaseTO {
 		this.setOrderDate(orderFieldArray[1]);
 		this.setStoreNo(orderFieldArray[2]);
 		this.setStoreName(orderFieldArray[3]);
-		this.setItemCode(orderFieldArray[4]);
+		this.setItemID(orderFieldArray[4]);
 		this.setItemName(orderFieldArray[5]);
 		this.setBarcode(orderFieldArray[6]);
 		this.setQuantity(orderFieldArray[7]);

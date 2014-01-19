@@ -132,14 +132,18 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 			List<ReceivingNoteTO> receivingList = receivingByDateMap
 					.get(processDateStr);
 
-			getLog().info(
-					"开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
-							+ "订单数量:" + receivingList.size());
-			retailerDataProcessing(retailerID, processDateStr, receivingList);
+			if (!(receivingList.size() == 0)) {
 
-			getLog().info(
-					"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
-							+ "订单数量:" + receivingList.size() + "\n");
+				getLog().info(
+						"开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
+								+ "订单数量:" + receivingList.size());
+				retailerDataProcessing(retailerID, processDateStr,
+						receivingList);
+
+				getLog().info(
+						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
+								+ "订单数量:" + receivingList.size() + "\n");
+			}
 		}
 
 		String sourceFilePath = Utils.getProperty(retailerID
@@ -207,11 +211,11 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	private void mergeReceiving(BufferedWriter writer,
 			List<ReceivingNoteTO> receivingNotelist) throws BaseException {
 
-		
 		int failedCount = 0;
 		for (int i = 0; i < receivingNotelist.size(); i++) {
 
-			RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingNotelist.get(i);
+			RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingNotelist
+					.get(i);
 
 			String mergedLine = receivingNoteTO.toString();
 			try {

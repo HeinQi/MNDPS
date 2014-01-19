@@ -179,7 +179,7 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 					continue;
 				case 9:
 					String itemCode = sourceCell.getData$();
-					orderTO.setItemCode(itemCode);
+					orderTO.setItemID(itemCode);
 
 					continue;
 				case 10:
@@ -203,7 +203,7 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 			}
 
 			String key = orderTO.getOrderNo() + orderTO.getStoreName()
-					+ orderTO.getItemCode();
+					+ orderTO.getItemID();
 			orderMap.put(key, orderTO);
 
 		}

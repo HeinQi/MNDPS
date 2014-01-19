@@ -32,12 +32,12 @@ public class ReceivingNoteTO extends BaseTO {
 		this.receivingDate = receivingDate;
 	}
 
-	public String getStoreNo() {
+	public String getStoreID() {
 		return storeID;
 	}
 
-	public void setStoreNo(String storeNo) {
-		this.storeID = storeNo;
+	public void setStoreID(String storeID) {
+		this.storeID = storeID;
 	}
 
 	public String getStoreName() {
@@ -48,12 +48,12 @@ public class ReceivingNoteTO extends BaseTO {
 		this.storeName = storeName;
 	}
 
-	public String getItemCode() {
+	public String getItemID() {
 		return itemID;
 	}
 
-	public void setItemCode(String itemCode) {
-		this.itemID = itemCode;
+	public void setItemID(String itemID) {
+		this.itemID = itemID;
 	}
 
 	public String getItemName() {
@@ -101,9 +101,9 @@ public class ReceivingNoteTO extends BaseTO {
 
 		this.setOrderNo(receivingFieldArray[0]);
 		this.setReceivingDate(receivingFieldArray[1]);
-		this.setStoreNo(receivingFieldArray[2]);
+		this.setStoreID(receivingFieldArray[2]);
 		this.setStoreName(receivingFieldArray[3]);
-		this.setItemCode(receivingFieldArray[4]);
+		this.setItemID(receivingFieldArray[4]);
 		this.setItemName(receivingFieldArray[5]);
 		this.setBarcode(receivingFieldArray[6]);
 		this.setQuantity(receivingFieldArray[7]);

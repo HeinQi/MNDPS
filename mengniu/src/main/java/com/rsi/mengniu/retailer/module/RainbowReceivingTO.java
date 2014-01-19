@@ -1,9 +1,8 @@
 package com.rsi.mengniu.retailer.module;
 
 public class RainbowReceivingTO extends ReceivingNoteTO {
-	// Order_No Store_No Store_Name Receiving_Date Item_Code Barcode Item_Name
-	// Order_Qty Order_Amount Receiving_Qty Receiving_Amount Unit_Price
-
+	
+	private static final long serialVersionUID = 7620979609472511745L;
 	
 	private String orderQuantity = "";
 	private String orderTotalPrice = "";
@@ -37,10 +36,10 @@ public class RainbowReceivingTO extends ReceivingNoteTO {
 		String[] consolidatedFieldArray = consolidatedString.split("\t");
 
 		this.setOrderNo(consolidatedFieldArray[0]);
-		this.setStoreNo(consolidatedFieldArray[1]);
+		this.setStoreID(consolidatedFieldArray[1]);
 		this.setStoreName(consolidatedFieldArray[2]);
 		this.setReceivingDate(consolidatedFieldArray[3]);
-		this.setItemCode(consolidatedFieldArray[4]);
+		this.setItemID(consolidatedFieldArray[4]);
 		this.setBarcode(consolidatedFieldArray[5]);
 		this.setItemName(consolidatedFieldArray[6]);
 		this.setOrderQuantity(consolidatedFieldArray[7]);

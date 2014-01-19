@@ -77,7 +77,7 @@ public class CarrefourDataConversionService extends
 
 						switch (j) {
 						case 2:
-							receivingNoteTO.setStoreNo(sourceCellValue);
+							receivingNoteTO.setStoreID(sourceCellValue);
 
 							continue;
 						case 3:
@@ -97,7 +97,7 @@ public class CarrefourDataConversionService extends
 
 							continue;
 						case 8:
-							receivingNoteTO.setItemCode(sourceCellValue);
+							receivingNoteTO.setItemID(sourceCellValue);
 
 							continue;
 						case 9:
@@ -191,7 +191,7 @@ public class CarrefourDataConversionService extends
 					OrderTO orderTO = new OrderTO(orderLine);
 					String key = orderTO.getOrderNo()
 							+ orderTO.getStoreName().substring(3)
-							+ orderTO.getItemCode();
+							+ orderTO.getItemID();
 					orderMap.put(key, orderTO);
 
 				}

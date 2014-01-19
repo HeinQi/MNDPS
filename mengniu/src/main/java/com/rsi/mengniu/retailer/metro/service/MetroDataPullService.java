@@ -1,6 +1,5 @@
 package com.rsi.mengniu.retailer.metro.service;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,35 +79,6 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 	public void getReceive(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user+"下载收货单...");
-		/*
-		 * // https://portal.metro-link.com:443/irj/portal/mcc HttpGet httpGet = new HttpGet("http://portal.metro-link.com/irj/portal");
-		 * httpGet.addHeader("Accept-Language", "zh-CN"); httpGet.addHeader("User-Agent",
-		 * "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"); CloseableHttpResponse response =
-		 * httpClient.execute(httpGet); String responseStr = EntityUtils.toString(response.getEntity()); response.close();
-		 * 
-		 * String str = responseStr.substring(responseStr.indexOf("afpVerifierKey = '")+18); String afpVerifierKey =
-		 * str.substring(0,str.indexOf("'")); str = str.substring(str.indexOf("sap-ep-inp\":\"")+13); String sap_ep_inp =
-		 * str.substring(0,str.indexOf("\"")); str = str.substring(str.indexOf("sap-ep-pp\":\"")+12); String sap_ep_pp =
-		 * str.substring(0,str.indexOf("\"")); str = str.substring(str.indexOf("sap-ep-nh\":\"")+12); String sap_ep_nh =
-		 * str.substring(0,str.indexOf("\"")); str = str.substring(str.indexOf("sap-ep-ur\":\"")+12); String sap_ep_ur =
-		 * str.substring(0,str.indexOf("\""));;
-		 * 
-		 * 
-		 * String url =
-		 * "https://portal.metro-link.com/AFPServlet/NavigationServlet?action=getSelectedPathTree&mode=nogzip&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&targetNodeId=&pathname=%2Firj%2Fportal%2Fmcc&sap-ep-inp="
-		 * + sap_ep_inp + "&sap-ep-nh=" + sap_ep_nh + "&sap-ep-pp=" + sap_ep_pp + "&sap-ep-ul=zh_CN&sap-ep-ur=" + sap_ep_ur + "&afpVerifierKey=" +
-		 * afpVerifierKey; System.out.println(url); HttpGet httpGet1 = new HttpGet(url); httpGet1.addHeader("Accept-Language", "zh-CN");
-		 * //httpGet1.addHeader("User-Agent",
-		 * "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"); CloseableHttpResponse response1
-		 * = httpClient.execute(httpGet1); String responseStr1 = EntityUtils.toString(response1.getEntity()); //System.out.println(responseStr1);
-		 * response1.close();
-		 */
-		/**
-		 * 
-		 * "action" := "getSelectedPathTree", "mode" := "nogzip", "supportInitialNavNodesFilter" := "true", "filterViewIdList" := ";mcc;common;",
-		 * "targetNodeId" := "", "pathname" := "/irj/portal/mcc", "sap-ep-inp" := "", "sap-ep-nh" := "1386590678518", "sap-ep-pp" := "", "sap-ep-ul"
-		 * := "zh_CN", "sap-ep-ur" := "69c3b503ebc19d4447da62ccf041c28b", "afpVerifierKey" := "d87d8a7ccce7e4f870f684cfe4575adf";
-		 */
 
 		/*
 		 * sap-ext-sid:8bYti*zClHwZHwXfrCHo6A--qvel*Z7akaxIul*bBSNpTA-- sap-wd-cltwndid:WID1389278326411 sap-wd-norefresh:X
@@ -315,27 +285,6 @@ public class MetroDataPullService implements RetailerDataPullService {
 			log.info(user+"下载收货单失败!");
 		}
 		
-		/*
-		responseStr6 = responseStr6.substring(
-				responseStr6.indexOf("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"urST3Bd urFontStd\""),
-				responseStr6.indexOf("<div id=\"aaaa.GoodsRecView.tableGoodsRec-hiddenData\""));
-		Document receiveResult = Jsoup.parse(responseStr6);
-		Elements dataElements = receiveResult.select("tr[uDat]");
-		// CheckBox_ChangeIdaaaa.GoodsRecView.checked_editor.0CheckedtrueContextPathGoodsRec.0urEventNameCHECKBOXCLICKButton_PressIdaaaa.GoodsRecView.ButtonShowGRLinesClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo%40%7B"sFocussedId"%3A%20"aaaa.GoodsRecView.ButtonShowGRLines"%7DHashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle
-		List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
-		//select all
-		String sapEventQueueDetail = "Button_PressIdaaaa.GoodsRecView.ToolBarButtonChoiceClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.GoodsRecView.ToolBarButtonChoice\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
-//		for (int i = 0; i < 2; i++) {
-//			sapEventQueueDetail += "CheckBox_ChangeIdaaaa.GoodsRecView.checked_editor."+i+"CheckedtrueContextPathGoodsRec."+i+"urEventNameCHECKBOXCLICK";
-//		}
-		if (sapEventQueueDetail != "") {
-		getReceiveDetail(httpClient, sap_ext_sid, sap_wd_cltwndid, sap_wd_norefresh, sap_wd_secure_id,sapEventQueueDetail, receiveList);
-		FileUtil.exportReceivingInfoToTXT(Constants.RETAILER_METRO, user.getUserId(), receiveList);
-		
-		}
-		
-		*/
-		
 	}
 
 	public String getReceiveDetailByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
@@ -422,7 +371,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String filterViewIdList = doc1.select("input[name=filterViewIdList]").first().attr("value");// filterViewIdList"
 		String currentWindowId = doc1.select("input[name=CurrentWindowId]").first().attr("value"); // CurrentWindowId"
 		String prevNavTarget = doc1.select("input[name=PrevNavTarget]").first().attr("value"); // PrevNavTarget"
-
+		
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+		
 		List<NameValuePair> orderformParams2 = new ArrayList<NameValuePair>();
 		orderformParams2.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams2.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -461,6 +412,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String sap_wd_secure_id = doc2.select("input[name=sap-wd-secure-id]").first().attr("value");// sap-wd-secure-id
 		String sap_wd_norefresh = doc2.select("input[name=sap-wd-norefresh]").first().attr("value");// sap-wd-norefresh
 
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+		
 		//StartDate
 		List<NameValuePair> orderformParams3 = new ArrayList<NameValuePair>();
 		orderformParams3.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
@@ -481,7 +434,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse orderRes3 = httpClient.execute(orderPost3);
 		String responseStr3 = EntityUtils.toString(orderRes3.getEntity());
 		orderRes3.close();
-
+		
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+		
 		//EndDate
 		List<NameValuePair> orderformParams4 = new ArrayList<NameValuePair>();
 		orderformParams4.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
@@ -501,7 +456,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse orderRes4 = httpClient.execute(orderPost4);
 		String responseStr4 = EntityUtils.toString(orderRes4.getEntity());
 		orderRes4.close();
-
+		
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+		
 		// Search Max500rows  查询结果包含多条记录 
 		List<NameValuePair> orderformParams5 = new ArrayList<NameValuePair>();
 		orderformParams5.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
@@ -523,7 +480,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			log.info(user+"没有查询到符合条件的订单单数据!");
 			return;
 		}
-
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
 		//Select ALL
 		List<NameValuePair> orderformParams6 = new ArrayList<NameValuePair>();
 		orderformParams6.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));

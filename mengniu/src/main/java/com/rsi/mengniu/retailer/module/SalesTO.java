@@ -1,7 +1,7 @@
 package com.rsi.mengniu.retailer.module;
 
-public class SalesTO extends BaseTO{
-	
+public class SalesTO extends BaseTO {
+
 	private static final long serialVersionUID = 4087166645842465278L;
 	private String itemID = "";
 	private String itemName = "";
@@ -9,12 +9,15 @@ public class SalesTO extends BaseTO{
 	private String storeID = "";
 	private String salesQuantity = "";
 	private String salesAmount = "";
-	
-	
 
 	public String toString() {
-		return this.itemID + "\t" + this.itemName + "\t" + this.salesDate + "\t" + this.storeID + "\t" + this.salesQuantity
-				+ "\t" + this.salesAmount;
+		return this.itemID + "\t" + this.itemName + "\t" + this.salesDate
+				+ "\t" + this.storeID + "\t" + this.salesQuantity + "\t"
+				+ this.salesAmount;
+	}
+
+	public SalesTO() {
+
 	}
 
 	public SalesTO(String salesString) {
@@ -75,8 +78,5 @@ public class SalesTO extends BaseTO{
 	public void setSalesAmount(String salesAmount) {
 		this.salesAmount = salesAmount;
 	}
-	
-	
-	
 
 }

@@ -156,7 +156,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		getLog().info(destPath);
 		// Copy processed receiving note from inbound to processed folder
 		// TODO
-		FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
+		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
 				destPath);
 
 		// create file by date

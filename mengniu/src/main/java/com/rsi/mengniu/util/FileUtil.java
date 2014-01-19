@@ -31,7 +31,7 @@ public class FileUtil {
 	public static void main(String[] args) throws BaseException {
 		//testFileAmount("C:/mengniu/yonghui/output/");
 		List<String> stringList = getAllFile("C:/mengniu/carrefour/receiving/inbound/");
-		copyFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
+		moveFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
 	}
 	
 	
@@ -314,6 +314,29 @@ public class FileUtil {
 	}
 
 	/**
+	 * Move selected files from sourcePath to dest path
+	 * 
+	 * @param sourceFileNameList
+	 * @param sourcePath
+	 * @param destPath
+	 * @throws BaseException 
+	 */
+	public static void moveFiles(List<String> sourceFileNameList,
+			String sourcePath, String destPath) throws BaseException {
+
+		for (String sourceFileName : sourceFileNameList) {
+			File fnewpath = new File(destPath);
+			if (!fnewpath.exists())	fnewpath.mkdirs();
+			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
+			// 文件原地址
+			File oldFile = new File(sourcePath + sourceFileName);
+			
+			oldFile.delete();}
+
+	}
+	
+
+	/**
 	 * Copy selected files from sourcePath to dest path
 	 * 
 	 * @param sourceFileNameList
@@ -328,24 +351,12 @@ public class FileUtil {
 			File fnewpath = new File(destPath);
 			if (!fnewpath.exists())	fnewpath.mkdirs();
 			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
-//			// 文件原地址
-			File oldFile = new File(sourcePath + sourceFileName);
-			
-			oldFile.delete();
-//			// 文件新（目标）地址
-//			// new一个新文件夹
-//			File fnewpath = new File(destPath);
-//			// 判断文件夹是否存在
-//			if (!fnewpath.exists())
-//				fnewpath.mkdirs();
-//			// 将文件移到新文件里
-//			File fnew = new File(destPath + oldFile.getName());
-//			
-//			oldFile.renameTo(fnew);
 		}
 
 	}
 
+
+	
 	public static void createFolder(String path) {
 		File fnewpath = new File(path);
 		// 判断文件夹是否存在

@@ -55,6 +55,8 @@
 	
 	<bean id ="rainbow.data.conversion" class="com.rsi.mengniu.retailer.rainbow.service.RainbowDataConversionService">
 	</bean>
+	<bean id ="hualian.data.conversion" class="com.rsi.mengniu.retailer.hualian.service.HualianDataConversionService">
+	</bean>
 	
 	
 </beans>

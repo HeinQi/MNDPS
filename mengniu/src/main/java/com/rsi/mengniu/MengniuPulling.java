@@ -25,17 +25,17 @@ public class MengniuPulling {
 			// DataPullTaskPool.initTaskPool("tesco");
 			// DataPullTaskPool.initTaskPool("yonghui");
 			// DataPullTaskPool.initTaskPool("metro");
-			DataPullTaskPool.initTaskPool(retailerId);
-			int threadNum = Integer.parseInt(Utils
-					.getProperty("datapull.thread.amount"));
-			final CountDownLatch mDoneSignal = new CountDownLatch(threadNum);
-
-			ExecutorService exec = Executors.newFixedThreadPool(threadNum);
-			for (int i = 0; i < threadNum; i++) {
-				exec.execute(new DataPullThread(mDoneSignal));
-			}
-			exec.shutdown();
-			mDoneSignal.await(); // Wait all thread done
+//			DataPullTaskPool.initTaskPool(retailerId);
+//			int threadNum = Integer.parseInt(Utils
+//					.getProperty("datapull.thread.amount"));
+//			final CountDownLatch mDoneSignal = new CountDownLatch(threadNum);
+//
+//			ExecutorService exec = Executors.newFixedThreadPool(threadNum);
+//			for (int i = 0; i < threadNum; i++) {
+//				exec.execute(new DataPullThread(mDoneSignal));
+//			}
+//			exec.shutdown();
+//			mDoneSignal.await(); // Wait all thread done
 
 			if ("ALL".equalsIgnoreCase(retailerId)) {
 				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService) appContext

@@ -27,32 +27,15 @@ import com.rsi.mengniu.util.Utils;
 
 public abstract class RetailerDataConversionService {
 
-	// private void main(String[] args) throws BaseException {
-	// getLog().info("开始");
-	//
-	// FileUtil.testFileAmount("C:/root/yonghui/merged/");
-	// retailerDataProcessing(Constants.RETAILER_CARREFOUR,
-	// DateUtil.toDate("2013-12-01"), DateUtil.toDate("2014-01-03"));
-	//
-	// retailerDataProcessing(Constants.RETAILER_TESCO,
-	// DateUtil.toDate("2013-12-30"), DateUtil.toDate("2014-01-05"));
-	//
-	// retailerDataProcessing(Constants.RETAILER_YONGHUI,
-	// DateUtil.toDate("2013-12-25"), DateUtil.toDate("2014-01-11"));
-	// getLog().info("结束");
-	// }
-
 	protected abstract String getRetailerID();
+	
+
+	protected abstract Log getLog();
 
 	protected abstract Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File receivingFile)
 			throws BaseException;
 
-	protected abstract Log getLog();
-
-	protected abstract Map<String, List<SalesTO>> getSalesInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File salesFile)
-			throws BaseException;
 
 	/**
 	 * Get Order Info
@@ -65,6 +48,21 @@ public abstract class RetailerDataConversionService {
 	protected abstract Map<String, OrderTO> getOrderInfo(String retailerID,
 			Set<String> orderNoSet) throws BaseException;
 
+
+	/**
+	 * Get Sales Info
+	 * @param retailerID
+	 * @param startDate
+	 * @param endDate
+	 * @param salesFile
+	 * @return
+	 * @throws BaseException
+	 */
+	protected abstract Map<String, List<SalesTO>> getSalesInfoFromFile(
+			String retailerID, Date startDate, Date endDate, File salesFile)
+			throws BaseException;
+
+	
 	/**
 	 * Process Data by time range
 	 * 
@@ -80,98 +78,19 @@ public abstract class RetailerDataConversionService {
 
 		getLog().info("开始处理数据");
 
+		getLog().info("开始处理收货单和订单数据");
+		
 		convertOrderData(retailerID, startDate, endDate);
 
+		getLog().info("收货单和订单数据处理结束");
+		
+		
+		getLog().info("零售商：" + retailerID +" 开始处理销售单");
 		convertSalesData(retailerID, startDate, endDate);
 
+		getLog().info("零售商：" + retailerID +" 销售单处理结束");
 		getLog().info("数据处理结束");
 
-	}
-
-	private void convertSalesData(String retailerID, Date startDate,
-			Date endDate) throws BaseException {
-		// getSalesData
-		Map<String, List<SalesTO>> salesMap = this.getSalesInfo(retailerID, startDate, endDate);
-
-		// Write Data to output folder
-		for (Entry<String, List<SalesTO>> entry : salesMap
-				.entrySet()) {
-			String processDateStr = entry.getKey();
-			List<SalesTO> salesList = entry.getValue();
-			salesDataProcessing(retailerID, processDateStr,
-					salesList);
-		}
-		// Archive
-		String sourceFilePath = Utils.getProperty(retailerID
-				+ Constants.SALES_INBOUND_PATH);
-		getLog().info(sourceFilePath);
-		String destPath = Utils.getProperty(retailerID
-				+ Constants.SALES_PROCESSED_PATH);
-		
-		getLog().info(destPath);
-		FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
-				destPath);
-	}
-
-	private void salesDataProcessing(String retailerID, String processDateStr,
-			List<SalesTO> salesList) throws BaseException {
-		BufferedWriter writer = this.initSalesOutputFile(retailerID, processDateStr);
-		
-		for(SalesTO salesTO:salesList){
-			String outputLine = salesTO.toString();
-			try {
-				writer.write(outputLine);
-
-				writer.newLine();
-			} catch (IOException e) {
-				FileUtil.closeFileWriter(writer);
-				throw new BaseException(e);
-			}
-		}
-		
-		FileUtil.closeFileWriter(writer);
-	}
-	
-
-	protected BufferedWriter initSalesOutputFile(String retailerID, String processDate)
-			throws BaseException {
-		BufferedWriter writer;
-		String mergeFolderPath = Utils.getProperty(retailerID
-				+ Constants.OUTPUT_SALES_PATH);
-
-		String mergeFilePath = mergeFolderPath + retailerID + "_sales_"
-				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
-				+ ".txt";
-		getLog().info("初始化整合文本文件. 文件名: " + mergeFilePath);
-		File mergeFolder = new File(mergeFolderPath);
-		if (!mergeFolder.exists()) {
-			mergeFolder.mkdir();
-		}
-
-		File mergeFile = new File(mergeFilePath);
-
-		try {
-			FileOutputStream fileOutput = new FileOutputStream(mergeFile);
-			writer = new BufferedWriter(new OutputStreamWriter(fileOutput,
-					"UTF-8"));
-		} catch (IOException e) {
-			throw new BaseException(e);
-		}
-
-		writerSalesOutputFileHeader(writer);
-		return writer;
-	}
-
-	private void writerSalesOutputFileHeader(BufferedWriter writer)
-			throws BaseException {
-		String mergedHeader = Utils.getProperty(Constants.SALES_HEADER);
-		try {
-			writer.write(mergedHeader);
-			writer.newLine();
-		} catch (IOException e) {
-
-			throw new BaseException(e);
-		}
 	}
 
 	private void convertOrderData(String retailerID, Date startDate,
@@ -181,13 +100,26 @@ public abstract class RetailerDataConversionService {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, startDate, endDate);
 
+		if(receivingNoteMap==null || receivingNoteMap.size()==0){
+			getLog().info("零售商：" + retailerID +" 无收货单数据。");
+			return;
+		}
+		
 		getLog().info("读取收货单数据结束:" + retailerID);
 
+		
 		// Get Order No. List
 
+		getLog().info("读取订单数据:" + retailerID);
 		Map<String, OrderTO> orderTOMap = getOrderInfo(retailerID,
 				receivingNoteMap.keySet());
 
+		if(orderTOMap==null || orderTOMap.size()==0){
+			getLog().info("零售商：" + retailerID +" 无订单单数据。");
+			return;
+		}
+		
+		getLog().info("读取订单数据结束:" + retailerID);
 		// go through the receiving map, generate map: key receiving date
 
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = generateReceivingMapByDate(receivingNoteMap);
@@ -223,42 +155,11 @@ public abstract class RetailerDataConversionService {
 		;
 		getLog().info(destPath);
 		// Copy processed receiving note from inbound to processed folder
-		FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
+		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
 				destPath);
 	}
+	
 
-	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
-			Map<String, List<ReceivingNoteTO>> receivingNoteMap) {
-		Map<String, List<ReceivingNoteTO>> receivingByDateMap = new HashMap<String, List<ReceivingNoteTO>>();
-		for (List<ReceivingNoteTO> receivingNoteList : receivingNoteMap
-				.values()) {
-
-			List<ReceivingNoteTO> receivingNoteByDateList = null;
-			for (ReceivingNoteTO receivingNoteTO : receivingNoteList) {
-				String processDate = receivingNoteTO.getReceivingDate();
-				if (receivingByDateMap.containsKey(processDate)) {
-					receivingNoteByDateList = receivingByDateMap
-							.get(processDate);
-				} else {
-					receivingNoteByDateList = new ArrayList<ReceivingNoteTO>();
-
-				}
-				receivingNoteByDateList.add(receivingNoteTO);
-				receivingByDateMap.put(processDate, receivingNoteByDateList);
-
-			}
-		}
-
-		for (Entry<String, List<ReceivingNoteTO>> entry : receivingByDateMap
-				.entrySet()) {
-			String key = entry.getKey();
-			List valueList = entry.getValue();
-
-			getLog().info("收货单日期：" + key + " 收货单数量:" + valueList.size());
-		}
-
-		return receivingByDateMap;
-	}
 
 	/**
 	 * Get receiving data
@@ -293,6 +194,39 @@ public abstract class RetailerDataConversionService {
 
 		return receivingNoteMap;
 
+	}
+
+	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
+			Map<String, List<ReceivingNoteTO>> receivingNoteMap) {
+		Map<String, List<ReceivingNoteTO>> receivingByDateMap = new HashMap<String, List<ReceivingNoteTO>>();
+		for (List<ReceivingNoteTO> receivingNoteList : receivingNoteMap
+				.values()) {
+
+			List<ReceivingNoteTO> receivingNoteByDateList = null;
+			for (ReceivingNoteTO receivingNoteTO : receivingNoteList) {
+				String processDate = receivingNoteTO.getReceivingDate();
+				if (receivingByDateMap.containsKey(processDate)) {
+					receivingNoteByDateList = receivingByDateMap
+							.get(processDate);
+				} else {
+					receivingNoteByDateList = new ArrayList<ReceivingNoteTO>();
+
+				}
+				receivingNoteByDateList.add(receivingNoteTO);
+				receivingByDateMap.put(processDate, receivingNoteByDateList);
+
+			}
+		}
+
+		for (Entry<String, List<ReceivingNoteTO>> entry : receivingByDateMap
+				.entrySet()) {
+			String key = entry.getKey();
+			List valueList = entry.getValue();
+
+			getLog().info("收货单日期：" + key + " 收货单数量:" + valueList.size());
+		}
+
+		return receivingByDateMap;
 	}
 
 	/**
@@ -374,10 +308,17 @@ public abstract class RetailerDataConversionService {
 		}
 	}
 
+	/**
+	 * Parse the receiving list of one day to map
+	 * The key is: Order Number + Store Name + Item ID
+	 * @param receivingNoteList
+	 * @return
+	 * @throws BaseException
+	 */
 	private Map<String, ReceivingNoteTO> parseReceivingListToMap(
 			List<ReceivingNoteTO> receivingNoteList) throws BaseException {
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
-
+	
 		for (int i = 0; i < receivingNoteList.size(); i++) {
 			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
 			String storeName = receivingNoteByStoreTO.getStoreName();
@@ -395,17 +336,18 @@ public abstract class RetailerDataConversionService {
 						"整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity()
 								+ " 原始总价: "
 								+ receivingNoteByStoreTO.getTotalPrice());
-
+	
 				getLog().info(
 						"整合收货单: 整合后数量: " + existTO.getQuantity() + " 整合后总价: "
 								+ existTO.getTotalPrice());
 			} else {
 				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
 			}
-
+	
 		}
 		return receivingNoteByStoreMap;
 	}
+
 
 	/**
 	 * Merge Order Info and Receiving Info to one txt record
@@ -489,6 +431,44 @@ public abstract class RetailerDataConversionService {
 		}
 	}
 
+
+	/**
+	 * Convert the sales info by user per running date to by sales date
+	 * @param retailerID
+	 * @param startDate
+	 * @param endDate
+	 * @throws BaseException
+	 */
+	public void convertSalesData(String retailerID, Date startDate,
+			Date endDate) throws BaseException {
+		
+		// getSalesData
+		
+		Map<String, List<SalesTO>> salesMap = this.getSalesInfo(retailerID, startDate, endDate);
+		if(salesMap==null || salesMap.size()==0){
+			getLog().info("零售商：" + retailerID +" 无销售单数据。");
+			return;
+		}
+		// Write Data to output folder
+		for (Entry<String, List<SalesTO>> entry : salesMap
+				.entrySet()) {
+			String processDateStr = entry.getKey();
+			List<SalesTO> salesList = entry.getValue();
+			salesDataProcessing(retailerID, processDateStr,
+					salesList);
+		}
+		// Archive
+		String sourceFilePath = Utils.getProperty(retailerID
+				+ Constants.SALES_INBOUND_PATH);
+		getLog().info(sourceFilePath);
+		String destPath = Utils.getProperty(retailerID
+				+ Constants.SALES_PROCESSED_PATH);
+		
+		getLog().info(destPath);
+		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
+				destPath);
+	}
+	
 	private Map<String, List<SalesTO>> getSalesInfo(String retailerID,
 			Date startDate, Date endDate) throws BaseException {
 		Map salesMap = new HashMap();
@@ -514,6 +494,68 @@ public abstract class RetailerDataConversionService {
 		return salesMap;
 
 	}
+
+	private void salesDataProcessing(String retailerID, String processDateStr,
+			List<SalesTO> salesList) throws BaseException {
+		BufferedWriter writer = this.initSalesOutputFile(retailerID, processDateStr);
+		
+		for(SalesTO salesTO:salesList){
+			String outputLine = salesTO.toString();
+			try {
+				writer.write(outputLine);
+
+				writer.newLine();
+			} catch (IOException e) {
+				FileUtil.closeFileWriter(writer);
+				throw new BaseException(e);
+			}
+		}
+		
+		FileUtil.closeFileWriter(writer);
+	}
+	
+
+	protected BufferedWriter initSalesOutputFile(String retailerID, String processDate)
+			throws BaseException {
+		BufferedWriter writer;
+		String mergeFolderPath = Utils.getProperty(retailerID
+				+ Constants.OUTPUT_SALES_PATH);
+
+		String mergeFilePath = mergeFolderPath + retailerID + "_sales_"
+				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
+				+ ".txt";
+		getLog().info("初始化整合文本文件. 文件名: " + mergeFilePath);
+		File mergeFolder = new File(mergeFolderPath);
+		if (!mergeFolder.exists()) {
+			mergeFolder.mkdir();
+		}
+
+		File mergeFile = new File(mergeFilePath);
+
+		try {
+			FileOutputStream fileOutput = new FileOutputStream(mergeFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput,
+					"UTF-8"));
+		} catch (IOException e) {
+			throw new BaseException(e);
+		}
+
+		writerSalesOutputFileHeader(writer);
+		return writer;
+	}
+
+	private void writerSalesOutputFileHeader(BufferedWriter writer)
+			throws BaseException {
+		String mergedHeader = Utils.getProperty(Constants.SALES_HEADER);
+		try {
+			writer.write(mergedHeader);
+			writer.newLine();
+		} catch (IOException e) {
+
+			throw new BaseException(e);
+		}
+	}
+
 
 	
 }

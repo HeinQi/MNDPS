@@ -49,6 +49,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			if (!"Success".equals(loginResult)) {
 				return;
 			}
+			
+			getSalesExcel(httpClient, user);
 			// receive
 			//getReceiveExcel(httpClient, user);
 			// order

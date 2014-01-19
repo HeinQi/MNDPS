@@ -8,9 +8,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -22,6 +23,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.exception.BaseException;
+
 
 public class Utils {
 	private static Properties properties; 
@@ -137,7 +139,7 @@ public class Utils {
 		for (Entry<String, List> entry : subMap
 				.entrySet()) {
 			String key = entry.getKey();
-			List<?> valueList = entry.getValue();
+			List valueList = entry.getValue();
 			if (mainMap.containsKey(key)) {
 				mainMap.get(key).addAll(valueList);
 			} else {

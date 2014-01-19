@@ -231,7 +231,7 @@ public class FileUtil {
 			throws BaseException {
 
 		String salesInboundFolderPath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
+				+ Constants.SALES_INBOUND_PATH);
 		createFolder(salesInboundFolderPath);
 		String salesFilePath = salesInboundFolderPath + "Sales_"
 				+ retailerID + "_" + userID + "_"

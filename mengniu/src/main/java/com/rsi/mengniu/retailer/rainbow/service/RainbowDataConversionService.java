@@ -25,6 +25,7 @@ import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
@@ -184,7 +185,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	private void retailerDataProcessing(String retailerID, String processDate,
 			List<ReceivingNoteTO> receivingList) throws BaseException {
 
-		BufferedWriter writer = initMergeFile(retailerID, processDate);
+		BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
 
 		// Get matched receiving note by iterate order txt file
 		// Merge to one record
@@ -231,5 +232,13 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		if (failedCount != 0) {
 			getLog().info("收货单整合失败数量: " + failedCount);
 		}
+	}
+
+	@Override
+	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
+			String retailerID, Date startDate, Date endDate, File salesFile)
+			throws BaseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

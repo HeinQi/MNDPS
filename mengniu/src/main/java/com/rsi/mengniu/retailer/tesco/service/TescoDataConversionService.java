@@ -28,6 +28,7 @@ import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
@@ -237,6 +238,14 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 	@Override
 	protected Log getLog() {
 		return log;
+	}
+
+	@Override
+	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
+			String retailerID, Date startDate, Date endDate, File salesFile)
+			throws BaseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
@@ -135,5 +136,19 @@ public class Utils {
 			storeMap.put(storeName,storeID);
 		}
 		return storeMap;
+	}
+
+	public static void putSubMapToMainMap(Map<String, List> mainMap,
+			Map<String, List> subMap) {
+		for (Entry<String, List> entry : subMap
+				.entrySet()) {
+			String key = entry.getKey();
+			List<?> valueList = entry.getValue();
+			if (mainMap.containsKey(key)) {
+				mainMap.get(key).addAll(valueList);
+			} else {
+				mainMap.put(key, valueList);
+			}
+		}
 	}
 }

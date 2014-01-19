@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
@@ -30,6 +36,7 @@ public class RenrenleDataConversionService extends
 		RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(RenrenleDataConversionService.class);
+
 	@Override
 	protected String getRetailerID() {
 		return Constants.RETAILER_RENRENLE;
@@ -61,56 +68,84 @@ public class RenrenleDataConversionService extends
 			throws BaseException {
 
 		String fileName = salesFile.getName();
-		String salesDate = fileName.substring(fileName.lastIndexOf("_")+1,fileName.indexOf("."));
-		salesDate = DateUtil.toString(DateUtil.toDate(salesDate,"yyyyMMdd"));
-		log.info("销售单生成日期："+ salesDate +"。销售开始日期：" +  DateUtil.toString(startDate) +"。销售截至日期："+ DateUtil.toString(endDate));
+		String salesDate = fileName.substring(fileName.lastIndexOf("_") + 1,
+				fileName.indexOf("."));
+		salesDate = DateUtil.toString(DateUtil.toDate(salesDate, "yyyyMMdd"));
+		log.info("销售单生成日期：" + salesDate + "。销售开始日期："
+				+ DateUtil.toString(startDate) + "。销售截至日期："
+				+ DateUtil.toString(endDate));
 		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
+		try {
+			InputStream sourceExcel = new FileInputStream(salesFile);
 
-		if (salesFile.exists()) {
-			BufferedReader reader = null;
-			try {
-				// Open the file
-				FileInputStream fileInput = new FileInputStream(salesFile);
-				InputStreamReader inputStrReader = new InputStreamReader(
-						fileInput, "UTF-8");
-				reader = new BufferedReader(inputStrReader);
-				reader.readLine();
-				// Read line by line
-				String salesLine = null;
-				while ((salesLine = reader.readLine()) != null) {
-					SalesTO salesTO = new SalesTO(
-							salesLine);
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
 
-					List<SalesTO> salesTOList = null;
-					if (salesMap.containsKey(salesDate)) {
-						salesTOList = salesMap.get(salesDate);
+			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+			for (int i = 3; i < sourceSheet.getPhysicalNumberOfRows() - 1; i++) {
+				Row sourceRow = sourceSheet.getRow(i);
+				if (sourceRow == null) {
+					continue;
+				}
+				SalesTO salesTO = new SalesTO();
+				salesTO.setSalesDate(salesDate);
+				List<SalesTO> salesTOList = null;
+
+				for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+
+					Cell sourceCell = sourceRow.getCell(j);
+
+					String sourceCellValue;
+					if (sourceCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+						sourceCellValue = Double.valueOf(
+								sourceCell.getNumericCellValue()).toString();
 					} else {
-						salesTOList = new ArrayList<SalesTO>();
-						// Test the Hashmap
-						salesMap.put(salesDate, salesTOList);
+
+						sourceCellValue = sourceCell.getStringCellValue();
 					}
 
-					log.debug("收货单详细条目: " + salesTO.toString());
-					salesTOList.add(salesTO);
+					switch (j) {
+					case 0:
+						salesTO.setStoreID(sourceCellValue);
+
+						continue;
+					case 2:
+						salesTO.setItemName(sourceCellValue);
+
+						continue;
+					case 3:
+						salesTO.setItemID(sourceCellValue);
+
+						continue;
+					case 6:
+						salesTO.setSalesQuantity(sourceCellValue);
+
+						continue;
+					case 7:
+						salesTO.setSalesAmount(sourceCellValue);
+
+						continue;
+
+					}
 
 				}
+				if (salesMap.containsKey(salesDate)) {
+					salesTOList = salesMap.get(salesDate);
+				} else {
+					salesTOList = new ArrayList<SalesTO>();
+					// Test the Hashmap
+					salesMap.put(salesDate, salesTOList);
+				}
 
-			} catch (FileNotFoundException e) {
-				log.error(e);
-				throw new BaseException(e);
-			} catch (IOException e) {
+				log.debug("收货单详细条目: " + salesTO.toString());
+				salesTOList.add(salesTO);
 
-				log.error(e);
-				throw new BaseException(e);
-
-			} finally {
-
-				FileUtil.closeFileReader(reader);
 			}
-
-			log.info("收货单: " + salesFile.getName() + " 包含的详单数量为:"
-					+ salesMap.size());
-
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
 		}
 		return salesMap;
 	}

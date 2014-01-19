@@ -46,11 +46,7 @@ public class CarrefourDataConversionService extends
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
 			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-			/*
-			 * Workbook wb = null; if (fileType.equals("xls")) { wb = new
-			 * HSSFWorkbook(); } else if(fileType.equals("xlsx")) { wb = new
-			 * XSSFWorkbook(); }
-			 */
+		
 			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
 			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 				Row sourceRow = sourceSheet.getRow(i);

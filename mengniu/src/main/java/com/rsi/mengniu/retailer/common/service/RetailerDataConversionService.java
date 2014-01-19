@@ -279,7 +279,7 @@ public abstract class RetailerDataConversionService {
 		getLog().info("初始化整合文本文件. 文件名: " + mergeFilePath);
 		File mergeFolder = new File(mergeFolderPath);
 		if (!mergeFolder.exists()) {
-			mergeFolder.mkdir();
+			mergeFolder.mkdirs();
 		}
 
 		File mergeFile = new File(mergeFilePath);
@@ -526,7 +526,7 @@ public abstract class RetailerDataConversionService {
 		getLog().info("初始化整合文本文件. 文件名: " + mergeFilePath);
 		File mergeFolder = new File(mergeFolderPath);
 		if (!mergeFolder.exists()) {
-			mergeFolder.mkdir();
+			boolean mk = mergeFolder.mkdirs();
 		}
 
 		File mergeFile = new File(mergeFilePath);

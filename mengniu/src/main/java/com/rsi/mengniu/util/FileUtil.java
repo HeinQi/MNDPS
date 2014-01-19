@@ -55,7 +55,7 @@ public class FileUtil {
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
 		// File receivingInboundFolder = new File(orderFolderPath);
 		// if (!receivingInboundFolder.exists()) {
-		// receivingInboundFolder.mkdir();
+		// receivingInboundFolder.mkdirs();
 		// }
 
 		File orderFile = new File(orderFilePath);
@@ -127,7 +127,7 @@ public class FileUtil {
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
 		// File receivingInboundFolder = new File(receivingInboundFolderPath);
 		// if (!receivingInboundFolder.exists()) {
-		// receivingInboundFolder.mkdir();
+		// receivingInboundFolder.mkdirs();
 		// }
 
 		File receivingFile = new File(receivingFilePath);
@@ -183,7 +183,7 @@ public class FileUtil {
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
 		// File receivingInboundFolder = new File(receivingInboundFolderPath);
 		// if (!receivingInboundFolder.exists()) {
-		// receivingInboundFolder.mkdir();
+		// receivingInboundFolder.mkdirs();
 		// }
 
 		File receivingFile = new File(receivingFilePath);
@@ -239,7 +239,7 @@ public class FileUtil {
 		// log.info("初始化整合文本文件. 文件名: " + salesInboundFolderPath);
 		// File salesInboundFolder = new File(salesInboundFolderPath);
 		// if (!salesInboundFolder.exists()) {
-		// salesInboundFolder.mkdir();
+		// salesInboundFolder.mkdirs();
 		// }
 
 		File salesFile = new File(salesFilePath);
@@ -434,7 +434,7 @@ public class FileUtil {
 		}
 		File destDir = new File(dest); // 解压目录
 		if (destDir.isDirectory() && !destDir.exists()) {
-			destDir.mkdir();
+			destDir.mkdirs();
 		}
 		if (zFile.isEncrypted()) {
 			zFile.setPassword(passwd.toCharArray()); // 设置密码

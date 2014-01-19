@@ -58,8 +58,8 @@
 	<bean id ="hualian.data.conversion" class="com.rsi.mengniu.retailer.hualian.service.HualianDataConversionService">
 	</bean>
 	
-	<!-- <bean id ="renrenle.data.conversion" class="com.rsi.mengniu.retailer.renrenle.service.RenrenleDataConversionService">
-	</bean> -->
+	<bean id ="renrenle.data.conversion" class="com.rsi.mengniu.retailer.renrenle.service.RenrenleDataConversionService">
+	</bean>
 	
 	
 </beans>

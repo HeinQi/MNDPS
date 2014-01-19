@@ -443,7 +443,6 @@ public abstract class RetailerDataConversionService {
 			Date endDate) throws BaseException {
 		
 		// getSalesData
-		
 		Map<String, List<SalesTO>> salesMap = this.getSalesInfo(retailerID, startDate, endDate);
 		if(salesMap==null || salesMap.size()==0){
 			getLog().info("零售商：" + retailerID +" 无销售单数据。");

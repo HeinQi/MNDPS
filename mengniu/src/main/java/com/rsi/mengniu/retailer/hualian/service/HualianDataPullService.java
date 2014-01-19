@@ -118,9 +118,9 @@ public class HualianDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),"GBK"));
 		Element dataTable = doc.select("table").first();
-		Elements rows = dataTable.select("tr:gt(2)");
+		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i=0; i<rows.size()-1; i++) {
-			Elements tds = rows.select("td");
+			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
 			sales.setStoreID(tds.get(0).text());
 			sales.setItemID(tds.get(1).text());

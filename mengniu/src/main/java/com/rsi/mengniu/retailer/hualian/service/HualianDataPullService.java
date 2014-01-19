@@ -127,6 +127,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 			sales.setItemName(tds.get(2).text());
 			sales.setSalesQuantity(tds.get(3).text());
 			sales.setSalesAmount(tds.get(4).text());
+			salesList.add(sales);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}

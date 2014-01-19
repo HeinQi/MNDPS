@@ -49,5 +49,8 @@
 	<bean id ="yonghui.data.conversion" class="com.rsi.mengniu.retailer.yonghui.service.YonghuiDataConversionService">
 	</bean>
 	
+	<bean id ="rainbow.data.conversion" class="com.rsi.mengniu.retailer.rainbow.service.RainbowDataConversionService">
+	</bean>
+	
 	
 </beans>

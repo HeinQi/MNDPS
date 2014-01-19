@@ -141,7 +141,7 @@ public abstract class RetailerDataConversionService {
 
 	}
 
-	private Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
+	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
 			Map<String, List<ReceivingNoteTO>> receivingNoteMap) {
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = new HashMap<String, List<ReceivingNoteTO>>();
 		for (List<ReceivingNoteTO> receivingNoteList : receivingNoteMap
@@ -182,7 +182,7 @@ public abstract class RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	private Map<String, List<ReceivingNoteTO>> getReceivingInfo(
+	protected Map<String, List<ReceivingNoteTO>> getReceivingInfo(
 			String retailerID, Date startDate, Date endDate)
 			throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
@@ -245,7 +245,7 @@ public abstract class RetailerDataConversionService {
 
 	}
 
-	private BufferedWriter initMergeFile(String retailerID, String processDate)
+	protected BufferedWriter initMergeFile(String retailerID, String processDate)
 			throws BaseException {
 		BufferedWriter writer;
 		String mergeFolderPath = Utils.getProperty(retailerID
@@ -395,6 +395,8 @@ public abstract class RetailerDataConversionService {
 			}
 		}
 
-		getLog().info("收货单整合失败数量: " + failedCount);
+		if (failedCount != 0) {
+			getLog().info("收货单整合失败数量: " + failedCount);
+		}
 	}
 }

@@ -2,19 +2,19 @@ package com.rsi.mengniu.retailer.module;
 
 public class ReceivingNoteTO extends BaseTO {
 
-	private static final long serialVersionUID = 1665922323609964610L;
+	protected static final long serialVersionUID = 1665922323609964610L;
 
 
-	private String orderNo=""; // 1
-	private String receivingDate="";// 2
-	private String storeID=""; // 3
-	private String storeName="";// 4
-	private String itemID=""; // 5
-	private String itemName=""; // 6
-	private String barcode="";// 7
-	private String quantity="";// 8
-	private String unitPrice="";// 9
-	private String totalPrice="";// 10
+	protected String orderNo=""; // 1
+	protected String receivingDate="";// 2
+	protected String storeID=""; // 3
+	protected String storeName="";// 4
+	protected String itemID=""; // 5
+	protected String itemName=""; // 6
+	protected String barcode="";// 7
+	protected String quantity="";// 8
+	protected String unitPrice="";// 9
+	protected String totalPrice="";// 10
 
 	public String getOrderNo() {
 		return orderNo;

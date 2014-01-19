@@ -104,10 +104,10 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 	public void getSalesExcel(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
 		//http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
-		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.RECEIVING_INBOUND_PATH);
+		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_PATH);
 		FileUtil.createFolder(salesFilePath);
-		String receiveFileNm = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
-		FileOutputStream receiveFos = new FileOutputStream(salesFilePath + receiveFileNm);
+		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(Utils.getStartDate(Constants.RETAILER_RENRENLE)) + ".xls";
+		FileOutputStream salseFos = new FileOutputStream(salesFilePath + receiveFileNm);
 
 		String searchDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RENRENLE),"yyyy-MM-dd");
 		List<NameValuePair> salesformParams = new ArrayList<NameValuePair>();
@@ -115,33 +115,15 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		salesformParams.add(new BasicNameValuePair("searchType", "0"));
 		salesformParams.add(new BasicNameValuePair("saleType", "0"));
 		salesformParams.add(new BasicNameValuePair("orderASC", "false"));
-		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(salesformParams, "UTF-8");
-		HttpPost receivePost = new HttpPost("http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1");
-		receivePost.setEntity(receiveFormEntity);
-		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
-		String responseStr = EntityUtils.toString(receiveRes.getEntity());
-		receiveRes.close();
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
-		if (responseStr.contains("Excel文档生成成功")) {
-			// Download Excel file
-			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
-			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
-
-			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();
-			downloadformParams.add(new BasicNameValuePair("filename", inyrFileName));
-			downloadformParams.add(new BasicNameValuePair("filenamedownload", "excelpath"));
-			HttpEntity downloadFormEntity = new UrlEncodedFormEntity(downloadformParams, "UTF-8");
-			HttpPost downloadPost = new HttpPost("http://supplierweb.carrefour.com.cn/download.jsp");
-			downloadPost.setEntity(downloadFormEntity);
-			CloseableHttpResponse downloadRes = httpClient.execute(downloadPost);
-			downloadRes.getEntity().writeTo(receiveFos);
-			downloadRes.close();
-			receiveFos.close();
-			log.info(user + "家乐福收货单Excel下载成功!");
-		} else {
-			log.info(user + "家乐福收货单Excel下载失败!");
-		}
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
+		HttpEntity salesFormEntity = new UrlEncodedFormEntity(salesformParams, "UTF-8");
+		HttpPost salesPost = new HttpPost("http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1");
+		salesPost.setEntity(salesFormEntity);
+		CloseableHttpResponse downloadRes = httpClient.execute(salesPost);
+		downloadRes.getEntity().writeTo(salseFos);
+		downloadRes.close();
+		salseFos.close();
+		log.info(user + "销售数据下载成功");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 
 	}
 

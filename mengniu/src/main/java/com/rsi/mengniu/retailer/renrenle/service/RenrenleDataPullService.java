@@ -2,6 +2,7 @@ package com.rsi.mengniu.retailer.renrenle.service;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -47,11 +48,10 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 				return;
 			}
 			
-			getSalesExcel(httpClient, user);
-			// receive
-			//getReceiveExcel(httpClient, user);
-			// order
-			//getOrder(httpClient, user);
+			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE), Utils.getEndDate(Constants.RETAILER_RENRENLE));
+			for (Date searchDate:dates) {
+				getSalesExcel(httpClient, user,DateUtil.toString(searchDate,"yyyy-MM-dd"));
+			}
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
@@ -100,8 +100,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getSalesExcel(CloseableHttpClient httpClient, User user) throws Exception {
-		log.info(user + "开始下载销售数据...");
+	public void getSalesExcel(CloseableHttpClient httpClient, User user,String searchDate) throws Exception {
+		log.info(user + "开始下载"+searchDate+"的销售数据...");
 		
 		// /scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401
 		// 销售查询
@@ -118,10 +118,9 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		//http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
 		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesFilePath);
-		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(Utils.getStartDate(Constants.RETAILER_RENRENLE)) + ".xls";
+		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_" + searchDate.replaceAll("-", "") + ".xls";
 		FileOutputStream salseFos = new FileOutputStream(salesFilePath + receiveFileNm);
 
-		String searchDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RENRENLE),"yyyy-MM-dd");
 		List<NameValuePair> salesformParams = new ArrayList<NameValuePair>();
 		salesformParams.add(new BasicNameValuePair("searchDate", searchDate));
 		salesformParams.add(new BasicNameValuePair("searchType", "0"));
@@ -136,7 +135,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		downloadRes.getEntity().writeTo(salseFos);
 		downloadRes.close();
 		salseFos.close();
-		log.info(user + "销售数据下载成功");
+		log.info(user + searchDate+"的销售数据下载成功");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 
 	}

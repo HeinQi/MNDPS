@@ -9,6 +9,7 @@ public final class Constants {
 	public static final String RETAILER_RAINBOW = "rainbow";
 	public static final String RETAILER_RENRENLE = "renrenle";
 
+	public static final String SALES_PATH = ".sales.filePath";
 	public static final String ORDER_PATH = ".order.filePath";
 	public static final String RECEIVING_INBOUND_PATH = ".receiving.inbound.filePath";
 	public static final String RECEIVING_PROCESSED_PATH = ".receiving.processed.filePath";

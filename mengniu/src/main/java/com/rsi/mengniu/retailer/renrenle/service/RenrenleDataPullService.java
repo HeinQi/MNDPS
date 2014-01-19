@@ -101,18 +101,22 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getReceiveExcel(CloseableHttpClient httpClient, User user) throws Exception {
-		log.info(user + "开始下载收货单...");
-		// goMenu('inyr.do?action=query','14','预估进退查询')
+	public void getSalesExcel(CloseableHttpClient httpClient, User user) throws Exception {
+		log.info(user + "开始下载销售数据...");
+		//http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
+		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.RECEIVING_INBOUND_PATH);
+		FileUtil.createFolder(salesFilePath);
+		String receiveFileNm = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
+		FileOutputStream receiveFos = new FileOutputStream(salesFilePath + receiveFileNm);
 
-		// $('inyrForm').action="inyr.do?action=export";
-		// 供应商预估进退查询/Supplier Inyr Inquiry
-		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
-		receiveformParams.add(new BasicNameValuePair("unitid", "ALL"));
-		receiveformParams.add(new BasicNameValuePair("butype", "byjv"));
-		receiveformParams.add(new BasicNameValuePair("systemdate", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "yyyy/MM/dd"))); // yyyy/mm/dd
-		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
-		HttpPost receivePost = new HttpPost("http://supplierweb.carrefour.com.cn/inyr.do?action=export");
+		String searchDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RENRENLE),"yyyy-MM-dd");
+		List<NameValuePair> salesformParams = new ArrayList<NameValuePair>();
+		salesformParams.add(new BasicNameValuePair("searchDate", searchDate));
+		salesformParams.add(new BasicNameValuePair("searchType", "0"));
+		salesformParams.add(new BasicNameValuePair("saleType", "0"));
+		salesformParams.add(new BasicNameValuePair("orderASC", "false"));
+		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(salesformParams, "UTF-8");
+		HttpPost receivePost = new HttpPost("http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1");
 		receivePost.setEntity(receiveFormEntity);
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
 		String responseStr = EntityUtils.toString(receiveRes.getEntity());
@@ -122,10 +126,6 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			// Download Excel file
 			responseStr = responseStr.substring(responseStr.indexOf("javascript:downloads('") + 22);
 			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
-			String receiveFilePath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_INBOUND_PATH);
-			FileUtil.createFolder(receiveFilePath);
-			String receiveFileNm = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
-			FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + receiveFileNm);
 
 			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();
 			downloadformParams.add(new BasicNameValuePair("filename", inyrFileName));

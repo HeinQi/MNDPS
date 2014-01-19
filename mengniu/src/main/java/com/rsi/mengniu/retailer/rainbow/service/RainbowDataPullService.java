@@ -36,7 +36,6 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String returnType = this.login(httpClient, user);
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 			if (!"Success".equals(returnType)) {
 				return;
 			}
@@ -98,9 +97,13 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 	private void getReceiving(CloseableHttpClient httpClient, User user)
 			throws Exception {
+<<<<<<< HEAD
 		List <ReceivingNoteTO> receivingList = new ArrayList<ReceivingNoteTO>();
 		
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
+=======
+
+>>>>>>> 724ce47b8caf961feeedc326d2944456cec083e7
 		HttpGet httpGet = new HttpGet(
 				"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
 						+ "?start=1"
@@ -135,11 +138,17 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String responseStr = EntityUtils.toString(entity);
+<<<<<<< HEAD
+=======
+		log.info(responseStr);
+		
+>>>>>>> 724ce47b8caf961feeedc326d2944456cec083e7
 		response.close();
 		
 		
 		Document doc = Jsoup.parse(responseStr);
 		
+<<<<<<< HEAD
 		String totalPageNumberStr = doc.select("a").last().attr("onclick");
 		
 		totalPageNumberStr = totalPageNumberStr.substring(totalPageNumberStr.indexOf("(")+1, totalPageNumberStr.indexOf(")"));
@@ -241,6 +250,10 @@ public class RainbowDataPullService implements RetailerDataPullService {
 				}
 				
 			}
+=======
+		for(Element rowElement : rowsElements){
+			Elements tdElements = rowElement.select("td");
+>>>>>>> 724ce47b8caf961feeedc326d2944456cec083e7
 			
 		}
 		FileUtil.exportReceivingInfoToTXTForRainbow(Constants.RETAILER_RAINBOW, user.getUserId(), receivingList);

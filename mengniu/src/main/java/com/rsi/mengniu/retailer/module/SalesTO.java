@@ -21,7 +21,7 @@ public class SalesTO extends BaseTO {
 	}
 
 	public SalesTO(String salesString) {
-		String[] orderFieldArray = salesString.split("\t");
+		String[] orderFieldArray = salesString.split("\t",-1);
 
 		this.setItemID(orderFieldArray[0]);
 		this.setItemName(orderFieldArray[1]);

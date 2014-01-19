@@ -33,7 +33,7 @@ public class RainbowReceivingTO extends ReceivingNoteTO {
 
 
 	public RainbowReceivingTO(String consolidatedString) {
-		String[] consolidatedFieldArray = consolidatedString.split("\t");
+		String[] consolidatedFieldArray = consolidatedString.split("\t",-1);
 
 		this.setOrderNo(consolidatedFieldArray[0]);
 		this.setStoreID(consolidatedFieldArray[1]);

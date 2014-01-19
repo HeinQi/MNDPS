@@ -61,5 +61,8 @@
 	<bean id ="renrenle.data.conversion" class="com.rsi.mengniu.retailer.renrenle.service.RenrenleDataConversionService">
 	</bean>
 	
+	<bean id ="metro.data.conversion" class="com.rsi.mengniu.retailer.metro.service.MetroDataConversionService">
+	</bean>
+	
 	
 </beans>

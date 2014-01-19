@@ -152,25 +152,12 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		getLog().info(sourceFilePath);
 		String destPath = Utils.getProperty(retailerID
 				+ Constants.RECEIVING_PROCESSED_PATH);
-		;
+		
 		getLog().info(destPath);
-		// Copy processed receiving note from inbound to processed folder
-		// TODO
-		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
+			FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
 				destPath);
 
-		// create file by date
-		// populate the new receiving map: key:storename+itemid
-		// match with order map
-		/*
-		 * List<Date> dateList = null; try { dateList =
-		 * DateUtil.getDateArrayByRange(startDate, endDate); for (int i = 0; i <
-		 * dateList.size(); i++) { Date processDate = dateList.get(i);
-		 * 
-		 * retailerDataProcessing(retailerID, processDate); }
-		 * 
-		 * } catch (ParseException e) { throw new BaseException(e); }
-		 */
+	
 
 		getLog().info("数据处理结束");
 

@@ -183,12 +183,13 @@ public abstract class RetailerDataConversionService {
 
 				File receivingFile = receivingList[i];
 				getLog().info("收货单文件名: " + receivingFile.getName());
+				
+				//Get Receiving Info
 				Map receivingNoteSingleMap = getReceivingInfoFromFile(
 						retailerID, startDate, endDate, receivingFile);
 
 				Utils.putSubMapToMainMap(receivingNoteMap,receivingNoteSingleMap);
 				
-				//receivingNoteMap.putAll(receivingNoteSingleMap);
 			}
 		}
 
@@ -196,8 +197,8 @@ public abstract class RetailerDataConversionService {
 
 	}
 
-	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
-			Map<String, List<ReceivingNoteTO>> receivingNoteMap) {
+	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate (
+			Map<String, List<ReceivingNoteTO>> receivingNoteMap) throws BaseException{
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = new HashMap<String, List<ReceivingNoteTO>>();
 		for (List<ReceivingNoteTO> receivingNoteList : receivingNoteMap
 				.values()) {
@@ -315,7 +316,7 @@ public abstract class RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	private Map<String, ReceivingNoteTO> parseReceivingListToMap(
+	public Map<String, ReceivingNoteTO> parseReceivingListToMap(
 			List<ReceivingNoteTO> receivingNoteList) throws BaseException {
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
 	

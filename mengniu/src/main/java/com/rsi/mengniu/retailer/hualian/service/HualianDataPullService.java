@@ -22,8 +22,10 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
+import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
 //https://tesco.chinab2bi.com/security/login.hlt
@@ -88,23 +90,28 @@ public class HualianDataPullService implements RetailerDataPullService {
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"),"GBK"));
 		Element storeElement = doc.select("#store").first();
 		formResponse.close();
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
+		List<SalesTO> salesList = new ArrayList<SalesTO>();
 		Elements sElements = storeElement.select("option[value]");
 		for (Element store:sElements) {
 			String storeId = store.attr("value");
-			getSalesByStore(httpClient,user,storeId);
+			getSalesByStore(httpClient,user,storeId,salesList);
 		}
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
+		FileUtil.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(), salesList);
+		log.info(user + "销售数据下载成功");
 	}
 	
 	///suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user,String storeId) throws Exception {
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
+	private void getSalesByStore(CloseableHttpClient httpClient, User user,String storeId,List<SalesTO> salesList) throws Exception {
 		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_HUALIAN),"yyyyMMdd");
 		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_HUALIAN),"yyyyMMdd");
+		
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("store", storeId));
 		formParams.add(new BasicNameValuePair("begindate", startDate));
 		formParams.add(new BasicNameValuePair("enddate", endDate));
+		log.info(user + "下载店号为["+storeId+"],日期区间为"+startDate+" - "+endDate+"的销售数据");
+		
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
 		HttpPost httppost = new HttpPost("http://zunyi.beijing-hualian.com/suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
@@ -114,12 +121,15 @@ public class HualianDataPullService implements RetailerDataPullService {
 		Elements rows = dataTable.select("tr:gt(2)");
 		for (int i=0; i<rows.size()-1; i++) {
 			Elements tds = rows.select("td");
-			log.info(tds.get(0).text());
-			log.info(tds.get(1).text());
-			log.info(tds.get(2).text());
-			log.info(tds.get(3).text());
-			log.info(tds.get(4).text());
+			SalesTO sales = new SalesTO();
+			sales.setStoreID(tds.get(0).text());
+			sales.setItemID(tds.get(1).text());
+			sales.setItemName(tds.get(2).text());
+			sales.setSalesQuantity(tds.get(3).text());
+			sales.setSalesAmount(tds.get(4).text());
+			salesList.add(sales);
 		}
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}
 
 }

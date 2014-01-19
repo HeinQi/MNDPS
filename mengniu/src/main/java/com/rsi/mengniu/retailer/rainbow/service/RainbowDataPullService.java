@@ -113,24 +113,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 						+ "','yyyy-mm-dd')%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3C=to_date('"
 						+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))
 						+ "','yyyy-mm-dd')");
-//		
-//		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-//		formParams.add(new BasicNameValuePair("loginfile",
-//				"/login/Login.jsp?logintype=1"));
-//		formParams.add(new BasicNameValuePair("start", "0"));
-//		formParams.add(new BasicNameValuePair("limit", "20"));
-//		formParams.add(new BasicNameValuePair("where", " and 收货日期>=to_date('"
-//						+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RAINBOW))
-//						+ "','yyyy-mm-dd') and 收货日期<=to_date('"
-//						+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))
-//						+ "','yyyy-mm-dd')")); // 错误的密码
-//		formParams.add(new BasicNameValuePair("rptId", "3124")); // 错误的密码
-//		formParams.add(new BasicNameValuePair("html", "Y")); // 错误的密码
-//		HttpEntity getDetailEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-//
-//		HttpPost httpPost = new HttpPost(
-//				"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp");
-//		httpPost.setEntity(getDetailEntity);
+
 		
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
@@ -171,7 +154,6 @@ public class RainbowDataPullService implements RetailerDataPullService {
 			
 			//Receiving highlevel info
 			Elements rowsElements = summaryPageDoc.select("#dataTable").first().select("tr:gt(0)");
-			log.info(rowsElements);
 			rowsElements.remove(rowsElements.size()-1);
 			
 			
@@ -193,7 +175,6 @@ public class RainbowDataPullService implements RetailerDataPullService {
 //			</tr>
 			for(Element rowElement : rowsElements){
 				Elements tdElements = rowElement.select("td");
-				log.debug(rowElement);
 				String receivingNo = tdElements.get(0).text();
 				log.info(user + "收货单编号：" + receivingNo);
 

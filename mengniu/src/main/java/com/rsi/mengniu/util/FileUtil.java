@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -104,6 +105,36 @@ public class FileUtil {
 
 		}
 
+	}
+	
+
+
+	/**
+	 * Export Order info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param orderID
+	 * @param orderList
+	 * @throws BaseException
+	 */
+	public static void exportOrderInfoListToTXT(String retailerID, 
+			List<OrderTO> orderList) throws BaseException {
+		Map <String,List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+		List<OrderTO> tempOrderList = null;
+		for(OrderTO orderTO : orderList){
+			String orderNo = orderTO.getOrderNo();
+			
+			if(orderMap.containsKey(orderNo)){
+				tempOrderList = orderMap.get(orderNo);
+			} else {
+				tempOrderList = new ArrayList<OrderTO>();
+				orderMap.put(orderNo, tempOrderList);
+			}
+			tempOrderList.add(orderTO);
+		}
+		for(Entry<String, List<OrderTO>> entry:orderMap.entrySet()){
+			exportOrderInfoToTXT(retailerID,entry.getKey(),entry.getValue());
+		}
 	}
 
 	/**

@@ -269,15 +269,16 @@ public class MetroDataPullService implements RetailerDataPullService {
 			String pageStr = pageElement.attr("lsdata");
 			pageStr = pageStr.substring(pageStr.indexOf("ROW")+8,pageStr.lastIndexOf("}"));
 			int record = Integer.valueOf(pageStr);
+			log.info(user+"收货单明细共有 "+record+" 行");
 			int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
 			List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
-			getReceiveDetailByPage(receiveDetailRes,1,record,receiveList);
+			getReceiveDetailByPage(receiveDetailRes,1,record,receiveList,user);
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
 			for (int i=2; i<=page; i++) {
 				int startRow = i*10-9;
 				String detailStr = getReceiveDetailByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
 				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
-				getReceiveDetailByPage(detailStr,startRow,record,receiveList);
+				getReceiveDetailByPage(detailStr,startRow,record,receiveList,user);
 			}
 			FileUtil.exportReceivingInfoToTXT(Constants.RETAILER_METRO, user.getUserId(), receiveList);
 			log.info(user + "收货单下载成功!");
@@ -308,7 +309,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 	}	
 	
 	
-	private void getReceiveDetailByPage(String responseStr,int startRow,int record,List<ReceivingNoteTO> receiveList) {
+	private void getReceiveDetailByPage(String responseStr,int startRow,int record,List<ReceivingNoteTO> receiveList,User user) {
+		log.info(user+"读取收货单明细 "+startRow+"-"+((startRow+9)>record?record:(startRow+9))+" 行");
 		Document detailResult = Jsoup.parse(responseStr);
 		
 		for (int i=startRow; i<startRow+10 && i<=record;i++) {
@@ -465,7 +467,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 		orderformParams5.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams5.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams5.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
-		String sapEventQueueSubmit = "ComboBox_SelectIdaaaa.OrdersView.DropDownByKeyMaxResultKey500ByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEButton_PressIdaaaa.OrdersView.ButtonSearchClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonSearch\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		//String sapEventQueueSubmit = "ComboBox_SelectIdaaaa.OrdersView.DropDownByKeyMaxResultKey500ByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEButton_PressIdaaaa.OrdersView.ButtonSearchClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonSearch\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		String sapEventQueueSubmit = "ComboBox_SelectIdaaaa.OrdersView.DropDownByKeyStatusKeyRECEIVEDByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEComboBox_SelectIdaaaa.OrdersView.DropDownByKeyMaxResultKey500ByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEButton_PressIdaaaa.OrdersView.ButtonSearchClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonSearch\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams5.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueueSubmit));
 		HttpEntity orderFormEntity5 = new UrlEncodedFormEntity(orderformParams5, "UTF-8");
 		HttpPost orderPost5 = new HttpPost(url2);
@@ -494,6 +497,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		orderPost6.setEntity(orderFormEntity6);
 		CloseableHttpResponse orderRes6 = httpClient.execute(orderPost6);
 		orderRes6.close();
+		/*
 		//显示未交货订单明细
 		getUnDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id);
 		// Back
@@ -512,7 +516,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse orderRes8 = httpClient.execute(orderPost8);
 		String backRes = EntityUtils.toString(orderRes8.getEntity()); 
 		orderRes8.close();		
-		
+		*/
 		//显示已交货订单明细
 		getDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id);
 		
@@ -546,17 +550,16 @@ public class MetroDataPullService implements RetailerDataPullService {
 			int record = Integer.valueOf(pageStr);
 			int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
-			getOrderDetail(orderDetailRes,1,record,orderList);
+			getOrderDetail(orderDetailRes,1,record,orderList,user);
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
 			for (int i=2; i<=page; i++) {
 				int startRow = i*10-9;
 				String detailStr = getOrderByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
 				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
-				getOrderDetail(detailStr,startRow,record,orderList);
+				getOrderDetail(detailStr,startRow,record,orderList,user);
 			}
-			for (OrderTO order : orderList) {
-				//FileUtil.exportOrderInfoToTXT(Constants.RETAILER_METRO, order);
-			}
+			
+			FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
 			
 			log.info(user + "下载未交货订单明细成功!");
 		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
@@ -593,20 +596,19 @@ public class MetroDataPullService implements RetailerDataPullService {
 			String pageStr = pageElement.attr("lsdata");
 			pageStr = pageStr.substring(pageStr.indexOf("ROW")+8,pageStr.lastIndexOf("}"));
 			int record = Integer.valueOf(pageStr);
+			log.info(user+"已交货订单明细共有 "+record+" 行");
 			int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
-			getOrderDetail(orderDetailRes,1,record,orderList);
+			getOrderDetail(orderDetailRes,1,record,orderList,user);
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
 			for (int i=2; i<=page; i++) {
 				int startRow = i*10-9;
-				String detailStr = getOrderByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
+				String detailStr = getRecOrderByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
 				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
-				getOrderDetail(detailStr,startRow,record,orderList);
+				getOrderDetail(detailStr,startRow,record,orderList,user);
 			}
 			
-			for (OrderTO order : orderList) {
-				//FileUtil.exportOrderInfoToTXT(Constants.RETAILER_METRO, order);
-			}
+		    FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
 			
 			log.info(user + "下载已交货订单明细成功!");
 		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
@@ -617,6 +619,26 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 	}
 	
+	private String getRecOrderByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
+			String sap_wd_secure_id,int startRow) throws Exception {
+		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
+		orderformParams.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
+		orderformParams.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
+		orderformParams.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
+		orderformParams.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
+		//String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.OrderLinesView.tableOrderLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		String sapEventQueuePageRec = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		orderformParams.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueuePageRec));
+		HttpEntity orderFormEntity = new UrlEncodedFormEntity(orderformParams, "UTF-8");
+		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
+		HttpPost orderPost = new HttpPost(url);
+		orderPost.setEntity(orderFormEntity);
+		CloseableHttpResponse orderRes = httpClient.execute(orderPost);
+		String responseStr = EntityUtils.toString(orderRes.getEntity()); // 数据下载成功
+		orderRes.close();
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
+		return responseStr;
+	}	
 	private String getOrderByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
 			String sap_wd_secure_id,int startRow) throws Exception {
 		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
@@ -625,6 +647,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		orderformParams.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
 		String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.OrderLinesView.tableOrderLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		//String sapEventQueuePageRec = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueuePage));
 		HttpEntity orderFormEntity = new UrlEncodedFormEntity(orderformParams, "UTF-8");
 		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
@@ -637,10 +660,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		return responseStr;
 	}	
 	
-	
-	private void getOrderDetail(String responseStr,int startRow,int record,List<OrderTO> orderList) {
+	private void getOrderDetail(String responseStr,int startRow,int record,List<OrderTO> orderList,User user) {
+		log.info(user+"读取已交货订单明细 "+startRow+"-"+((startRow+9)>record?record:(startRow+9))+" 行");
 		Document detailResult = Jsoup.parse(responseStr);
-		
 		for (int i=startRow; i<startRow+10 && i<=record;i++) {
 			Elements dataElements = detailResult.select("tr[rr="+i+"]");
 			Elements tds = dataElements.first().select("td");

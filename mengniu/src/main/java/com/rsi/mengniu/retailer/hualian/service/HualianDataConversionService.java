@@ -35,7 +35,6 @@ public class HualianDataConversionService extends RetailerDataConversionService 
 		return Constants.RETAILER_HUALIAN;
 	}
 
-
 	@Override
 	protected Log getLog() {
 		return log;
@@ -47,35 +46,19 @@ public class HualianDataConversionService extends RetailerDataConversionService 
 			throws BaseException {
 		return null;
 	}
-	
-//	public void convertSalesData(String retailerID, Date startDate,
-//			Date endDate) throws BaseException {
-//		
-//		
-//		String sourceFilePath = Utils.getProperty(retailerID
-//				+ Constants.SALES_INBOUND_PATH);
-//		getLog().info("复制销售单文件: 源文件目录"+sourceFilePath);
-//		String backupPath = Utils.getProperty(retailerID
-//				+ Constants.SALES_PROCESSED_PATH);
-//		getLog().info("复制销售单文件: 目标文件目录"+backupPath);
-//		
-//		FileUtil.copyFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
-//				backupPath);
-//		
-//		String destPath = Utils.getProperty(retailerID
-//				+ Constants.OUTPUT_SALES_PATH);
-//		getLog().info("复制销售单文件: 目标文件目录"+destPath);
-//		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
-//				destPath);
-//	}
+
+
 	@Override
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File salesFile)
 			throws BaseException {
 		String fileName = salesFile.getName();
-		String salesDate = fileName.substring(fileName.lastIndexOf("_")+1,fileName.indexOf("."));
-		salesDate = DateUtil.toString(DateUtil.toDate(salesDate,"yyyyMMdd"));
-		log.info("销售单生成日期："+ salesDate +"。销售开始日期：" +  DateUtil.toString(startDate) +"。销售截至日期："+ DateUtil.toString(endDate));
+		// String salesDate =
+		// fileName.substring(fileName.lastIndexOf("_")+1,fileName.indexOf("."));
+		// salesDate = DateUtil.toString(DateUtil.toDate(salesDate,"yyyyMMdd"));
+		// log.info("销售单生成日期："+ salesDate +"。销售开始日期：" +
+		// DateUtil.toString(startDate) +"。销售截至日期："+
+		// DateUtil.toString(endDate));
 		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
 
 		if (salesFile.exists()) {
@@ -90,22 +73,24 @@ public class HualianDataConversionService extends RetailerDataConversionService 
 				// Read line by line
 				String salesLine = null;
 				while ((salesLine = reader.readLine()) != null) {
-					SalesTO salesTO = new SalesTO(
-							salesLine);
-					
+					SalesTO salesTO = new SalesTO(salesLine);
+					String salesDateStr = salesTO.getSalesDate();
+					Date salesDate = DateUtil.toDate(salesDateStr);
+					if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {
 
-					List<SalesTO> salesTOList = null;
-					if (salesMap.containsKey(salesDate)) {
-						salesTOList = salesMap.get(salesDate);
-					} else {
-						salesTOList = new ArrayList<SalesTO>();
-						// Test the Hashmap
-						salesMap.put(salesDate, salesTOList);
+						List<SalesTO> salesTOList = null;
+						if (salesMap.containsKey(salesDateStr)) {
+							salesTOList = salesMap.get(salesDateStr);
+						} else {
+							salesTOList = new ArrayList<SalesTO>();
+							// Test the Hashmap
+							salesMap.put(salesDateStr, salesTOList);
+						}
+
+						log.debug("收货单详细条目: " + salesTO.toString());
+						salesTOList.add(salesTO);
+
 					}
-
-					log.debug("收货单详细条目: " + salesTO.toString());
-					salesTOList.add(salesTO);
-
 				}
 
 			} catch (FileNotFoundException e) {

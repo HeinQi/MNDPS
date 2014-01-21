@@ -48,6 +48,18 @@ public class MengniuPulling {
 						.getBean("yonghui.data.conversion");
 				yonhuiConversion.retailerDataProcessing();
 
+				RetailerDataConversionService renrenleConversion = (RetailerDataConversionService) appContext
+						.getBean("renrenle.data.conversion");
+				renrenleConversion.retailerDataProcessing();
+
+				RetailerDataConversionService rainbowConversion = (RetailerDataConversionService) appContext
+						.getBean("rainbow.data.conversion");
+				rainbowConversion.retailerDataProcessing();
+
+				RetailerDataConversionService hualianConversion = (RetailerDataConversionService) appContext
+						.getBean("hualian.data.conversion");
+				hualianConversion.retailerDataProcessing();
+
 			} else if (appContext.containsBean(retailerId + ".data.conversion")) {
 				RetailerDataConversionService dataConversion = (RetailerDataConversionService) appContext
 						.getBean(retailerId + ".data.conversion");

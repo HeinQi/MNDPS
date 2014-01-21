@@ -89,7 +89,7 @@ public class Utils {
 	
 	public static String getRaimbowStoreIDByName(String storeName) throws BaseException{
 		String storeID =  getRainbowStoreMapping().get(storeName);
-		return storeID==null?storeName:storeID;
+		return storeID==null?"":storeID;
 	}
 	
 	public static Map<String, String> getRainbowStoreMapping() throws BaseException{

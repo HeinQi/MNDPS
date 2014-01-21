@@ -42,6 +42,17 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File receivingFile)
 			throws BaseException {
+		return getReceivingInfoFromFileByStatus(receivingFile, "NORMAL");
+	}
+
+	private Map<String, List<ReceivingNoteTO>> getAbnormalReceivingInfoFromFile(
+			String retailerID, Date startDate, Date endDate, File receivingFile)
+			throws BaseException {
+		return getReceivingInfoFromFileByStatus(receivingFile, "ABNORAML");
+	}
+
+	private Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFileByStatus(
+			File receivingFile, String status) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		if (receivingFile.exists()) {
@@ -59,18 +70,20 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 					RainbowReceivingTO receivingNoteTO = new RainbowReceivingTO(
 							receivingLine);
 					String orderNo = receivingNoteTO.getOrderNo();
+					String receivingInfoStatus = getStatus(receivingNoteTO);
+					if (receivingInfoStatus.equals(status)) {
+						List<ReceivingNoteTO> receivingNoteTOList = null;
+						if (receivingNoteMap.containsKey(orderNo)) {
+							receivingNoteTOList = receivingNoteMap.get(orderNo);
+						} else {
+							receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+							// Test the Hashmap
+							receivingNoteMap.put(orderNo, receivingNoteTOList);
+						}
 
-					List<ReceivingNoteTO> receivingNoteTOList = null;
-					if (receivingNoteMap.containsKey(orderNo)) {
-						receivingNoteTOList = receivingNoteMap.get(orderNo);
-					} else {
-						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
-						// Test the Hashmap
-						receivingNoteMap.put(orderNo, receivingNoteTOList);
+						log.debug("收货单详细条目: " + receivingNoteTO.toString());
+						receivingNoteTOList.add(receivingNoteTO);
 					}
-
-					log.debug("收货单详细条目: " + receivingNoteTO.toString());
-					receivingNoteTOList.add(receivingNoteTO);
 
 				}
 
@@ -92,6 +105,14 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 
 		}
 		return receivingNoteMap;
+	}
+
+	private String getStatus(RainbowReceivingTO receivingNoteTO) {
+		if (receivingNoteTO.getStoreID() != null
+				& !receivingNoteTO.getStoreID().equals("")) {
+			return "NORMAL";
+		}
+		return "ABNORMAL";
 	}
 
 	@Override
@@ -117,6 +138,8 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, startDate, endDate);
+		
+		
 
 		getLog().info("读取收货单数据结束:" + retailerID);
 
@@ -147,17 +170,15 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 			}
 		}
 
-		String sourceFilePath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
-		getLog().info(sourceFilePath);
-		String destPath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_PROCESSED_PATH);
-		
-		getLog().info(destPath);
-			FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
-				destPath);
-
-	
+//		String sourceFilePath = Utils.getProperty(retailerID
+//				+ Constants.RECEIVING_INBOUND_PATH);
+//		getLog().info(sourceFilePath);
+//		String destPath = Utils.getProperty(retailerID
+//				+ Constants.RECEIVING_PROCESSED_PATH);
+//
+//		getLog().info(destPath);
+//		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
+//				destPath);
 
 		getLog().info("数据处理结束");
 

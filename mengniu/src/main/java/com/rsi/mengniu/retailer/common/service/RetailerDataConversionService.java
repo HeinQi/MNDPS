@@ -297,7 +297,7 @@ public abstract class RetailerDataConversionService {
 		return writer;
 	}
 
-	private void writerOrderOutputFileHeader(BufferedWriter writer)
+	protected void writerOrderOutputFileHeader(BufferedWriter writer)
 			throws BaseException {
 		String mergedHeader = Utils.getProperty(Constants.OUTPUT_ORDER_HEADER);
 		try {

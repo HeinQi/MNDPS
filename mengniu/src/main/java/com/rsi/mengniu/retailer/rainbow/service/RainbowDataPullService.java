@@ -103,7 +103,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 		HttpGet httpGet = new HttpGet(
 				"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
-						+ "?start=1"
+						+ "?start=0"
 						+ "&limit=20"
 						+ "&rptId=3124"
 						+ "&showSelectionModel=false"
@@ -132,7 +132,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 			
 			HttpGet summaryPageGet = new HttpGet(
 					"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
-							+ "?start="+i
+							+ "?start="+(i-1)*20
 							+ "&limit=20"
 							+ "&rptId=3124"
 							+ "&showSelectionModel=false"

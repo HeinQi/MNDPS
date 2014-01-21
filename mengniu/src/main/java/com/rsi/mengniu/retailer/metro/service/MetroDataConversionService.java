@@ -228,7 +228,7 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 			List<ReceivingNoteTO> receivingNoteByDateList = null;
 			for (ReceivingNoteTO receivingNoteTO : receivingNoteList) {
 				String processDate = receivingNoteTO.getReceivingDate();
-				processDate = DateUtil.toString(DateUtil.toDate(processDate, "yyyy/M/d"));
+				processDate = DateUtil.toString(DateUtil.toDate(processDate, "yyyy-M-d"));
 				if (receivingByDateMap.containsKey(processDate)) {
 					receivingNoteByDateList = receivingByDateMap
 							.get(processDate);

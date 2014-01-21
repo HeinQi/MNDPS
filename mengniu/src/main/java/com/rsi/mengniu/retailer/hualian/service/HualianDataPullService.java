@@ -1,6 +1,7 @@
 package com.rsi.mengniu.retailer.hualian.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -40,10 +41,9 @@ public class HualianDataPullService implements RetailerDataPullService {
 			if (!"Success".equals(loginResult)) {
 				return;
 			}
-
 			getSales(httpClient, user);
 
-			//getOrder(httpClient, user);
+			// getOrder(httpClient, user);
 
 			httpClient.close();
 		} catch (Exception e) {
@@ -61,7 +61,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
-		String reponseLogin = new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),"GBK");
+		String reponseLogin = new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK");
 		loginResponse.close();
 		if (reponseLogin.contains("您的供应商编号或密码有误")) {
 			log.info(user + "错误的密码,退出!");
@@ -71,7 +71,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 		HttpGet httpGet = new HttpGet("http://zunyi.beijing-hualian.com/suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
-		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"),"GBK");
+		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
 		if (!loginStr.contains("查询系统")) {
 			log.info(user + "系统出错,退出!");
 			return "Error";
@@ -87,39 +87,43 @@ public class HualianDataPullService implements RetailerDataPullService {
 		HttpGet salesHttpGet = new HttpGet("http://zunyi.beijing-hualian.com/suppl_select.asp?action=sale");
 		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
 		HttpEntity formEntity = formResponse.getEntity();
-		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"),"GBK"));
+		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
 		Element storeElement = doc.select("#store").first();
 		formResponse.close();
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		List<SalesTO> salesList = new ArrayList<SalesTO>();
 		Elements sElements = storeElement.select("option[value]");
-		for (Element store:sElements) {
-			String storeId = store.attr("value");
-			getSalesByStore(httpClient,user,storeId,salesList);
+		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
+		for (Date searchDate : dates) {
+			for (Element store : sElements) {
+				String storeId = store.attr("value");
+				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+			}
+
 		}
+
 		FileUtil.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(), salesList);
 		log.info(user + "销售数据下载成功");
 	}
-	
-	///suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user,String storeId,List<SalesTO> salesList) throws Exception {
-		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_HUALIAN),"yyyyMMdd");
-		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_HUALIAN),"yyyyMMdd");
-		
+
+	// /suppl_select.asp?action=salesel
+	private void getSalesByStore(CloseableHttpClient httpClient, User user, String storeId, List<SalesTO> salesList, String searchDate)
+			throws Exception {
+
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("store", storeId));
-		formParams.add(new BasicNameValuePair("begindate", startDate));
-		formParams.add(new BasicNameValuePair("enddate", endDate));
-		log.info(user + "下载店号为["+storeId+"],日期区间为"+startDate+" - "+endDate+"的销售数据");
-		
+		formParams.add(new BasicNameValuePair("begindate", searchDate));
+		formParams.add(new BasicNameValuePair("enddate", searchDate));
+		log.info(user + "下载店号为[" + storeId + "],日期为 " + searchDate + " 的销售数据");
+
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
 		HttpPost httppost = new HttpPost("http://zunyi.beijing-hualian.com/suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),"GBK"));
+		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
 		Element dataTable = doc.select("table").first();
 		Elements rows = dataTable.select("tr:gt(0)");
-		for (int i=0; i<rows.size()-1; i++) {
+		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
 			sales.setStoreID(tds.get(0).text());
@@ -127,6 +131,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 			sales.setItemName(tds.get(2).text());
 			sales.setSalesQuantity(tds.get(3).text());
 			sales.setSalesAmount(tds.get(4).text());
+			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));

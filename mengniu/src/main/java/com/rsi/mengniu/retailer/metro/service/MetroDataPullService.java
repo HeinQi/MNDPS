@@ -670,10 +670,12 @@ public class MetroDataPullService implements RetailerDataPullService {
 			orderTo.setStoreNo(tds.get(2).select("span").first().text()); // 门店编号
 			orderTo.setOrderNo(tds.get(3).select("span").first().text()); // 订单编号
 			orderTo.setOrderDate(tds.get(4).select("span").first().text()); // 订货日期
-			orderTo.setItemID(tds.get(7).select("span").first().text()); // 商品编号
-			orderTo.setBarcode(tds.get(8).select("span").first().text()); // 条形码
-			orderTo.setItemName(tds.get(9).select("span").first().text()); // 商品描述
-			orderTo.setQuantity(tds.get(12).select("span").first().text()); // 订货数量
+			orderTo.setItemID(tds.get(8).select("span").first().text()); // 商品编号
+			orderTo.setBarcode(tds.get(9).select("span").first().text()); // 条形码
+			orderTo.setItemName(tds.get(10).select("span").first().text()); // 商品描述
+			orderTo.setUnitPrice(tds.get(13).select("span").first().text());// 进货价格
+			orderTo.setQuantity(tds.get(15).select("span").first().text()); // 订货数量
+			orderTo.setTotalPrice(tds.get(19).select("span").first().text()); // 净金额
 			orderList.add(orderTo);
 		}
 

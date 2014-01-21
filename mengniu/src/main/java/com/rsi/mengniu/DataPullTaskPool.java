@@ -55,6 +55,9 @@ public class DataPullTaskPool {
 			user.setUserId(getCellValueAsStr(row.getCell(0)));
 			user.setPassword(getCellValueAsStr(row.getCell(1)));
 			user.setRetailer(sheet.getSheetName());
+			if (Constants.RETAILER_HUALIAN.equals(sheet.getSheetName())) {
+				user.setUrl(getCellValueAsStr(row.getCell(3)));
+			}
 			log.debug(user);
 			userList.add(user);
 		}

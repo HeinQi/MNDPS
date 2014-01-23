@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -27,6 +29,7 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.TescoOrderNotifyTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
@@ -39,6 +42,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+		HashMap<String,Object> contextMap = new HashMap<String,Object>();
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
@@ -48,8 +52,13 @@ public class TescoDataPullService implements RetailerDataPullService {
 
 			getReceiveExcel(httpClient, user);
 
-			getOrder(httpClient, user);
-
+			getOrder(httpClient, user,contextMap);
+			
+			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_TESCO), Utils.getEndDate(Constants.RETAILER_TESCO));
+			for (Date searchDate:dates) {
+				getSales(httpClient, user,DateUtil.toString(searchDate,"yyyy-MM-dd"),contextMap);
+				break;
+			}
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
@@ -126,7 +135,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 	}
 
-	public void getOrder(CloseableHttpClient httpClient, User user) throws Exception {
+	public void getOrder(CloseableHttpClient httpClient, User user,HashMap<String,Object> contextMap) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sp/purOrder/sellPubOrderQryInit.hlt
 		// load search from
 		log.info(user + "跳转到订单查询页面...");
@@ -137,6 +146,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		formResponse.close();
 		Element parentVendorElement = formDoc.select("#parentVendor").first();
 		String parentVendor = parentVendorElement.attr("value");
+		contextMap.put("parentVender",parentVendor);
 		List<TescoOrderNotifyTO> notifyList = new ArrayList<TescoOrderNotifyTO>();
 
 		getNotifyList(httpClient, parentVendor, notifyList, user);
@@ -158,20 +168,6 @@ public class TescoDataPullService implements RetailerDataPullService {
 			readOrder(br, user);
 			log.info(user + "订单数据下载成功!");
 		}
-
-		/*
-		 * 
-		 * page.togglestatus:nullform status:sell parentVendor:303688 vendor:11152615 orderDateStart:2014-01-01 orderDateEnd:2014-01-05 readFlag:
-		 * downFlag: page.pageSize:10 page.pageNo:1 page.totalPages:1 page.jumpNumber:1
-		 */
-
-		/*
-		 * openPDF('4195444', '303688', 'MERGE_11152615@supplier.cn.tesco.com_20140105105533.txt', '20140105') function openPDF(poId, parentVendor,
-		 * fileName, createDate){ var url = "/tesco/sp/purOrder/pdfView.hlt?seed"; var params = "&fileName="+fileName; params +=
-		 * "&createDate="+createDate; params += "&poId=" + poId; params += "&parentVendor=" + parentVendor;
-		 * 
-		 * url += params; openEasyWin("winId","订单明细信息",url,"1000","600",true); }
-		 */
 
 	}
 
@@ -290,4 +286,60 @@ public class TescoDataPullService implements RetailerDataPullService {
 		}
 
 	}
+	
+	public void getSales(CloseableHttpClient httpClient, User user,String searchDate,HashMap<String,Object> contextMap) throws Exception {
+				log.info(user + "查询销售数据...");
+				int pageNo = 1;
+				int totalPages = 1;
+				String parentVendor = (String) contextMap.get("parentVendor");
+				List<SalesTO> salesList = new ArrayList<SalesTO>();
+				do {
+					Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
+					List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
+					searchformParams.add(new BasicNameValuePair("tranDate", searchDate));// 查询日期
+					searchformParams.add(new BasicNameValuePair("dateType", "1"));// 查询日期
+					searchformParams.add(new BasicNameValuePair("parentVendor", parentVendor));// parentVendor
+					searchformParams.add(new BasicNameValuePair("page.pageNo", String.valueOf(pageNo))); // pageSize
+					searchformParams.add(new BasicNameValuePair("page.totalPages", String.valueOf(totalPages))); // totalPages
+					searchformParams.add(new BasicNameValuePair("status", "sell"));// pageSize
+
+					HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
+					HttpPost searchPost = new HttpPost("https://tesco.chinab2bi.com/tesco/sp/saleStock/query.hlt");
+					searchPost.setEntity(searchFormEntity);
+					CloseableHttpResponse searchRes = httpClient.execute(searchPost);
+					String searchResStr = EntityUtils.toString(searchRes.getEntity());
+					searchRes.close();
+					if (searchResStr.contains("查询到0条记录")) {
+						log.info(user+"没有查到 "+searchDate+" 的销售数据");
+						return;
+					}
+					String recordStr = searchResStr.substring(0,searchResStr.lastIndexOf("条记录"));
+					recordStr = recordStr.substring(recordStr.lastIndexOf("共")+1);
+					Document doc = Jsoup.parse(searchResStr);
+					Element eTotalPages = doc.select("#totalPages").first();
+					totalPages = Integer.parseInt(eTotalPages.attr("value")); // totalPages
+					log.info(user+"查到"+searchDate+"销售记录共"+recordStr+"条,当前第"+pageNo+"页,共"+totalPages+"页");
+					
+					Element tableElement = doc.select("table#row").first();
+					Elements rowElements =  tableElement.select("tr[class]");
+					for (Element row : rowElements) {
+						Elements tds = row.select("td");
+						SalesTO salesTo = new SalesTO();
+						salesTo.setSalesDate(searchDate);
+						salesTo.setItemID(tds.get(2).text());
+						salesTo.setItemName(tds.get(4).text());
+						salesTo.setStoreID(tds.get(6).text());
+						salesTo.setSalesQuantity(tds.get(8).text());
+						salesTo.setSalesAmount(tds.get(9).text());
+						salesList.add(salesTo);
+						log.info(user+"成功读取销售数据第"+salesList.size()+"条");
+					}
+					pageNo++;
+				} while (pageNo <= totalPages);
+				
+				FileUtil.exportSalesInfoToTXT(Constants.RETAILER_TESCO, user.getUserId(), salesList);
+//				log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + "到"
+//						+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + ",共有" + notifyList.size() + "条订单通知");
+				log.info(user + "销售数据下载成功");
+			}
 }

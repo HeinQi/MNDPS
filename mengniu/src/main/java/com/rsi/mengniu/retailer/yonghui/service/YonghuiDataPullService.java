@@ -192,6 +192,14 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		log.info(user + "订单数据下载成功");
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
 	}

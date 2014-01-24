@@ -57,7 +57,6 @@ public class TescoDataPullService implements RetailerDataPullService {
 			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_TESCO), Utils.getEndDate(Constants.RETAILER_TESCO));
 			for (Date searchDate:dates) {
 				getSales(httpClient, user,DateUtil.toString(searchDate,"yyyy-MM-dd"),contextMap);
-				break;
 			}
 			httpClient.close();
 		} catch (Exception e) {

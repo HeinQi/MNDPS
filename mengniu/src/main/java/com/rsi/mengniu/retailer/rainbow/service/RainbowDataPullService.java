@@ -1,12 +1,16 @@
 package com.rsi.mengniu.retailer.rainbow.service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,9 +25,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
@@ -44,11 +50,16 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
 		}
+//		try {
+//			this.getReceiving(httpClient, user);
+//		} catch (Exception e) {
+//			log.error(user + Utils.getTrace(e));
+//		}
+		
 		try {
-			this.getReceiving(httpClient, user);
+			this.getSales(httpClient, user);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(user + Utils.getTrace(e));
 		}
 
 	}
@@ -98,6 +109,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 	private void getReceiving(CloseableHttpClient httpClient, User user)
 			throws Exception {
+		log.info(user + "开始下载收货单...");
 		List <ReceivingNoteTO> receivingList = new ArrayList<ReceivingNoteTO>();
 		
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
@@ -123,108 +135,163 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		
 		Document doc = Jsoup.parse(responseStr);
 		
-		String totalPageNumberStr = doc.select("a").last().attr("onclick");
-		
-		totalPageNumberStr = totalPageNumberStr.substring(totalPageNumberStr.indexOf("(")+1, totalPageNumberStr.indexOf(")"));
-		int totalPageNumber = Integer.valueOf(totalPageNumberStr);
-		for(int i = 1; i<= totalPageNumber;i++){
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
-			
-			HttpGet summaryPageGet = new HttpGet(
-					"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
-							+ "?start="+(i-1)*20
-							+ "&limit=20"
-							+ "&rptId=3124"
-							+ "&showSelectionModel=false"
-							+ "&html=Y"
-							+ "&sqlWhere=&where=%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3E=to_date('"
-							+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RAINBOW))
-							+ "','yyyy-mm-dd')%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3C=to_date('"
-							+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))
-							+ "','yyyy-mm-dd')");
-			
+		Element lastA = doc.select("a").last();
+		//If there is only one page without pagination
+		if(!lastA.hasAttr("onclick")){
+			receivingList.addAll(getReceivingFromPage(httpClient, user,
+					doc));
+		} else {
 
+			//If there are multiple page without pagination
+			String totalPageNumberStr = doc.select("a").last().attr("onclick");
 			
-			CloseableHttpResponse summaryPageResponse = httpClient.execute(summaryPageGet);
-			HttpEntity summaryPageEntity = summaryPageResponse.getEntity();
-			String summaryPageResponseStr = EntityUtils.toString(summaryPageEntity);
-			summaryPageResponse.close();
-			
-			Document summaryPageDoc = Jsoup.parse(summaryPageResponseStr);
-			
-			//Receiving highlevel info
-			Elements rowsElements = summaryPageDoc.select("#dataTable").first().select("tr:gt(0)");
-			rowsElements.remove(rowsElements.size()-1);
-			
-			
-//			<tr>
-//			0	<td style="display: ">
-//					<a href='javascript:void(0);'
-//						onclick="doJump('/gysp/orderdetail.jsp?SHDH=REC-050140104000060','')">REC-050140104000060</a>
-//				</td>
-//			1	<td style="display: ">观澜天虹</td>
-//			2	<td style="display: ">天虹商场股份有限公司</td>
-//			3	<td style="display: ">天虹商场股份有限公司</td>
-//			4	<td style="display: ">2014-01-04</td>
-//			5	<td style="display: ">ORD-050140102000052</td>
-//			6	<td style="display: ">2014-01-04</td>
-//			7	<td style="display: ">4103.03</td>
-//			8	<td style="display: ">N</td>
-//			9	<td style="display: ">正常</td>
-//			10	<td style="display: ">未读</td>
-//			</tr>
-			for(Element rowElement : rowsElements){
-				Elements tdElements = rowElement.select("td");
-				String receivingNo = tdElements.get(0).text();
-				log.info(user + "收货单编号：" + receivingNo);
-
+			totalPageNumberStr = totalPageNumberStr.substring(totalPageNumberStr.indexOf("(")+1, totalPageNumberStr.indexOf(")"));
+			int totalPageNumber = Integer.valueOf(totalPageNumberStr);
+			for(int i = 2; i<= totalPageNumber;i++){
 				Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
-				HttpGet receivingDetailHTTPGet = new HttpGet(
-						"http://vd.rainbow.cn:8080//gysp/orderdetail.jsp?SHDH="
-								+ receivingNo);
-				CloseableHttpResponse receivingResponse =  httpClient.execute(receivingDetailHTTPGet);
-				HttpEntity receivingEntity = receivingResponse.getEntity();
-				String receivingResponseStr = EntityUtils.toString(receivingEntity);
-				//log.info(receivingResponseStr);
-				receivingResponse.close();
 				
-				Document receivingDetailDoc = Jsoup.parse(receivingResponseStr);
+				HttpGet summaryPageGet = new HttpGet(
+						"http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"
+								+ "?start="+(i-1)*20
+								+ "&limit=20"
+								+ "&rptId=3124"
+								+ "&showSelectionModel=false"
+								+ "&html=Y"
+								+ "&sqlWhere=&where=%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3E=to_date('"
+								+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RAINBOW))
+								+ "','yyyy-mm-dd')%20and%20%E6%94%B6%E8%B4%A7%E6%97%A5%E6%9C%9F%3C=to_date('"
+								+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))
+								+ "','yyyy-mm-dd')");
 				
-				//Get receiving main info
-				Elements receivingMainInfoElements = receivingDetailDoc.select("#table154").get(2).select("tr").get(1).select("td");
-				String storeName = receivingMainInfoElements.get(0).text();
-				String receivingDate = receivingMainInfoElements.get(1).text();
-				String orderNo = receivingMainInfoElements.get(2).text();
+	
 				
+				CloseableHttpResponse summaryPageResponse = httpClient.execute(summaryPageGet);
+				HttpEntity summaryPageEntity = summaryPageResponse.getEntity();
+				String summaryPageResponseStr = EntityUtils.toString(summaryPageEntity);
+				summaryPageResponse.close();
+				Document summaryPageDoc = Jsoup.parse(summaryPageResponseStr);
+				receivingList.addAll(getReceivingFromPage(httpClient, user,
+						summaryPageDoc));
+				
+			}
+		}
+		
+		log.info(user + "收货单下载结束.");
+		log.info(user + "写入收货单文件.");
+		FileUtil.exportReceivingInfoToTXTForRainbow(Constants.RETAILER_RAINBOW, user.getUserId(), receivingList);
 
-				storeName = storeName.substring(storeName.indexOf(":")+1);
-				receivingDate = receivingDate.substring(receivingDate.indexOf(":")+1);
-				orderNo = orderNo.substring(orderNo.indexOf(":")+1);
-				
-				String storeID = Utils.getRaimbowStoreIDByName(storeName);
-				
-				Elements receivingDetailTableElements = receivingDetailDoc.select("#table152").first().select("tr:gt(0)");
-				receivingDetailTableElements.remove(receivingDetailTableElements.size()-1);
-				
-				//Get receiving detail item
-				for(Element receivingDetailRowElement : receivingDetailTableElements){
-					Elements receivingDetailTDElements = receivingDetailRowElement.select("td");
-					 String itemID=receivingDetailTDElements.get(0).text();
-					 String itemName=receivingDetailTDElements.get(2).text();
-					 String barcode=receivingDetailTDElements.get(1).text();
-					 String orderQuantity=receivingDetailTDElements.get(6).text();
-					 String orderTotalPrice=receivingDetailTDElements.get(8).text();
-					 String receivingQuantity=receivingDetailTDElements.get(9).text();
-					 String receivingTotalPrice=receivingDetailTDElements.get(12).text();
-					 String unitPrice=receivingDetailTDElements.get(7).text();
-					 RainbowReceivingTO rainbowReceivingTO = new RainbowReceivingTO(orderNo, storeID, storeName, receivingDate, itemID, barcode, itemName, orderQuantity, orderTotalPrice, receivingQuantity, receivingTotalPrice, unitPrice);
-					 receivingList.add(rainbowReceivingTO);
-				}
-				
+		log.info(user + "写入收货单文件结束.");
+
+	}
+
+	private List<ReceivingNoteTO> getReceivingFromPage(CloseableHttpClient httpClient,
+			User user, 
+			Document pageDoc) throws InterruptedException,
+			IOException, ClientProtocolException, BaseException {
+
+		List<ReceivingNoteTO> receivingList = new ArrayList<ReceivingNoteTO>();
+		//Receiving highlevel info
+		Elements rowsElements = pageDoc.select("#dataTable").first().select("tr:gt(0)");
+		rowsElements.remove(rowsElements.size()-1);
+		
+		
+		for(Element rowElement : rowsElements){
+			Elements tdElements = rowElement.select("td");
+			String receivingNo = tdElements.get(0).text();
+			log.info(user + "收货单编号：" + receivingNo);
+
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
+			HttpGet receivingDetailHTTPGet = new HttpGet(
+					"http://vd.rainbow.cn:8080//gysp/orderdetail.jsp?SHDH="
+							+ receivingNo);
+			CloseableHttpResponse receivingResponse =  httpClient.execute(receivingDetailHTTPGet);
+			HttpEntity receivingEntity = receivingResponse.getEntity();
+			String receivingResponseStr = EntityUtils.toString(receivingEntity);
+			//log.info(receivingResponseStr);
+			receivingResponse.close();
+			
+			Document receivingDetailDoc = Jsoup.parse(receivingResponseStr);
+			
+			//Get receiving main info
+			Elements receivingMainInfoElements = receivingDetailDoc.select("#table154").get(2).select("tr").get(1).select("td");
+			String storeName = receivingMainInfoElements.get(0).text();
+			String receivingDate = receivingMainInfoElements.get(1).text();
+			String orderNo = receivingMainInfoElements.get(2).text();
+			
+
+			storeName = storeName.substring(storeName.indexOf(":")+1);
+			receivingDate = receivingDate.substring(receivingDate.indexOf(":")+1);
+			orderNo = orderNo.substring(orderNo.indexOf(":")+1);
+			
+			String storeID = Utils.getRaimbowStoreIDByName(storeName);
+			
+			Elements receivingDetailTableElements = receivingDetailDoc.select("#table152").first().select("tr:gt(0)");
+			receivingDetailTableElements.remove(receivingDetailTableElements.size()-1);
+			
+			//Get receiving detail item
+			for(Element receivingDetailRowElement : receivingDetailTableElements){
+				Elements receivingDetailTDElements = receivingDetailRowElement.select("td");
+				 String itemID=receivingDetailTDElements.get(0).text();
+				 String itemName=receivingDetailTDElements.get(2).text();
+				 String barcode=receivingDetailTDElements.get(1).text();
+				 String orderQuantity=receivingDetailTDElements.get(6).text();
+				 String orderTotalPrice=receivingDetailTDElements.get(8).text();
+				 String receivingQuantity=receivingDetailTDElements.get(9).text();
+				 String receivingTotalPrice=receivingDetailTDElements.get(12).text();
+				 String unitPrice=receivingDetailTDElements.get(7).text();
+				 RainbowReceivingTO rainbowReceivingTO = new RainbowReceivingTO(orderNo, storeID, storeName, receivingDate, itemID, barcode, itemName, orderQuantity, orderTotalPrice, receivingQuantity, receivingTotalPrice, unitPrice);
+				 receivingList.add(rainbowReceivingTO);
 			}
 			
 		}
-		FileUtil.exportReceivingInfoToTXTForRainbow(Constants.RETAILER_RAINBOW, user.getUserId(), receivingList);
 		
+		return receivingList;
+	}
+	//%3E%3Dto_date%28%272014-01-01%27%2C%27yyyy-mm-dd%27%29+and+TJRQ%3C%3Dto_date%28%272014-01-01%27%2C%27yyyy-mm-dd%27%29&sqlWhere=&rptId=4762&html=Y
 
-	}}
+	private void getSales(CloseableHttpClient httpClient, User user)
+			throws Exception {
+
+		log.info(user + "开始下载销售单.");
+		List <SalesTO> salesList = new ArrayList<SalesTO>();
+		
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
+		
+		
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		formParams.add(new BasicNameValuePair("findModel","0"));
+		formParams.add(new BasicNameValuePair("command", "adv"));
+		formParams.add(new BasicNameValuePair("rptId", "4762"));
+		formParams.add(new BasicNameValuePair("optTJRQ", ">="));
+		formParams.add(new BasicNameValuePair("TJRQ", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RAINBOW))));
+		formParams.add(new BasicNameValuePair("optTJRQ_end", ">="));
+		formParams.add(new BasicNameValuePair("TJRQ_end", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))));
+		formParams.add(new BasicNameValuePair("sqlWhere", ""));
+		formParams.add(new BasicNameValuePair("where", " and TJRQ>=to_date('"+DateUtil.toString(Utils.getStartDate(Constants.RETAILER_RAINBOW))+"','yyyy-mm-dd') and TJRQ<=to_date('"+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_RAINBOW))+"','yyyy-mm-dd')"));
+		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
+
+		HttpPost httppost = new HttpPost(
+				"http://vd.rainbow.cn:8080/object/ObjectReportExport.jsp");
+
+		httppost.setEntity(loginEntity);
+		
+		CloseableHttpResponse response = httpClient.execute(httppost);
+		HttpEntity entity = response.getEntity();
+		//log.info( EntityUtils.toString(entity));
+		
+		String salesFilePath = Utils.getProperty(user.getRetailer() + Constants.SALES_INBOUND_PATH);
+		FileUtil.createFolder(salesFilePath);
+		
+		String salesFileNm = "Sales_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
+		
+		FileOutputStream receiveFos = new FileOutputStream(salesFilePath + salesFileNm);
+
+		entity.writeTo(receiveFos);
+		response.close();
+
+
+		log.info(user + "销售单文件名：" + salesFileNm);
+		log.info(user + "下载销售单结束.");
+	}
+
+}

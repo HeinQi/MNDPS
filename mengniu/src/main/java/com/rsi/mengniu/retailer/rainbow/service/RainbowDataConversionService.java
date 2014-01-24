@@ -112,15 +112,10 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
 
-	public void retailerDataProcessing() throws BaseException {
-		String retailerID = this.getRetailerID();
-		Date startDate = Utils.getStartDate(retailerID);
-		Date endDate = Utils.getEndDate(retailerID);
-
-		getLog().info("开始处理数据");
-
-		getLog().info("读取收货单数据:" + retailerID);
+	public void convertOrderData(String retailerID, Date startDate,
+			Date endDate) throws BaseException {
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
 				retailerID, startDate, endDate);
@@ -217,9 +212,6 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		getLog().info(destPath);
 		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
 				destPath);
-
-		getLog().info("数据处理结束");
-
 	}
 
 	/**
@@ -336,6 +328,10 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		}
 	}
 
+	/**
+	 * Key Date
+	 * Value SalesTO List
+	 */
 	@Override
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File salesFile)

@@ -93,7 +93,7 @@ public abstract class RetailerDataConversionService {
 
 	}
 
-	private void convertOrderData(String retailerID, Date startDate,
+	public void convertOrderData(String retailerID, Date startDate,
 			Date endDate) throws BaseException {
 		getLog().info("读取收货单数据:" + retailerID);
 		// Get Receiving Note

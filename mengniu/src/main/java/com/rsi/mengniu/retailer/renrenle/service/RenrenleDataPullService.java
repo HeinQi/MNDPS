@@ -1,6 +1,8 @@
 package com.rsi.mengniu.retailer.renrenle.service;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,9 +22,12 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.OrderTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
@@ -47,15 +52,32 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			if (!"Success".equals(loginResult)) {
 				return;
 			}
-			
-			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE), Utils.getEndDate(Constants.RETAILER_RENRENLE));
-			for (Date searchDate:dates) {
-				getSalesExcel(httpClient, user,DateUtil.toString(searchDate,"yyyy-MM-dd"));
+		} catch (Exception e) {
+			log.error(user + Utils.getTrace(e));
+			return;
+		}
+		try {
+			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
+					Utils.getEndDate(Constants.RETAILER_RENRENLE));
+			for (Date searchDate : dates) {
+				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+			}
+
+		} catch (Exception e) {
+			log.error(user + Utils.getTrace(e));
+		}
+
+		try {
+			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
+					Utils.getEndDate(Constants.RETAILER_RENRENLE));
+			for (Date searchDate : dates) {
+				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
 			}
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
 		}
+
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
@@ -73,49 +95,51 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		fos.close();
 		String recognizeStr = ocr.recognizeText(validateImgPath + imgName + ".jpg", validateImgPath + imgName, false);
 		// login /login.do?action=doLogin
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("name", user.getUserId()));
-		formParams.add(new BasicNameValuePair("password",user.getPassword()));
-		formParams.add(new BasicNameValuePair("shopID", "RRL001")); //必须选人人乐集团
-		formParams.add(new BasicNameValuePair("verifyCode", recognizeStr)); 
+		formParams.add(new BasicNameValuePair("password", user.getPassword()));
+		formParams.add(new BasicNameValuePair("shopID", "RRL001")); // 必须选人人乐集团
+		formParams.add(new BasicNameValuePair("verifyCode", recognizeStr));
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
 		HttpPost httppost = new HttpPost("http://www.renrenle.cn/scm/login.do?method=login");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		String responseStr = new String (EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),"GBK");
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
+		String responseStr = new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK");
+
 		if (responseStr.contains("验证码输入不正确")) {
 			log.info(user + "验证码输入不正确,Relogin...");
 			return "InvalidCode";
 		} else if (responseStr.contains("您的用户名或密码输入有误")) {
 			log.info(user + "您的用户名或密码输入有误,退出!");
-			return "InvalidPassword"; 
+			return "InvalidPassword";
 		} else if (!responseStr.contains("mainAction")) {
 			log.info(user + "系统出错,退出!");
 			return "SystemError";
 		}
 		loginResponse.close();
 		log.info(user + "登录成功!");
-		
+
 		return "Success";
 	}
 
-	public void getSalesExcel(CloseableHttpClient httpClient, User user,String searchDate) throws Exception {
-		log.info(user + "开始下载"+searchDate+"的销售数据...");
-		
+	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+		log.info(user + "开始下载" + searchDate + "的销售数据...");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		// /scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401
 		// 销售查询
-		HttpGet httpGet = new HttpGet("http://www.renrenle.cn/scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401");
+		HttpGet httpGet = new HttpGet(
+				"http://www.renrenle.cn/scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401");
 		CloseableHttpResponse searchRes = httpClient.execute(httpGet);
 		HttpEntity searchEntity = searchRes.getEntity();
-		String searchStr = new String (EntityUtils.toString(searchEntity).getBytes("ISO_8859_1"),"GBK");
-		searchRes.close();		
+		String searchStr = new String(EntityUtils.toString(searchEntity).getBytes("ISO_8859_1"), "GBK");
+		searchRes.close();
 		Document searchDoc = Jsoup.parse(searchStr);
 		Element token = searchDoc.select("input[name=org.apache.struts.taglib.html.TOKEN]").first();
 		String tokenStr = token.attr("value");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
-		
-		//http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
+
+		// http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
 		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesFilePath);
 		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_" + searchDate.replaceAll("-", "") + ".xls";
@@ -135,9 +159,90 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		downloadRes.getEntity().writeTo(salseFos);
 		downloadRes.close();
 		salseFos.close();
-		log.info(user + searchDate+"的销售数据下载成功");
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
+		log.info(user + searchDate + "的销售数据下载成功");
+	}
 
+	public void getOrders(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+		log.info(user + "开始下载" + searchDate + "的订单数据...");
+
+		int pageNo = 1;
+		int totalPages = 1;
+		List<String> orderIdList = new ArrayList<String>();
+		do {
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
+			List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
+			searchformParams.add(new BasicNameValuePair("startDate", searchDate));
+			searchformParams.add(new BasicNameValuePair("endDate", searchDate));
+			searchformParams.add(new BasicNameValuePair("activeFlag", "1"));
+			searchformParams.add(new BasicNameValuePair("flag", "-1"));
+			searchformParams.add(new BasicNameValuePair("purchaseFlag", "-1"));
+			searchformParams.add(new BasicNameValuePair("orderASC", "false"));
+			searchformParams.add(new BasicNameValuePair("thisPage", String.valueOf(pageNo)));
+
+			HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
+			HttpPost searchPost = new HttpPost("http://www.renrenle.cn/scm/order/orderAction.do?method=queryOrder");
+			searchPost.setEntity(searchFormEntity);
+			CloseableHttpResponse response = httpClient.execute(searchPost);
+			String responseStr = new String(EntityUtils.toString(response.getEntity()).getBytes("ISO_8859_1"), "GBK");
+			response.close();
+			if (!responseStr.contains("泰斯玛供应链关系管理系统")) {
+				log.error(user+"订单查询失败,请登录网站检查");
+				return;
+			}
+			String totalPageStr = responseStr.substring(responseStr.indexOf("</B>/<B>")+8);
+			totalPageStr = totalPageStr.substring(0,totalPageStr.indexOf("</B>"));
+			totalPages = Integer.parseInt(totalPageStr);
+			Document doc = Jsoup.parse(responseStr);
+			Element table = doc.select("table.box_table1").first();
+			Elements orderIds = table.select("a[href^=orderAction]");
+			for (Element eOrderId : orderIds) {
+				String orderId = eOrderId.text();
+				orderIdList.add(orderId);
+			}
+			pageNo++;
+		} while (pageNo <= totalPages);
+
+		log.info(user+"查询到"+searchDate+"号订单共"+orderIdList.size()+"条");
+		List<OrderTO> orderList = new ArrayList<OrderTO>();
+		for (int i=0; i<orderIdList.size(); i++) {
+			getOrderDetail(httpClient,user,orderIdList.get(i),searchDate,orderList);
+			log.info(user+"成功获取第"+(i+1)+"条订单,订单号为"+orderIdList.get(i));
+		}
+		FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_RENRENLE, orderList);
+		log.info(user + searchDate + "的订单数据下载成功");
+
+	}
+	
+	private void getOrderDetail(CloseableHttpClient httpClient, User user,String orderId,String searchDate,List<OrderTO> orderList) throws Exception {
+		///scm/order/orderAction.do?method=printOrder&sheetID=A002201401024822
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
+		String url = "http://www.renrenle.cn/scm/order/orderAction.do?method=printOrder&sheetID="+orderId;
+		HttpGet httpOrderGet = new HttpGet(url);
+		CloseableHttpResponse orderDetailResponse = httpClient.execute(httpOrderGet);
+		HttpEntity orderEntity = orderDetailResponse.getEntity();
+		String orderStr = new String(EntityUtils.toString(orderEntity).getBytes("ISO_8859_1"), "GBK");
+		if (!orderStr.contains(orderId)) {
+			log.error(user+"获取订单失败订单号为"+orderId+",请登录网站检查");
+			return;
+		}
+		Document orderDoc = Jsoup.parse(orderStr);
+		Element dataTable = orderDoc.select("table.print_box_table1").last();
+		Element storeRow = dataTable.select("tr:eq(2)").first();
+		String storeName = storeRow.select("td").get(3).text();
+		Elements rows = dataTable.select("tr:gt(5)");
+		for (int i = 0; i < rows.size() - 1; i++) {
+			Elements tds = rows.get(i).select("td");
+			OrderTO orderTo = new OrderTO();
+			orderTo.setOrderNo(orderId);
+			orderTo.setOrderDate(searchDate);
+			orderTo.setStoreName(storeName);
+			orderTo.setItemName(tds.get(0).text());
+			orderTo.setItemID(tds.get(1).text());
+			orderTo.setBarcode(tds.get(2).text());
+			orderTo.setUnitPrice(tds.get(7).text());
+			orderTo.setQuantity(tds.get(10).text());
+			orderList.add(orderTo);
+		}
 	}
 
 	public OCR getOcr() {

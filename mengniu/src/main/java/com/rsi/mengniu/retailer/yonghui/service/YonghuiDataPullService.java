@@ -249,7 +249,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 					}
 				}
 			}
-			FileUtil.exportSalesInfoToTXT(Constants.RETAILER_YONGHUI, user.getUserId(), salesList);
+			Utils.exportSalesInfoToTXT(Constants.RETAILER_YONGHUI, user.getUserId(),DateUtil.toDate(searchDate, "yyyy-MM-dd"),salesList);
 			log.info(user + "成功下载日期为"+searchDate+"的销售数据");
 		} else {
 			log.info(user+"没有查询到销售数据或网站出错");

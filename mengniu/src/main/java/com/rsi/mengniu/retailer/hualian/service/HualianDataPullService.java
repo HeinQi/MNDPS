@@ -26,7 +26,6 @@ import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
-import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
 //https://tesco.chinab2bi.com/security/login.hlt
@@ -91,18 +90,18 @@ public class HualianDataPullService implements RetailerDataPullService {
 		Element storeElement = doc.select("#store").first();
 		formResponse.close();
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
-		List<SalesTO> salesList = new ArrayList<SalesTO>();
 		Elements sElements = storeElement.select("option[value]");
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
+			List<SalesTO> salesList = new ArrayList<SalesTO>();
 			for (Element store : sElements) {
 				String storeId = store.attr("value");
 				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
 			}
+			Utils.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(),searchDate, salesList);
 
 		}
 
-		FileUtil.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(), salesList);
 		log.info(user + "销售数据下载成功");
 	}
 

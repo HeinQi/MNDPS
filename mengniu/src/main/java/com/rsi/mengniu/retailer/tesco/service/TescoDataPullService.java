@@ -336,7 +336,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 					pageNo++;
 				} while (pageNo <= totalPages);
 				
-				FileUtil.exportSalesInfoToTXT(Constants.RETAILER_TESCO, user.getUserId(), salesList);
+				Utils.exportSalesInfoToTXT(Constants.RETAILER_TESCO, user.getUserId(),DateUtil.toDate(searchDate, "yyyy-MM-dd"),salesList);
 //				log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + "到"
 //						+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + ",共有" + notifyList.size() + "条订单通知");
 				log.info(user + "销售数据下载成功");

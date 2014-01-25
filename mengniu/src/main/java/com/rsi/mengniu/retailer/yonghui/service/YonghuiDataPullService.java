@@ -53,9 +53,9 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 				return;
 			}
 			// receive
-			// getReceive(httpClient, user);
+			 getReceive(httpClient, user);
 			// order
-			// getOrder(httpClient, user);
+			 getOrder(httpClient, user);
 
 			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_YONGHUI),
 					Utils.getEndDate(Constants.RETAILER_YONGHUI));

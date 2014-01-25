@@ -148,12 +148,10 @@ public abstract class RetailerDataConversionService {
 	}
 
 	/**
-	 * Get receiving data map
-	 * 
-	 * Key - order No
-	 * 
+	 *  Get receiving data map
 	 * @param retailerID
-	 * @param processDate
+	 * @param startDate
+	 * @param endDate
 	 * @return
 	 * @throws BaseException
 	 */

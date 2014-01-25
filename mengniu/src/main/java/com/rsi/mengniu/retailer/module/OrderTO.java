@@ -32,12 +32,12 @@ public class OrderTO extends BaseTO {
 		this.orderDate = orderDate;
 	}
 
-	public String getStoreNo() {
+	public String getStoreID() {
 		return storeID;
 	}
 
-	public void setStoreNo(String storeNo) {
-		this.storeID = storeNo;
+	public void setStoreID(String storeID) {
+		this.storeID = storeID;
 	}
 
 	public String getStoreName() {
@@ -119,7 +119,7 @@ public class OrderTO extends BaseTO {
 
 		this.setOrderNo(orderFieldArray[0]);
 		this.setOrderDate(orderFieldArray[1]);
-		this.setStoreNo(orderFieldArray[2]);
+		this.setStoreID(orderFieldArray[2]);
 		this.setStoreName(orderFieldArray[3]);
 		this.setItemID(orderFieldArray[4]);
 		this.setItemName(orderFieldArray[5]);

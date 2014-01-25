@@ -186,7 +186,7 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
 					String key = orderTO.getOrderNo()
-							+ orderTO.getStoreNo()
+							+ orderTO.getStoreID()
 							+ orderTO.getItemID();
 					orderMap.put(key, orderTO);
 

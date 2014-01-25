@@ -44,9 +44,8 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 	}
 
 	@Override
-	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File receivingFile)
-			throws BaseException {
+	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
+			Date endDate, File receivingFile) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 		try {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
@@ -65,11 +64,9 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 				}
 
 				if (sourceRow.getCell(11).getStringCellValue() != null
-						&& !sourceRow.getCell(11).getStringCellValue()
-								.equals("")) {
+						&& !sourceRow.getCell(11).getStringCellValue().equals("")) {
 
-					receivingDateStr = sourceRow.getCell(11)
-							.getStringCellValue();
+					receivingDateStr = sourceRow.getCell(11).getStringCellValue();
 					receivingDate = DateUtil.toDate(receivingDateStr);
 				}
 				// If receivingDate is in the date range
@@ -84,35 +81,29 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 
 						int cellType = sourceCell.getCellType();
 						if (cellType == Cell.CELL_TYPE_NUMERIC) {
-							sourceCellValue = Double.valueOf(
-									sourceCell.getNumericCellValue())
-									.toString();
+							sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
 						} else {
 
 							sourceCellValue = sourceCell.getStringCellValue();
 						}
 						switch (j) {
 						case 3:
-							if (sourceCellValue != null
-									&& !sourceCellValue.equals("")) {
+							if (sourceCellValue != null && !sourceCellValue.equals("")) {
 								storeID = sourceCellValue.substring(0, sourceCellValue.indexOf("."));
 							}
 							receivingNoteTO.setStoreID(storeID);
 							continue;
 						case 4:
 
-							if (sourceCellValue != null
-									&& !sourceCellValue.equals("")) {
+							if (sourceCellValue != null && !sourceCellValue.equals("")) {
 								storeName = sourceCellValue;
 							}
 							receivingNoteTO.setStoreName(storeName);
 							continue;
 						case 5:
 
-							if (sourceCellValue != null
-									&& !sourceCellValue.equals("")) {
-								sourceCellValue = Utils
-										.trimPrefixZero(sourceCellValue);
+							if (sourceCellValue != null && !sourceCellValue.equals("")) {
+								sourceCellValue = Utils.trimPrefixZero(sourceCellValue);
 								orderNo = sourceCellValue;
 							}
 							receivingNoteTO.setOrderNo(orderNo);
@@ -158,8 +149,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 			throw new BaseException(e);
 		}
 
-		for (Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap
-				.entrySet()) {
+		for (Entry<String, List<ReceivingNoteTO>> entry : receivingNoteMap.entrySet()) {
 			String key = entry.getKey();
 			List valueList = entry.getValue();
 
@@ -170,8 +160,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 	}
 
 	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
+	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
 		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
 		for (String orderNo : orderNoSet) {
 			// Get order info map
@@ -186,12 +175,10 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 
 		return orderTOMap;
 	}
-	
-	private Map<String, OrderTO> getOrderInfo(String orderNo)
-			throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_TESCO
-				+ Constants.ORDER_PATH)
-				+ "Order_" + Constants.RETAILER_TESCO + "_" + orderNo + ".txt";
+
+	private Map<String, OrderTO> getOrderInfo(String orderNo) throws BaseException {
+		String fileName = Utils.getProperty(Constants.RETAILER_TESCO + Constants.ORDER_PATH) + "Order_"
+				+ Constants.RETAILER_TESCO + "_" + orderNo + ".txt";
 		File orderFile = new File(fileName);
 
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
@@ -201,16 +188,14 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 			try {
 				// Open the file
 				FileInputStream fileInput = new FileInputStream(orderFile);
-				InputStreamReader inputStrReader = new InputStreamReader(
-						fileInput, "UTF-8");
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
 				reader = new BufferedReader(inputStrReader);
 				reader.readLine();
 				// Read line by line
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getOrderNo() + orderTO.getStoreName()
-							+ orderTO.getItemID();
+					String key = orderTO.getOrderNo() + orderTO.getStoreName() + orderTO.getItemID();
 					orderMap.put(key, orderTO);
 
 				}
@@ -241,11 +226,53 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 	}
 
 	@Override
-	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File salesFile)
-			throws BaseException {
-		// TODO Auto-generated method stub
-		return null;
+	protected Map<String, List<SalesTO>> getSalesInfoFromFile(String retailerID, Date startDate, Date endDate,
+			File salesFile) throws BaseException {
+		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
+
+		if (salesFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				FileInputStream fileInput = new FileInputStream(salesFile);
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
+				reader.readLine();
+				// Read line by line
+				String salesLine = null;
+				while ((salesLine = reader.readLine()) != null) {
+					SalesTO salesTO = new SalesTO(salesLine);
+					String salesDateStr = salesTO.getSalesDate();
+					List<SalesTO> salesTOList = null;
+					if (salesMap.containsKey(salesDateStr)) {
+						salesTOList = salesMap.get(salesDateStr);
+					} else {
+						salesTOList = new ArrayList<SalesTO>();
+						salesMap.put(salesDateStr, salesTOList);
+					}
+
+					log.debug("销售单详细条目: " + salesTO.toString());
+					salesTOList.add(salesTO);
+
+				}
+
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			log.info("销售单包含的详单数量为:" + salesMap.size());
+
+		}
+		return salesMap;
 	}
 
 }

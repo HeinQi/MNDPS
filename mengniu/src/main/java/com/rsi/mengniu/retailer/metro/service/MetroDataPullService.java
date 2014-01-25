@@ -667,7 +667,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			Elements dataElements = detailResult.select("tr[rr="+i+"]");
 			Elements tds = dataElements.first().select("td");
 			OrderTO orderTo = new OrderTO();
-			orderTo.setStoreNo(tds.get(2).select("span").first().text()); // 门店编号
+			orderTo.setStoreID(tds.get(2).select("span").first().text()); // 门店编号
 			orderTo.setOrderNo(tds.get(3).select("span").first().text()); // 订单编号
 			orderTo.setOrderDate(tds.get(4).select("span").first().text()); // 订货日期
 			orderTo.setItemID(tds.get(8).select("span").first().text()); // 商品编号

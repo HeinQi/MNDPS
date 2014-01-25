@@ -1,6 +1,7 @@
 package com.rsi.mengniu.retailer.renrenle.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,6 +32,7 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
+import com.rsi.mengniu.util.Utils;
 
 public class RenrenleDataConversionService extends
 		RetailerDataConversionService {
@@ -150,4 +152,132 @@ public class RenrenleDataConversionService extends
 		return salesMap;
 	}
 
+	public void processOrderData(String retailerID, Date startDate, Date endDate) throws BaseException {
+		//Get Receiving Data
+		//Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(retailerID, startDate, endDate);
+
+		//Get Order Data
+		Map<String, List<OrderTO>> orderMap = this.getOrderInfo(retailerID, startDate, endDate);
+		//Match
+		
+		//Generate Output file
+		convertOrderData(retailerID,orderMap);
+		
+	}
+
+	private void convertOrderData(String retailerID,Map<String, List<OrderTO>> orderMap) throws BaseException {
+		for(String orderDateStr:orderMap.keySet()){
+			BufferedWriter writer = initOrderOutputFile(retailerID, orderDateStr);
+			List<OrderTO> orderList = orderMap.get(orderDateStr);
+			for(OrderTO orderTO : orderList){
+				String outputLine = orderTO.getOrderNo()
+						+ "\t"
+						+ orderTO.getStoreID()
+						+ "\t"
+						+ orderTO.getStoreName()
+						+ "\t"
+						+ ""
+						+ "\t"
+						+ orderTO.getItemID()
+						+ "\t"
+						+ orderTO.getBarcode()
+						+ "\t"
+						+ orderTO.getItemName()
+						+ "\t"
+						+ orderTO.getQuantity()
+						+ "\t"
+						+ orderTO.getTotalPrice()
+						+ "\t"
+						+ ""
+						+ "\t"
+						+ ""
+						+ "\t"
+						+ "";
+				try {
+					writer.write(outputLine);
+					writer.newLine();
+				} catch (IOException e) {
+					FileUtil.closeFileWriter(writer);
+					throw new BaseException(e);
+				}
+			}
+
+		}
+		
+	}
+
+	private Map<String, List<OrderTO>>  getOrderInfo(String retailerID, Date startDate, Date endDate) throws BaseException {
+		Map orderMap = new HashMap();
+
+		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_PATH));
+
+		File[] orderList = orderFolder.listFiles();
+		if (orderList != null) {
+			for (int i = 0; i < orderList.length; i++) {
+
+				File orderFile = orderList[i];
+				
+				String fileName = orderFile.getName();
+				String orderDateStr = fileName.substring(fileName.lastIndexOf("_")+1, fileName.indexOf("."));
+				
+				Date orderDate = DateUtil.toDate(orderDateStr, "yyyyMMdd");
+				
+				if(DateUtil.isInDateRange(orderDate, startDate, endDate)){
+					getLog().info("订单文件名: " + orderFile.getName());
+
+					// Get Receiving Info
+					Map<String, List> orderSingleMap = getOrderInfoFromFile(orderFile,orderDateStr);
+
+					Utils.putSubMapToMainMap(orderMap, orderSingleMap);
+				}
+				
+				
+
+			}
+		}
+
+		return orderMap;
+		
+	}
+
+	private Map<String, List> getOrderInfoFromFile(File orderFile,String orderDateStr) throws BaseException {
+		BufferedReader reader = null;
+		Map<String, List> orderMap = new HashMap<String, List>();
+		try {
+			// Open the file
+			FileInputStream fileInput = new FileInputStream(orderFile);
+			InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
+			reader = new BufferedReader(inputStrReader);
+			reader.readLine();
+			// Read line by line
+			String orderLine = null;
+			List<OrderTO> orderTOList = new ArrayList<OrderTO>();
+			while ((orderLine = reader.readLine()) != null) {
+				OrderTO orderTO = new OrderTO(orderLine);
+				orderTOList.add(orderTO);
+
+			}
+			// 
+			log.info("订单日期: " + orderDateStr + " 包含的详单数量为:" + orderTOList.size());
+			orderMap.put(orderDateStr, orderTOList);
+
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+
+			log.error(e);
+			throw new BaseException(e);
+
+		} finally {
+
+			FileUtil.closeFileReader(reader);
+		}
+		return orderMap;
+
+		
+
+	}
+	
+	
 }

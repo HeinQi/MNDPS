@@ -1,9 +1,12 @@
 package com.rsi.mengniu.util;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
@@ -21,8 +24,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.exception.BaseException;
+import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
+import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 
 
 public class Utils {
@@ -31,6 +38,7 @@ public class Utils {
 	public void setProperties(Properties p) {
 		properties = p;
 	}
+	
 	public static String getProperty(String key) {
 		return properties.getProperty(key);
 	}
@@ -147,4 +155,157 @@ public class Utils {
 			}
 		}
 	}
+	
+
+	/**
+	 * Export Receiving Info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param userID
+	 * @param receivingList
+	 * @throws BaseException
+	 */
+	public static void exportReceivingInfoToTXT(String retailerID,
+			String userID, Date receivingDate, List<ReceivingNoteTO> receivingList)
+			throws BaseException {
+
+		String receivingInboundFolderPath = Utils.getProperty(retailerID
+				+ Constants.RECEIVING_INBOUND_PATH);
+		FileUtil.createFolder(receivingInboundFolderPath);
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
+				+ retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+		
+
+		File receivingFile = new File(receivingFilePath);
+
+		BufferedWriter writer = null;
+
+		try {
+			receivingFile.createNewFile();
+			String receivingHeader = Utils.getProperty(Constants.RECEIVING_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(receivingHeader);
+			writer.newLine();
+
+			for (int i = 0; i < receivingList.size(); i++) {
+				ReceivingNoteTO receivingNoteTO = receivingList.get(i);
+				String receivingRow = receivingNoteTO.toString();
+				writer.write(receivingRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			FileUtil.closeFileWriter(writer);
+
+		}
+
+	}
+
+	
+	/**
+	 * Export Receiving Info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param userID
+	 * @param receivingList
+	 * @throws BaseException
+	 */
+	public static void exportReceivingInfoToTXTForRainbow(String retailerID,
+			String userID,Date receivingDate, List<ReceivingNoteTO> receivingList)
+			throws BaseException {
+	
+		String receivingInboundFolderPath = getProperty(retailerID
+				+ Constants.RECEIVING_INBOUND_PATH);
+		FileUtil.createFolder(receivingInboundFolderPath);
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
+				+ retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+	
+	
+		File receivingFile = new File(receivingFilePath);
+	
+		BufferedWriter writer = null;
+	
+		try {
+			receivingFile.createNewFile();
+			String receivingHeader = getProperty(Constants.OUTPUT_ORDER_HEADER);
+	
+			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(receivingHeader);
+			writer.newLine();
+	
+			for (int i = 0; i < receivingList.size(); i++) {
+				RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingList.get(i);
+				String receivingRow = receivingNoteTO.toString();
+				writer.write(receivingRow);
+				writer.newLine();
+			}
+	
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+	
+			FileUtil.closeFileWriter(writer);
+	
+		}
+	
+	}
+
+	/**
+	 * Export Receiving Info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param userID
+	 * @param receivingList
+	 * @throws BaseException
+	 */
+	public static void exportSalesInfoToTXT(String retailerID,
+			String userID, Date slaesDate, List<SalesTO> salesList)
+			throws BaseException {
+
+		String salesInboundFolderPath = Utils.getProperty(retailerID
+				+ Constants.SALES_INBOUND_PATH);
+		FileUtil.createFolder(salesInboundFolderPath);
+		String salesFilePath = salesInboundFolderPath + "Sales_"
+				+ retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+		
+
+		File salesFile = new File(salesFilePath);
+
+		BufferedWriter writer = null;
+
+		try {
+			salesFile.createNewFile();
+			String salesHeader = Utils.getProperty(Constants.SALES_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(salesFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(salesHeader);
+			writer.newLine();
+
+			for (int i = 0; i < salesList.size(); i++) {
+				SalesTO salesTO = (SalesTO) salesList.get(i);
+				String salesRow = salesTO.toString();
+				writer.write(salesRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			FileUtil.closeFileWriter(writer);
+
+		}
+
+	}
+
 }

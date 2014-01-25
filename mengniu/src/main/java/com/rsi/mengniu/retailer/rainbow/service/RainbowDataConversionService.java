@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -19,6 +20,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
@@ -114,7 +120,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	}
 	
 
-	public void convertOrderData(String retailerID, Date startDate,
+	public void processOrderData(String retailerID, Date startDate,
 			Date endDate) throws BaseException {
 		// Get Receiving Note
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
@@ -336,7 +342,55 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File salesFile)
 			throws BaseException {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
+		try {
+			InputStream sourceExcel = new FileInputStream(salesFile);
+
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+
+			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+				Row sourceRow = sourceSheet.getRow(i);
+				if (sourceRow == null) {
+					continue;
+				}
+
+				String salesDateStr = sourceRow.getCell(8).getStringCellValue();
+				Date salesDate = DateUtil.toDate(salesDateStr);
+
+				// If receivingDate is in the date range
+				if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {
+
+					SalesTO salesTO = new SalesTO();
+					List<SalesTO> salesTOList = null;
+
+					salesTO.setItemID(sourceRow.getCell(1).getStringCellValue());
+					salesTO.setItemName(sourceRow.getCell(2).getStringCellValue());
+					salesTO.setStoreID(sourceRow.getCell(5).getStringCellValue());
+					salesTO.setSalesDate(salesDateStr);
+					salesTO.setSalesQuantity(sourceRow.getCell(6).getStringCellValue());
+					salesTO.setSalesAmount(sourceRow.getCell(7).getStringCellValue());
+					
+					
+					if (salesMap.containsKey(salesDateStr)) {
+						salesTOList = salesMap.get(salesDateStr);
+					} else {
+						salesTOList = new ArrayList<SalesTO>();
+						salesMap.put(salesDateStr, salesTOList);
+					}
+
+					log.debug("销售单详细条目: " + salesTO.toString());
+					salesTOList.add(salesTO);
+
+				}
+			}
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
+		}
+		return salesMap;
 	}
 }

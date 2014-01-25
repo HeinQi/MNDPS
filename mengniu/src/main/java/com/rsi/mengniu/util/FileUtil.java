@@ -23,7 +23,6 @@ import net.lingala.zip4j.exception.ZipException;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
-import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 
@@ -190,63 +189,6 @@ public class FileUtil {
 		}
 
 	}
-
-	
-
-	/**
-	 * Export Receiving Info from list to txt file
-	 * 
-	 * @param retailerID
-	 * @param userID
-	 * @param receivingList
-	 * @throws BaseException
-	 */
-	public static void exportReceivingInfoToTXTForRainbow(String retailerID,
-			String userID, List<ReceivingNoteTO> receivingList)
-			throws BaseException {
-
-		String receivingInboundFolderPath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
-		createFolder(receivingInboundFolderPath);
-		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
-				+ retailerID + "_" + userID + "_"
-				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
-		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
-		// File receivingInboundFolder = new File(receivingInboundFolderPath);
-		// if (!receivingInboundFolder.exists()) {
-		// receivingInboundFolder.mkdirs();
-		// }
-
-		File receivingFile = new File(receivingFilePath);
-
-		BufferedWriter writer = null;
-
-		try {
-			receivingFile.createNewFile();
-			String receivingHeader = Utils.getProperty(Constants.OUTPUT_ORDER_HEADER);
-
-			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
-			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
-			writer.write(receivingHeader);
-			writer.newLine();
-
-			for (int i = 0; i < receivingList.size(); i++) {
-				RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingList.get(i);
-				String receivingRow = receivingNoteTO.toString();
-				writer.write(receivingRow);
-				writer.newLine();
-			}
-
-		} catch (IOException e) {
-			throw new BaseException(e);
-		} finally {
-
-			closeFileWriter(writer);
-
-		}
-
-	}
-
 
 
 	/**

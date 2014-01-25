@@ -103,7 +103,7 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	public Map<String, ReceivingNoteTO> parseReceivingListToMap(
+	public Map<String, ReceivingNoteTO> generateReceivingMapForComparison(
 			List<ReceivingNoteTO> receivingNoteList) throws BaseException {
 		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
 	

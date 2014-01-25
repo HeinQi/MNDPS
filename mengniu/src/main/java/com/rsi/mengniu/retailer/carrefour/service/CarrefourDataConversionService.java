@@ -32,21 +32,19 @@ import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
-public class CarrefourDataConversionService extends
-		RetailerDataConversionService {
+public class CarrefourDataConversionService extends RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(CarrefourDataConversionService.class);
 
 	@Override
-	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File receivingFile)
-			throws BaseException {
+	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
+			Date endDate, File receivingFile) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 		try {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
 			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-		
+
 			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
 			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 				Row sourceRow = sourceSheet.getRow(i);
@@ -54,8 +52,7 @@ public class CarrefourDataConversionService extends
 					continue;
 				}
 
-				String receivingDateStr = sourceRow.getCell(6)
-						.getStringCellValue();
+				String receivingDateStr = sourceRow.getCell(6).getStringCellValue();
 				Date receivingDate = DateUtil.toDate(receivingDateStr);
 
 				// If receivingDate is in the date range
@@ -69,8 +66,7 @@ public class CarrefourDataConversionService extends
 
 						Cell sourceCell = sourceRow.getCell(j);
 
-						String sourceCellValue = sourceCell
-								.getStringCellValue();
+						String sourceCellValue = sourceCell.getStringCellValue();
 
 						switch (j) {
 						case 2:
@@ -79,8 +75,7 @@ public class CarrefourDataConversionService extends
 							continue;
 						case 3:
 
-							sourceCellValue = sourceCellValue
-									.substring(sourceCellValue.indexOf("-") + 1);
+							sourceCellValue = sourceCellValue.substring(sourceCellValue.indexOf("-") + 1);
 							receivingNoteTO.setStoreName(sourceCellValue);
 
 							continue;
@@ -143,8 +138,7 @@ public class CarrefourDataConversionService extends
 	}
 
 	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
+	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
 		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
 		for (String orderNo : orderNoSet) {
 			// Get order info map
@@ -160,15 +154,9 @@ public class CarrefourDataConversionService extends
 		return orderTOMap;
 	}
 
-	private Map<String, OrderTO> getOrderInfo(String orderNo)
-			throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_CARREFOUR
-				+ Constants.ORDER_PATH)
-				+ "Order_"
-				+ Constants.RETAILER_CARREFOUR
-				+ "_"
-				+ orderNo
-				+ ".txt";
+	private Map<String, OrderTO> getOrderInfo(String orderNo) throws BaseException {
+		String fileName = Utils.getProperty(Constants.RETAILER_CARREFOUR + Constants.ORDER_PATH) + "Order_"
+				+ Constants.RETAILER_CARREFOUR + "_" + orderNo + ".txt";
 		File orderFile = new File(fileName);
 
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
@@ -178,17 +166,14 @@ public class CarrefourDataConversionService extends
 			try {
 				// Open the file
 				FileInputStream fileInput = new FileInputStream(orderFile);
-				InputStreamReader inputStrReader = new InputStreamReader(
-						fileInput, "UTF-8");
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
 				reader = new BufferedReader(inputStrReader);
 				reader.readLine();
 				// Read line by line
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getOrderNo()
-							+ orderTO.getStoreName().substring(3)
-							+ orderTO.getItemID();
+					String key = orderTO.getOrderNo() + orderTO.getStoreName().substring(3) + orderTO.getItemID();
 					orderMap.put(key, orderTO);
 
 				}
@@ -219,12 +204,10 @@ public class CarrefourDataConversionService extends
 	}
 
 	@Override
-	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File salesFile)
-			throws BaseException {
+	protected Map<String, List<SalesTO>> getSalesInfoFromFile(String retailerID, Date startDate, Date endDate,
+			File salesFile) throws BaseException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
 }

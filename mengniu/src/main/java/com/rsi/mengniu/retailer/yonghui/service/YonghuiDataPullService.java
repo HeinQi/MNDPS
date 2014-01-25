@@ -26,6 +26,7 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
@@ -52,18 +53,25 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 				return;
 			}
 			// receive
-			getReceive(httpClient, user);
+			// getReceive(httpClient, user);
 			// order
-			getOrder(httpClient, user);
+			// getOrder(httpClient, user);
+
+			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_YONGHUI),
+					Utils.getEndDate(Constants.RETAILER_YONGHUI));
+			for (Date searchDate : dates) {
+				getSales(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+			}
 
 			httpClient.close();
 		} catch (Exception e) {
-			log.error(user+Utils.getTrace(e));
+			log.error(user + Utils.getTrace(e));
 		}
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/logon/logon.jsp");
 		CloseableHttpResponse loginPageResponse = httpClient.execute(httpGet);
 		String loginPageStr = EntityUtils.toString(loginPageResponse.getEntity());
@@ -106,22 +114,23 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = EntityUtils.toString(loginResponse.getEntity());
 		if (responseStr.contains("校验码无效") || responseStr.contains("checkcode2 not set")) {
-			log.info(user+"校验码无效,Relogin...");
+			log.info(user + "校验码无效,Relogin...");
 			return "InvalidCode";
 		} else if (responseStr.contains("登录失败,请检查登录名和密码")) {
 			log.info(user + "登录失败,请检查登录名和密码!");
 			return "InvalidPassword";
-		} else if (!responseStr.contains("订退货管理")) {
+		} else if (!responseStr.contains("OK")) {
 			log.info(user + "系统出错,退出!");
+			return "Error";
 		}
 		loginResponse.close();
 		log.info(user + "登录成功!");
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		return "Success";
 	}
 
 	public void getReceive(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载收货单...");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		// /vss/DaemonSearchSheet?docdate_min=2014-01-01&docdate_max=2014-10-05&sheetname=receipt
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("docdate_min", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd")));
@@ -135,8 +144,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		receiveRes.close();
 		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
 		Elements sheetIdElements = xmlDoc.select("sheetid");
-		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd") + "到" + DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd")
-				+ ",共有" + sheetIdElements.size() + "条收货单");
+		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd") + "到"
+				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd") + ",共有" + sheetIdElements.size() + "条收货单");
 		int count = 0;
 		List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
 		for (Element eSheetId : sheetIdElements) {
@@ -179,10 +188,10 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
 		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
-		String orderPath = Utils.getProperty(user.getRetailer()+Constants.ORDER_PATH);
+		String orderPath = Utils.getProperty(user.getRetailer() + Constants.ORDER_PATH);
 		FileUtil.createFolder(orderPath);
-		String fileNm = "Order_"+user.getRetailer()+"_"+user.getUserId()+"_"+DateUtil.toStringYYYYMMDD(new Date())+".xls";
-		FileOutputStream orderFos = new FileOutputStream(orderPath+fileNm);
+		String fileNm = "Order_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
+		FileOutputStream orderFos = new FileOutputStream(orderPath + fileNm);
 		String url = "http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=" + startDate + "&orderdate_max=" + endDate
 				+ "&operation=eptOrderSheet";
 		HttpGet httpGet = new HttpGet(url);
@@ -192,14 +201,61 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		log.info(user + "订单数据下载成功");
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
+	public void getSales(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+		log.info(user + "下载日期为"+searchDate+"的销售数据...");
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
+		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
+		searchformParams.add(new BasicNameValuePair("reportname", "salecost"));
+		searchformParams.add(new BasicNameValuePair("sdate_min", searchDate));
+		searchformParams.add(new BasicNameValuePair("sdate_max", searchDate));
+		searchformParams.add(new BasicNameValuePair("nosale", "false"));
+		searchformParams.add(new BasicNameValuePair("action", "getwithoutshop"));
+		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
+		HttpPost searchPost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonReport");
+		searchPost.setEntity(searchFormEntity);
+		String responseStr = Utils.HttpExecute(httpClient, searchPost, "sale_cost");
+		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
+		Elements goodsIds = xmlDoc.select("goodsid");
+		
+		if (goodsIds != null) {
+			log.info(user+"查询到日期为"+searchDate+"销售的货物"+goodsIds.size()+"条");
+			List<SalesTO> salesList = new ArrayList<SalesTO>();
+			for (Element eGoodsId : goodsIds) {
+				Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
+				String goodsId = eGoodsId.text();
+				List<NameValuePair> withShopformParams = new ArrayList<NameValuePair>();
+				withShopformParams.add(new BasicNameValuePair("reportname", "salecost"));
+				withShopformParams.add(new BasicNameValuePair("sdate_min", searchDate));
+				withShopformParams.add(new BasicNameValuePair("sdate_max", searchDate));
+				withShopformParams.add(new BasicNameValuePair("goodsid", goodsId));
+				withShopformParams.add(new BasicNameValuePair("action", "getwithshop"));
+				HttpEntity withShopFormEntity = new UrlEncodedFormEntity(withShopformParams, "UTF-8");
+				HttpPost withShopPost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonReport");
+				withShopPost.setEntity(withShopFormEntity);
+				String withShopStr = Utils.HttpExecute(httpClient, withShopPost, "sale_cost");
+				Document xmlDetailDoc = Jsoup.parse(withShopStr, "", Parser.xmlParser());
+				Elements rows = xmlDetailDoc.select("row");
+				if (rows != null) {
+					log.info(user+"下载货物ID为"+goodsId+"的门店销售数据");
+					for (Element row : rows) {
+						SalesTO salesTo = new SalesTO();
+						salesTo.setStoreID(row.select("shopid").text());
+						salesTo.setItemID(goodsId);
+						salesTo.setSalesDate(searchDate);
+						salesTo.setItemName(row.select("goodsname").text());
+						salesTo.setSalesQuantity(row.select("qty").text());
+						salesTo.setSalesAmount(row.select("truevalue").text());
+						salesList.add(salesTo);
+					}
+				}
+			}
+			FileUtil.exportSalesInfoToTXT(Constants.RETAILER_YONGHUI, user.getUserId(), salesList);
+			log.info(user + "成功下载日期为"+searchDate+"的销售数据");
+		} else {
+			log.info(user+"没有查询到销售数据或网站出错");
+		}
+	}
+
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
 	}

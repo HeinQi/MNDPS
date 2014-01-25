@@ -18,11 +18,19 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.util.StringUtils;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
@@ -68,6 +76,22 @@ public class Utils {
 		return buffer.toString();
 	}
 
+	public static String HttpExecute(CloseableHttpClient httpClient,HttpUriRequest request,String expectStr) throws Exception {
+		CloseableHttpResponse response = httpClient.execute(request);
+		HttpEntity entity = response.getEntity();
+		String responseStr = EntityUtils.toString(entity);
+		response.close();
+		if (!StringUtils.isEmpty(expectStr) && !StringUtils.isEmpty(responseStr)) { 
+			if (responseStr.contains(expectStr)) {
+				return responseStr;
+			} else {
+				throw new Exception("页面加载失败!");
+			}
+		} else {
+			return responseStr;
+		}
+	}
+	
 	public static void binaryImage(String imageName) throws IOException {
 		File file = new File(imageName + ".jpg");
 		BufferedImage image = ImageIO.read(file);

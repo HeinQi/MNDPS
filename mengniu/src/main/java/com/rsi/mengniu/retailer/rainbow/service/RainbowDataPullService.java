@@ -257,8 +257,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		
 		return receivingList;
 	}
-	//%3E%3Dto_date%28%272014-01-01%27%2C%27yyyy-mm-dd%27%29+and+TJRQ%3C%3Dto_date%28%272014-01-01%27%2C%27yyyy-mm-dd%27%29&sqlWhere=&rptId=4762&html=Y
-
+	
 	private void getSales(CloseableHttpClient httpClient, User user)
 			throws Exception {
 

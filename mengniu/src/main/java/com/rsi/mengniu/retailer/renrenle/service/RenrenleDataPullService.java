@@ -204,14 +204,14 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		} while (pageNo <= totalPages);
 
 		log.info(user+"查询到"+searchDate+"号订单共"+orderIdList.size()+"条");
-		List<OrderTO> orderList = new ArrayList<OrderTO>();
 		for (int i=0; i<orderIdList.size(); i++) {
-			getOrderDetail(httpClient,user,orderIdList.get(i),searchDate,orderList);
-			log.info(user+"成功获取第"+(i+1)+"条订单,订单号为"+orderIdList.get(i));
+			String orderId = orderIdList.get(i);
+			List<OrderTO> orderList = new ArrayList<OrderTO>();
+			getOrderDetail(httpClient,user,orderId,searchDate,orderList);
+			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId, DateUtil.toDate(searchDate,"yyyy-MM-dd"), orderList);
+			log.info(user+"成功获取第"+(i+1)+"条订单,订单号为"+orderId);
 		}
-		//Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE,user.getUserId(),DateUtil.toDate(searchDate,"yyyy-MM-dd"),orderList);
 		log.info(user + searchDate + "的订单数据下载成功");
-
 	}
 	
 	private void getOrderDetail(CloseableHttpClient httpClient, User user,String orderId,String searchDate,List<OrderTO> orderList) throws Exception {

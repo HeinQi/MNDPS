@@ -36,7 +36,11 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 
 		try {
-			login(httpClient, user);
+			String loginResult = login(httpClient, user);
+			// Invalid Password and others
+			if (!"Success".equals(loginResult)) {
+				return;
+			}
 
 			// receive
 			getReceive(httpClient, user);
@@ -68,9 +72,14 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String responseStr = EntityUtils.toString(response.getEntity());
 		loginResponse.close();
 		response.close();
-		if (!responseStr.contains("Login Successful")) {
+		if (responseStr.contains("Please check your User ID and/or your Passcode")) {
 			log.info(user + "登录失败,请检查登录名和密码!");
+			Utils.recordIncorrectUser(user);
 			return "InvalidPassword";
+		}		
+		if (!responseStr.contains("Login Successful")) {
+			log.info(user + "网站登录失败,请检查网站,退出");
+			return "Error";
 		}
 		log.info(user + "登录成功!");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));

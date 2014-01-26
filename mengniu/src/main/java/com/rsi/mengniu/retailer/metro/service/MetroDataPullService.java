@@ -1,6 +1,7 @@
 package com.rsi.mengniu.retailer.metro.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -31,36 +32,52 @@ import com.rsi.mengniu.util.Utils;
 
 public class MetroDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(MetroDataPullService.class);
+	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_METRO);
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
-
+		StringBuffer summaryBuffer = new StringBuffer();
+		summaryBuffer.append("运行时间: "+new Date()+"\r\n");
+		summaryBuffer.append("零售商: "+user.getRetailer()+"\r\n");
+		summaryBuffer.append("用户: "+user.getUserId()+"\r\n");
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
+				summaryBuffer.append("登录失败!\r\n");
+				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+				summaryLog.info(summaryBuffer);
 				return;
 			}
 		} catch (Exception e) {
+			summaryBuffer.append("登录失败!\r\n");
+			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+			summaryLog.info(summaryBuffer);
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
 			return;
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
 		try {
 			// receive
-			getReceive(httpClient, user);			
+			getReceive(httpClient, user,summaryBuffer);			
 		} catch (Exception e) {
+			summaryBuffer.append("收货单下载失败"+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查收货单查询功能是否正常!");
 			errorLog.error(user,e);			
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
 		try {
 			// order
-			getOrder(httpClient,user);
+			getOrder(httpClient,user,summaryBuffer);
 			httpClient.close();		
 		} catch (Exception e) {
+			summaryBuffer.append("订单下载失败"+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查订单查询功能是否正常!");
 			errorLog.error(user,e);
 		}
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+		summaryLog.info(summaryBuffer);
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
@@ -97,7 +114,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getReceive(CloseableHttpClient httpClient, User user) throws Exception {
+	public void getReceive(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
 		log.info(user+"下载收货单...");
 
 		/*
@@ -302,8 +319,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 			}
 			FileUtil.exportReceivingInfoToTXT(Constants.RETAILER_METRO, user.getUserId(), receiveList);
 			log.info(user + "收货单下载成功!");
+			summaryBuffer.append("收货单下载成功"+"\r\n");
 		} else {
 			log.info(user+"下载收货单失败!");
+			summaryBuffer.append("收货单下载失败"+"\r\n");
 		}
 		
 	}
@@ -351,7 +370,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 	}
 
-	public void getOrder(CloseableHttpClient httpClient,User user) throws Exception {
+	public void getOrder(CloseableHttpClient httpClient,User user,StringBuffer summaryBuffer) throws Exception {
 		log.info(user+"订单数据下载...");
 		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
 		orderformParams.add(new BasicNameValuePair("NavigationTarget", "navurl://2acb0a958f2485c518851f9e303d829f"));
@@ -538,7 +557,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		orderRes8.close();		
 		*/
 		//显示已交货订单明细
-		getDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id);
+		getDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,summaryBuffer);
 		
 	}
 	private void getUnDispatchOrder(CloseableHttpClient httpClient, User user,String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
@@ -589,7 +608,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		}
 	}
 	private void getDispatchOrder(CloseableHttpClient httpClient, User user,String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
-			String sap_wd_secure_id) throws Exception {
+			String sap_wd_secure_id,StringBuffer summaryBuffer) throws Exception {
 		//显示已交货订单明细
 		log.info(user+"下载已交货订单明细...");
 		List<NameValuePair> orderformParams7 = new ArrayList<NameValuePair>();
@@ -631,10 +650,13 @@ public class MetroDataPullService implements RetailerDataPullService {
 		    FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
 			
 			log.info(user + "下载已交货订单明细成功!");
+			summaryBuffer.append("订单下载成功"+"\r\n");
 		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
 			log.info(user+"没有查询到符合条件的已交货订单明细!");
+			summaryBuffer.append("没有查询到符合条件的订单数据"+"\r\n");
 		} else {
 			log.info(user+"下载已交货订单明细失败!");
+			summaryBuffer.append("订单下载失败"+"\r\n");
 		}
 
 	}

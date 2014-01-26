@@ -54,14 +54,16 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
 				summaryBuffer.append("登录失败!\r\n");
-				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE);
+				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+				summaryLog.info(summaryBuffer);
 				return;
 			}
 		} catch (Exception e) {
 			summaryBuffer.append("登录失败!\r\n");
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
-			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE);
+			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+			summaryLog.info(summaryBuffer);
 			return;
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
@@ -82,10 +84,12 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			httpClient.close();
 		} catch (Exception e) {
 			summaryBuffer.append("订单下载出错"+"\r\n");
+			summaryBuffer.append("成功数量: "+orderCount.getCounttotalNo()+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
 			errorLog.error(user,e);
 		}
-		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE);
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+		summaryLog.info(summaryBuffer);
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
@@ -186,13 +190,15 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 	public void getOrder(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer,CountTO orderCount) throws Exception {
 		log.info(user + "跳转到订单查询页面...");
-
+		summaryBuffer.append("订单日期: "+DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+" - "+DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+"\r\n");
 		// forward to PowerE2E Platform
 		HttpGet httpGet = new HttpGet("https://supplierweb.carrefour.com.cn/callSSO.jsp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		if (!EntityUtils.toString(entity).contains("PowerE2E Platform")) {
 			log.info(user + "订单查询页面加载出错,cannot forward to PowerE2E Platform");
+			summaryBuffer.append("订单下载出错"+"\r\n");
+			summaryBuffer.append("成功数量: 0\r\n");
 			return;
 		}
 		response.close();
@@ -263,12 +269,12 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			}
 			FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
 			count++;
+			orderCount.increaseOne();
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
 		}
 		log.info(user + "订单数据下载成功!");
-		summaryBuffer.append("订单日期: "+DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+" - "+DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+"\r\n");
 		summaryBuffer.append("订单下载成功"+"\r\n");
-		summaryBuffer.append("数量: "+1+"\r\n");
+		summaryBuffer.append("数量: "+orderCount.getCounttotalNo()+"\r\n");
 	}
 
 	// function gotoPage(page) {

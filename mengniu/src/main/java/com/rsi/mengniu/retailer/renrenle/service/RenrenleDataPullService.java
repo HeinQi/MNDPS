@@ -1,8 +1,7 @@
 package com.rsi.mengniu.retailer.renrenle.service;
 
-import java.io.BufferedReader;
 import java.io.FileOutputStream;
-import java.io.StringReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +26,6 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
-import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
@@ -37,10 +35,15 @@ import com.rsi.mengniu.util.Utils;
 //http://www.renrenle.cn/scm/welcome.do
 public class RenrenleDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(RenrenleDataPullService.class);
+	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RENRENLE);
 	private OCR ocr;
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+		StringBuffer summaryBuffer = new StringBuffer();
+		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
+		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
+		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
 		String loginResult = null;
 		int loginCount = 0; // 如果验证码出错重新login,最多15次
 		try {
@@ -50,13 +53,20 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
+				summaryBuffer.append("登录失败!\r\n");
+				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+				summaryLog.info(summaryBuffer);
 				return;
 			}
 		} catch (Exception e) {
-			log.error(user+"网站登录出错,请检查!");
-			errorLog.error(user,e);
+			log.error(user + "网站登录出错,请检查!");
+			errorLog.error(user, e);
+			summaryBuffer.append("登录失败!\r\n");
+			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+			summaryLog.info(summaryBuffer);
 			return;
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
 		try {
 			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
 					Utils.getEndDate(Constants.RETAILER_RENRENLE));
@@ -65,21 +75,30 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			}
 
 		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-			errorLog.error(user,e);
+			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user, e);
+		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
+
+		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
+				Utils.getEndDate(Constants.RETAILER_RENRENLE));
+
+		for (Date searchDate : dates) {
+			try {
+				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+			} catch (Exception e) {
+				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
+				errorLog.error(user, e);
+			}
+		}
+		try {
+			httpClient.close();
+		} catch (IOException e) {
+			errorLog.error(user, e);
 		}
 
-		try {
-			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
-					Utils.getEndDate(Constants.RETAILER_RENRENLE));
-			for (Date searchDate : dates) {
-				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
-			}
-			httpClient.close();
-		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查订单查询功能是否正常!");
-			errorLog.error(user,e);
-		}
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+		summaryLog.info(summaryBuffer);
 
 	}
 
@@ -188,11 +207,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			String responseStr = new String(EntityUtils.toString(response.getEntity()).getBytes("ISO_8859_1"), "GBK");
 			response.close();
 			if (!responseStr.contains("泰斯玛供应链关系管理系统")) {
-				log.error(user+"订单查询失败,请登录网站检查");
+				log.error(user + "订单查询失败,请登录网站检查");
 				return;
 			}
-			String totalPageStr = responseStr.substring(responseStr.indexOf("</B>/<B>")+8);
-			totalPageStr = totalPageStr.substring(0,totalPageStr.indexOf("</B>"));
+			String totalPageStr = responseStr.substring(responseStr.indexOf("</B>/<B>") + 8);
+			totalPageStr = totalPageStr.substring(0, totalPageStr.indexOf("</B>"));
 			totalPages = Integer.parseInt(totalPageStr);
 			Document doc = Jsoup.parse(responseStr);
 			Element table = doc.select("table.box_table1").first();
@@ -204,27 +223,28 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			pageNo++;
 		} while (pageNo <= totalPages);
 
-		log.info(user+"查询到"+searchDate+"号订单共"+orderIdList.size()+"条");
-		for (int i=0; i<orderIdList.size(); i++) {
+		log.info(user + "查询到" + searchDate + "号订单共" + orderIdList.size() + "条");
+		for (int i = 0; i < orderIdList.size(); i++) {
 			String orderId = orderIdList.get(i);
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
-			getOrderDetail(httpClient,user,orderId,searchDate,orderList);
-			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId, DateUtil.toDate(searchDate,"yyyy-MM-dd"), orderList);
-			log.info(user+"成功获取第"+(i+1)+"条订单,订单号为"+orderId);
+			getOrderDetail(httpClient, user, orderId, searchDate, orderList);
+			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId, DateUtil.toDate(searchDate, "yyyy-MM-dd"), orderList);
+			log.info(user + "成功获取第" + (i + 1) + "条订单,订单号为" + orderId);
 		}
 		log.info(user + searchDate + "的订单数据下载成功");
 	}
-	
-	private void getOrderDetail(CloseableHttpClient httpClient, User user,String orderId,String searchDate,List<OrderTO> orderList) throws Exception {
-		///scm/order/orderAction.do?method=printOrder&sheetID=A002201401024822
+
+	private void getOrderDetail(CloseableHttpClient httpClient, User user, String orderId, String searchDate, List<OrderTO> orderList)
+			throws Exception {
+		// /scm/order/orderAction.do?method=printOrder&sheetID=A002201401024822
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
-		String url = "http://www.renrenle.cn/scm/order/orderAction.do?method=printOrder&sheetID="+orderId;
+		String url = "http://www.renrenle.cn/scm/order/orderAction.do?method=printOrder&sheetID=" + orderId;
 		HttpGet httpOrderGet = new HttpGet(url);
 		CloseableHttpResponse orderDetailResponse = httpClient.execute(httpOrderGet);
 		HttpEntity orderEntity = orderDetailResponse.getEntity();
 		String orderStr = new String(EntityUtils.toString(orderEntity).getBytes("ISO_8859_1"), "GBK");
 		if (!orderStr.contains(orderId)) {
-			log.error(user+"获取订单失败订单号为"+orderId+",请登录网站检查");
+			log.error(user + "获取订单失败订单号为" + orderId + ",请登录网站检查");
 			return;
 		}
 		Document orderDoc = Jsoup.parse(orderStr);

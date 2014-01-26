@@ -112,6 +112,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			return "InvalidCode";
 		} else if (responseStr.contains("您的用户名或密码输入有误")) {
 			log.info(user + "您的用户名或密码输入有误,退出!");
+			Utils.recordIncorrectUser(user);
 			return "InvalidPassword";
 		} else if (!responseStr.contains("mainAction")) {
 			log.info(user + "系统出错,退出!");
@@ -208,7 +209,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			getOrderDetail(httpClient,user,orderIdList.get(i),searchDate,orderList);
 			log.info(user+"成功获取第"+(i+1)+"条订单,订单号为"+orderIdList.get(i));
 		}
-		FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_RENRENLE, orderList);
+		//Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE,user.getUserId(),DateUtil.toDate(searchDate,"yyyy-MM-dd"),orderList);
 		log.info(user + searchDate + "的订单数据下载成功");
 
 	}

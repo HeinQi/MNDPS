@@ -64,6 +64,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 		loginResponse.close();
 		if (reponseLogin.contains("您的供应商编号或密码有误")) {
 			log.info(user + "错误的密码,退出!");
+			Utils.recordIncorrectUser(user);
 			return "Error";
 		}
 		// forward

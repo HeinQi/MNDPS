@@ -43,6 +43,12 @@ public final class Constants {
 	public static final String SUMMARY_HUALIAN = "summary.hualian";
 	public static final String SUMMARY_RAINBOW = "summary.rainbow";
 	
+	public static final String SUMMARY_TITLE_ORDER = "---订单---";
+	public static final String SUMMARY_TITLE_RECEIVING = "---收货单---";
+	public static final String SUMMARY_TITLE_SALES = "---销售单---";
+	public static final String SUMMARY_SEPERATOR_LINE = "-------------------------------------------";
+	
+	
 	
 
 	public static final String SYS_ERROR = "syserror";

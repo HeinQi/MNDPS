@@ -50,23 +50,17 @@ public class MetroDataPullService implements RetailerDataPullService {
 			// receive
 			getReceive(httpClient, user);			
 		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			log.error(user+"页面加载失败，请登录网站检查收货单查询功能是否正常!");
 			errorLog.error(user,e);			
 		}
-
-
-
-		
 		try {
 			// order
 			getOrder(httpClient,user);
 			httpClient.close();		
 		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			log.error(user+"页面加载失败，请登录网站检查订单查询功能是否正常!");
 			errorLog.error(user,e);
 		}
-		
-		
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {

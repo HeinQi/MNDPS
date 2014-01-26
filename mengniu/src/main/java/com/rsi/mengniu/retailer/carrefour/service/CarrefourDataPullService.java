@@ -71,7 +71,6 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
 			errorLog.error(user,e);
-			return;			
 		}
 	}
 

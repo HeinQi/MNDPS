@@ -2,6 +2,7 @@ package com.rsi.mengniu.retailer.rainbow.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,34 +66,56 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
+			return;
 		}
-
+		List<Date> dateList = null;
 		try {
-
-			summaryBuffer.append("收货单 \r\n");
-			summaryBuffer.append("******\r\n");
-			List<Date> dateList = DateUtil.getDateArrayByRange(Utils.getStartDate(user.getRetailer()),
+			dateList = DateUtil.getDateArrayByRange(Utils.getStartDate(user.getRetailer()),
 					Utils.getEndDate(user.getRetailer()));
-			for (Date receivingDate : dateList) {
+		} catch (Exception e1) {
+			log.error("日期转换出错");
+			errorLog.info("日期转换出错", e1);
 
-				this.getReceiving(httpClient, user, receivingDate, summaryBuffer);
+		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING + "\r\n");
+		
+		for (Date receivingDate : dateList) {
+			CountTO countTO = new CountTO();
+
+			String receivingDateStr = DateUtil.toString(receivingDate);
+			summaryBuffer.append("收货单日期：" + receivingDateStr + " \r\n");
+			try {
+				this.getReceiving(httpClient, user, receivingDate, summaryBuffer, countTO);
+				summaryBuffer.append("收货单下载成功" + "\r\n");
+				summaryBuffer.append("数量：" + countTO.getCounttotalNo() + " \r\n");
+			} catch (Exception e) {
+				summaryBuffer.append("收货单下载失败!" + "\r\n");
+				log.error("收货单下载失败!");
+				errorLog.error(user, e);
 			}
-		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
 		}
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 
-		try {
+		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
 
-			summaryBuffer.append("销售单 \r\n");
-			summaryBuffer.append("******\r\n");
-			List<Date> dateList = DateUtil.getDateArrayByRange(Utils.getStartDate(user.getRetailer()),
-					Utils.getEndDate(user.getRetailer()));
-			for (Date salesDate : dateList) {
+		for (Date salesDate : dateList) {
+
+			String salesDateStr = DateUtil.toString(salesDate);
+			summaryBuffer.append("销售日期：" + salesDateStr + " \r\n");
+
+			try {
+
 				this.getSales(httpClient, user, salesDate, summaryBuffer);
+
+				summaryBuffer.append("销售单下载成功" + " \r\n");
+			} catch (Exception e) {
+				summaryBuffer.append("销售单下载失败!" + "\r\n");
+				log.error("销售单下载失败!");
+				errorLog.error(user + Utils.getTrace(e));
 			}
-		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
+
 		}
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 
 		summaryLog.info(summaryBuffer);
 
@@ -137,15 +160,13 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 	}
 
-	private void getReceiving(CloseableHttpClient httpClient, User user, Date receivingDate, StringBuffer summaryBuffer)
-			throws Exception {
+	private void getReceiving(CloseableHttpClient httpClient, User user, Date receivingDate,
+			StringBuffer summaryBuffer, CountTO countTO) throws Exception {
 
 		log.info(user + "开始下载收货单...");
 
 		String receivingDateStr = DateUtil.toString(receivingDate);
 
-		summaryBuffer.append("收货单日期：" + receivingDateStr + " \r\n");
-		CountTO countTO = new CountTO();
 		log.info(user + "收货单日期：" + receivingDateStr);
 		List<ReceivingNoteTO> receivingList = new ArrayList<ReceivingNoteTO>();
 
@@ -202,8 +223,6 @@ public class RainbowDataPullService implements RetailerDataPullService {
 		Utils.exportReceivingInfoToTXTForRainbow(Constants.RETAILER_RAINBOW, user.getUserId(), receivingDate,
 				receivingList);
 
-		summaryBuffer.append("收货单下载成功"+"\r\n");
-		summaryBuffer.append("数量：" + countTO.getCounttotalNo() + " \r\n\r\n");
 		log.info(user + "写入收货单文件结束.");
 
 	}
@@ -265,7 +284,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 				receivingList.add(rainbowReceivingTO);
 			}
 
-			countTO.setCounttotalNo(countTO.getCounttotalNo() + 1);
+			countTO.increaseOne();
 
 		}
 
@@ -279,8 +298,6 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		String salesDateStr = DateUtil.toString(salesDate);
 		log.info(user + "销售日期：" + salesDateStr);
-
-		summaryBuffer.append("销售日期：" + salesDateStr + " \r\n");
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 
@@ -320,8 +337,6 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		log.info(user + "销售单文件名：" + salesFileNm);
 
-		summaryBuffer.append("销售单下载成功" + " \r\n");
-		summaryBuffer.append("文件：" + salesFileNm + " \r\n\r\n");
 		log.info(user + "下载销售单结束.");
 	}
 

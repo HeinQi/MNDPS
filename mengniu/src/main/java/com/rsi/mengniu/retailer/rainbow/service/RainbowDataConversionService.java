@@ -53,14 +53,8 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	}
 
 	@Override
-	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File receivingFile)
-			throws BaseException {
-		return getReceivingInfoFromFileByStatus(receivingFile);
-	}
-
-	private Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFileByStatus(
-			File receivingFile) throws BaseException {
+	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
+			Date endDate, File receivingFile) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		if (receivingFile.exists()) {
@@ -68,28 +62,26 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 			try {
 				// Open the file
 				FileInputStream fileInput = new FileInputStream(receivingFile);
-				InputStreamReader inputStrReader = new InputStreamReader(
-						fileInput, "UTF-8");
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
 				reader = new BufferedReader(inputStrReader);
 				reader.readLine();
 				// Read line by line
 				String receivingLine = null;
 				while ((receivingLine = reader.readLine()) != null) {
-					RainbowReceivingTO receivingNoteTO = new RainbowReceivingTO(
-							receivingLine);
+					RainbowReceivingTO receivingNoteTO = new RainbowReceivingTO(receivingLine);
 					String orderNo = receivingNoteTO.getOrderNo();
-				
-						List<ReceivingNoteTO> receivingNoteTOList = null;
-						if (receivingNoteMap.containsKey(orderNo)) {
-							receivingNoteTOList = receivingNoteMap.get(orderNo);
-						} else {
-							receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
-							// Test the Hashmap
-							receivingNoteMap.put(orderNo, receivingNoteTOList);
-						}
 
-						log.debug("收货单详细条目: " + receivingNoteTO.toString());
-						receivingNoteTOList.add(receivingNoteTO);
+					List<ReceivingNoteTO> receivingNoteTOList = null;
+					if (receivingNoteMap.containsKey(orderNo)) {
+						receivingNoteTOList = receivingNoteMap.get(orderNo);
+					} else {
+						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+						// Test the Hashmap
+						receivingNoteMap.put(orderNo, receivingNoteTOList);
+					}
+
+					log.debug("收货单详细条目: " + receivingNoteTO.toString());
+					receivingNoteTOList.add(receivingNoteTO);
 
 				}
 
@@ -106,8 +98,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 				FileUtil.closeFileReader(reader);
 			}
 
-			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:"
-					+ receivingNoteMap.size());
+			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:" + receivingNoteMap.size());
 
 		}
 		return receivingNoteMap;
@@ -119,33 +110,29 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	}
 
 	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
+	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
 
-	public void processOrderData(String retailerID, Date startDate,
-			Date endDate) throws BaseException {
+	public void processOrderData(String retailerID, Date startDate, Date endDate) throws BaseException {
 		// Get Receiving Note
-		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(
-				retailerID, startDate, endDate);
-		
-		//split the map to normal and exception
-		
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(retailerID, startDate, endDate);
+
+		// split the map to normal and exception
+
 		ArrayList<ReceivingNoteTO> receivingNormalList = new ArrayList<ReceivingNoteTO>();
 		ArrayList<ReceivingNoteTO> receivingAbnormalList = new ArrayList<ReceivingNoteTO>();
-		
+
 		Map<String, List<ReceivingNoteTO>> receivingNormalMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		Map<String, List<ReceivingNoteTO>> receivingAbnormalMap = new HashMap<String, List<ReceivingNoteTO>>();
-		
-		for(List<ReceivingNoteTO> receivingList:receivingNoteMap.values()){
-			for(ReceivingNoteTO receivingTO: receivingList){
-				if(receivingTO.getStoreID()!=null && !receivingTO.getStoreID().equals("")){
+
+		for (List<ReceivingNoteTO> receivingList : receivingNoteMap.values()) {
+			for (ReceivingNoteTO receivingTO : receivingList) {
+				if (receivingTO.getStoreID() != null && !receivingTO.getStoreID().equals("")) {
 					receivingNormalList.add(receivingTO);
-				}else {
+				} else {
 					receivingAbnormalList.add(receivingTO);
 				}
 			}
@@ -153,12 +140,10 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		receivingNormalMap.put(retailerID, receivingNormalList);
 		receivingAbnormalMap.put(retailerID, receivingAbnormalList);
 
-
 		getLog().info("读取收货单数据结束:" + retailerID);
 
-		
 		// go through the receiving map, generate map: key receiving date
-		//Normal
+		// Normal
 
 		Map<String, List<ReceivingNoteTO>> receivingNormalByDateMap = generateReceivingMapByDate(receivingNormalMap);
 
@@ -168,23 +153,19 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		// Iterator Receiving Map by Date
 		for (int i = 0; i < receivingNormalKeyList.length; i++) {
 			String processDateStr = (String) receivingNormalKeyList[i];
-			List<ReceivingNoteTO> receivingList = receivingNormalByDateMap
-					.get(processDateStr);
+			getSummaryLog().info("订单收货日期："+processDateStr);
+			List<ReceivingNoteTO> receivingList = receivingNormalByDateMap.get(processDateStr);
 
 			if (!(receivingList.size() == 0)) {
 
-				getLog().info(
-						"开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
-								+ "订单数量:" + receivingList.size());
-				retailerDataProcessing(retailerID, processDateStr,
-						receivingList);
+				getLog().info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size());
+				retailerDataProcessing(retailerID, processDateStr, receivingList);
 
 				getLog().info(
-						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
-								+ "订单数量:" + receivingList.size() + "\r\n");
+						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size() + "\r\n");
+				getSummaryLog().info("订单合并成功数量："+receivingList.size());
 			}
 		}
-		
 
 		// go through the receiving map, generate map: key receiving date
 		// Exception
@@ -196,34 +177,26 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		// Iterator Receiving Map by Date
 		for (int i = 0; i < receivingAbnormalKeyList.length; i++) {
 			String processDateStr = (String) receivingAbnormalKeyList[i];
-			List<ReceivingNoteTO> receivingList = receivingAbnormalByDateMap
-					.get(processDateStr);
-
+			List<ReceivingNoteTO> receivingList = receivingAbnormalByDateMap.get(processDateStr);
+			getSummaryLog().info("订单收货日期："+processDateStr);
 			if (!(receivingList.size() == 0)) {
 
-				getLog().info(
-						"开始整合. 零售商: " + retailerID + " 日期:" + processDateStr
-								+ "订单数量:" + receivingList.size());
-				retailerDataAbnormalProcessing(retailerID, processDateStr,
-						receivingList);
+				getLog().info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size());
+				retailerDataAbnormalProcessing(retailerID, processDateStr, receivingList);
 
 				getLog().info(
-						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
-								+ "订单数量:" + receivingList.size() + "\r\n");
+						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size() + "\r\n");
+
+				getSummaryLog().info("有问题的订单数量："+receivingList.size());
 			}
 		}
-		
 
-
-		String sourceFilePath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
+		String sourceFilePath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		getLog().info(sourceFilePath);
-		String destPath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_PROCESSED_PATH);
+		String destPath = Utils.getProperty(retailerID + Constants.RECEIVING_PROCESSED_PATH);
 
 		getLog().info(destPath);
-		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath,
-				destPath);
+		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath, destPath);
 	}
 
 	/**
@@ -232,8 +205,8 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	 * @param processDate
 	 * @throws BaseException
 	 */
-	private void retailerDataProcessing(String retailerID, String processDate,
-			List<ReceivingNoteTO> receivingList) throws BaseException {
+	private void retailerDataProcessing(String retailerID, String processDate, List<ReceivingNoteTO> receivingList)
+			throws BaseException {
 
 		BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
 
@@ -250,7 +223,6 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		FileUtil.closeFileWriter(writer);
 
 	}
-
 
 	/**
 	 * Process Data of defined date
@@ -276,17 +248,13 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		FileUtil.closeFileWriter(writer);
 
 	}
-	
 
-	private BufferedWriter initAbnormalOrderOutputFile(String retailerID, String processDate)
-			throws BaseException {
+	private BufferedWriter initAbnormalOrderOutputFile(String retailerID, String processDate) throws BaseException {
 		BufferedWriter writer;
-		String mergeFolderPath = Utils.getProperty(retailerID
-				+ Constants.OUTPUT_ORDER_EXCEPTION_PATH);
+		String mergeFolderPath = Utils.getProperty(retailerID + Constants.OUTPUT_ORDER_EXCEPTION_PATH);
 
 		String mergeFilePath = mergeFolderPath + retailerID + "_order_"
-				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate))
-				+ ".txt";
+				+ DateUtil.toStringYYYYMMDD(DateUtil.toDate(processDate)) + ".txt";
 		getLog().info("初始化整合文本文件. 文件名: " + mergeFilePath);
 		File mergeFolder = new File(mergeFolderPath);
 		if (!mergeFolder.exists()) {
@@ -297,8 +265,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 
 		try {
 			FileOutputStream fileOutput = new FileOutputStream(mergeFile);
-			writer = new BufferedWriter(new OutputStreamWriter(fileOutput,
-					"UTF-8"));
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 		} catch (IOException e) {
 			throw new BaseException(e);
 		}
@@ -315,14 +282,12 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	 * @param orderTOMap
 	 * @throws BaseException
 	 */
-	private void mergeReceiving(BufferedWriter writer,
-			List<ReceivingNoteTO> receivingNotelist) throws BaseException {
+	private void mergeReceiving(BufferedWriter writer, List<ReceivingNoteTO> receivingNotelist) throws BaseException {
 
 		int failedCount = 0;
 		for (int i = 0; i < receivingNotelist.size(); i++) {
 
-			RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingNotelist
-					.get(i);
+			RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingNotelist.get(i);
 
 			String mergedLine = receivingNoteTO.toString();
 			try {
@@ -345,9 +310,8 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	 * Value SalesTO List
 	 */
 	@Override
-	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File salesFile)
-			throws BaseException {
+	protected Map<String, List<SalesTO>> getSalesInfoFromFile(String retailerID, Date startDate, Date endDate,
+			File salesFile) throws BaseException {
 		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
 		try {
 			InputStream sourceExcel = new FileInputStream(salesFile);
@@ -376,8 +340,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 					salesTO.setSalesDate(salesDateStr);
 					salesTO.setSalesQuantity(sourceRow.getCell(6).getStringCellValue());
 					salesTO.setSalesAmount(sourceRow.getCell(7).getStringCellValue());
-					
-					
+
 					if (salesMap.containsKey(salesDateStr)) {
 						salesTOList = salesMap.get(salesDateStr);
 					} else {

@@ -429,6 +429,7 @@ public class Utils {
 			header.createCell(1).setCellValue("用户名");
 			header.createCell(2).setCellValue("密码");
 			header.createCell(3).setCellValue("登录网站");
+			header.createCell(4).setCellValue("登录日期");
 
 			FileOutputStream fileOut = null;
 			try {
@@ -467,6 +468,7 @@ public class Utils {
 			row.createCell(1).setCellValue(user.getUserId());
 			row.createCell(2).setCellValue(user.getPassword());
 			row.createCell(3).setCellValue(user.getUrl());
+			row.createCell(3).setCellValue(DateUtil.toString(new Date()));
 
 			fileOut = new FileOutputStream(excelFile);
 			workbook.write(fileOut);

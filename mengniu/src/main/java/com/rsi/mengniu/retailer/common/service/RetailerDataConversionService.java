@@ -102,7 +102,7 @@ public abstract class RetailerDataConversionService {
 		
 
 		getSummaryLog().info("零售商数据处理结束");
-		getSummaryLog().info("-------------------------------------------"+"\n");
+		getSummaryLog().info(Constants.SUMMARY_SEPERATOR_LINE+"\n");
 
 	}
 
@@ -145,7 +145,7 @@ public abstract class RetailerDataConversionService {
 		for (int i = 0; i < receivingKeyList.length; i++) {
 			String processDateStr = (String) receivingKeyList[i];
 
-			getSummaryLog().info("订单合并日期："+processDateStr);
+			getSummaryLog().info("订单收货日期："+processDateStr);
 			List<ReceivingNoteTO> receivingList = receivingByDateMap.get(processDateStr);
 			if (!(receivingList.size() == 0)) {
 				getLog().info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size());

@@ -42,5 +42,9 @@ public final class Constants {
 	public static final String SUMMARY_RENRENLE = "summary.renrenle";
 	public static final String SUMMARY_HUALIAN = "summary.hualian";
 	public static final String SUMMARY_RAINBOW = "summary.rainbow";
+	
+	
+
+	public static final String SYS_ERROR = "syserror";
 
 }

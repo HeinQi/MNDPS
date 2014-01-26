@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
@@ -34,6 +35,8 @@ public abstract class RetailerDataConversionService {
 	protected abstract String getRetailerID();
 
 	protected abstract Log getLog();
+
+	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
 	protected abstract Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
 			Date endDate, File receivingFile) throws BaseException;

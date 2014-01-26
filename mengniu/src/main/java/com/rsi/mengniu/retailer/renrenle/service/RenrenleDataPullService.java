@@ -24,6 +24,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -67,26 +68,33 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			return;
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
+		
+		List<Date> dates = null;
 		try {
-			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
-					Utils.getEndDate(Constants.RETAILER_RENRENLE));
-			for (Date searchDate : dates) {
-				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
-			}
-
-		} catch (Exception e) {
-			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-			errorLog.error(user, e);
+			dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE), Utils.getEndDate(Constants.RETAILER_RENRENLE));
+		} catch (BaseException e1) {
+			errorLog.error(user, e1);
 		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
-
-		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
-				Utils.getEndDate(Constants.RETAILER_RENRENLE));
 
 		for (Date searchDate : dates) {
 			try {
-				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+				summaryBuffer.append("销售日期: "+searchDate+"\r\n");
+				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),summaryBuffer);
 			} catch (Exception e) {
+				summaryBuffer.append("销售数据下载失败"+"\r\n");
+				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+				errorLog.error(user, e);
+			}
+		}
+
+		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
+		for (Date searchDate : dates) {
+			try {
+				summaryBuffer.append("订单日期: "+searchDate+"\r\n");
+				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+				summaryBuffer.append("订单下载成功"+"\r\n");
+			} catch (Exception e) {
+				summaryBuffer.append("订单下载失败"+"\r\n");
 				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
 				errorLog.error(user, e);
 			}
@@ -144,8 +152,9 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate,StringBuffer summaryBuffer) throws Exception {
 		log.info(user + "开始下载" + searchDate + "的销售数据...");
+
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		// /scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401
 		// 销售查询
@@ -180,6 +189,9 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		downloadRes.getEntity().writeTo(salseFos);
 		downloadRes.close();
 		salseFos.close();
+		 
+		summaryBuffer.append("销售单下载成功"+"\r\n");
+		summaryBuffer.append("文件: "+receiveFileNm+"\r\n");
 		log.info(user + searchDate + "的销售数据下载成功");
 	}
 

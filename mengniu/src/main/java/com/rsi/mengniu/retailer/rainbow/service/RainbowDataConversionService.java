@@ -39,8 +39,8 @@ import com.rsi.mengniu.util.Utils;
 
 public class RainbowDataConversionService extends RetailerDataConversionService {
 
-	private Log log = LogFactory.getLog(RainbowDataConversionService.class);
-	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RAINBOW);
+	private static Log log = LogFactory.getLog(RainbowDataConversionService.class);
+	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RAINBOW);
 
 	@Override
 	protected Log getSummaryLog() {

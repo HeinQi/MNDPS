@@ -40,13 +40,17 @@ public class HualianDataPullService implements RetailerDataPullService {
 			if (!"Success".equals(loginResult)) {
 				return;
 			}
-			getSales(httpClient, user);
-
-			// getOrder(httpClient, user);
-
-			httpClient.close();
 		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
+			log.error(user+"网站登录出错,请检查!");
+			errorLog.error(user,e);
+			return;
+		}
+		try {
+			getSales(httpClient, user);
+			httpClient.close();			
+		} catch (Exception e) {
+			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user,e);
 		}
 	}
 

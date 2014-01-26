@@ -13,7 +13,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -53,27 +52,25 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 				return;
 			}
 		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
+			log.error(user+"网站登录出错,请检查!");
+			errorLog.error(user,e);
 			return;
 		}
 		try {
 			// receive
 			getReceiveExcel(httpClient, user);
-		} catch (HttpHostConnectException e)  {
-			log.error(user+"页面加载失败，请登录网站检查收货单功能是否正常！");
-			return;
 		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
-			return;				
+			log.error(user+"页面加载失败，请登录网站检查收货单功能是否正常！");
+			errorLog.error(user,e);
+			//log.error(user + Utils.getTrace(e));
 		}
 		try {
 			// order
 			getOrder(httpClient, user);
 			httpClient.close();
-		} catch (HttpHostConnectException e) {
-			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
 		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
+			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
+			errorLog.error(user,e);
 			return;			
 		}
 	}
@@ -105,7 +102,6 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			log.info(user + "网站登录出错,退出!");
 			return "SystemError";
 		}
-		
 		if (responseStr.contains("验证码失效")) {
 			log.info(user + "验证码失效,Relogin...");
 			return "InvalidCode";

@@ -41,15 +41,32 @@ public class MetroDataPullService implements RetailerDataPullService {
 			if (!"Success".equals(loginResult)) {
 				return;
 			}
-
+		} catch (Exception e) {
+			log.error(user+"网站登录出错,请检查!");
+			errorLog.error(user,e);
+			return;
+		}
+		try {
 			// receive
-			getReceive(httpClient, user);
+			getReceive(httpClient, user);			
+		} catch (Exception e) {
+			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user,e);			
+		}
+
+
+
+		
+		try {
 			// order
 			getOrder(httpClient,user);
-			httpClient.close();
+			httpClient.close();		
 		} catch (Exception e) {
-			log.error(user + Utils.getTrace(e));
+			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user,e);
 		}
+		
+		
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {

@@ -35,6 +35,7 @@ public abstract class RetailerDataConversionService {
 	protected abstract String getRetailerID();
 
 	protected abstract Log getLog();
+
 	protected abstract Log getSummaryLog();
 
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
@@ -84,7 +85,7 @@ public abstract class RetailerDataConversionService {
 		getLog().info("开始处理数据");
 
 		getLog().info("开始处理收货单和订单数据");
-		
+
 		getSummaryLog().info("订单合并情况：");
 
 		processOrderData(retailerID, startDate, endDate);
@@ -99,10 +100,9 @@ public abstract class RetailerDataConversionService {
 		getLog().info("零售商：" + retailerID + " 销售单处理结束");
 
 		getLog().info("数据处理结束");
-		
 
 		getSummaryLog().info("零售商数据处理结束");
-		getSummaryLog().info(Constants.SUMMARY_SEPERATOR_LINE+"\n");
+		getSummaryLog().info(Constants.SUMMARY_SEPERATOR_LINE + "\n");
 
 	}
 
@@ -145,7 +145,7 @@ public abstract class RetailerDataConversionService {
 		for (int i = 0; i < receivingKeyList.length; i++) {
 			String processDateStr = (String) receivingKeyList[i];
 
-			getSummaryLog().info("订单收货日期："+processDateStr);
+			getSummaryLog().info("订单收货日期：" + processDateStr);
 			List<ReceivingNoteTO> receivingList = receivingByDateMap.get(processDateStr);
 			if (!(receivingList.size() == 0)) {
 				getLog().info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size());
@@ -244,7 +244,6 @@ public abstract class RetailerDataConversionService {
 	private void convertOrderData(String retailerID, String processDate, List<ReceivingNoteTO> receivingList,
 			Map<String, OrderTO> orderTOMap) throws BaseException {
 
-		
 		// Convert Receiving info list to map
 		// Key: Store ID + Item Code
 		getLog().info("转换订单信息。 零售商: " + retailerID + " 日期:" + processDate + " 转换前的收货单数量:" + receivingList.size());
@@ -256,12 +255,23 @@ public abstract class RetailerDataConversionService {
 		// Merge to one record
 		// Write to merged txt file
 		getLog().info("开始整合订单和收货单信息. 零售商: " + retailerID + " 日期:" + processDate);
-		BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
-		mergeOrderAndReceiving(retailerID,DateUtil.toDate(processDate), writer, receivingNoteByStoreMap, orderTOMap);
+		StringBuffer stringBuffer = mergeOrderAndReceiving(retailerID, DateUtil.toDate(processDate),
+				receivingNoteByStoreMap, orderTOMap);
 		getLog().info("整合订单和收货单信息结束. 零售商: " + retailerID + " 日期:" + processDate);
+		if (stringBuffer.length() != 0) {
+			BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
 
-		// Close the opened file
-		FileUtil.closeFileWriter(writer);
+			try {
+				writer.write(stringBuffer.toString());
+
+			} catch (IOException e) {
+				FileUtil.closeFileWriter(writer);
+				throw new BaseException(e);
+			}
+
+			// Close the opened file
+			FileUtil.closeFileWriter(writer);
+		}
 
 	}
 
@@ -344,9 +354,9 @@ public abstract class RetailerDataConversionService {
 	 * @param orderTOMap
 	 * @throws BaseException
 	 */
-	private void mergeOrderAndReceiving(String retailerID, Date receivingDate,BufferedWriter writer, Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
-			Map<String, OrderTO> orderTOMap) throws BaseException {
-
+	private StringBuffer mergeOrderAndReceiving(String retailerID, Date receivingDate,
+			Map<String, ReceivingNoteTO> receivingNoteByStoreMap, Map<String, OrderTO> orderTOMap) throws BaseException {
+		StringBuffer stringBuffer = new StringBuffer();
 		Object[] receivingKeyList = receivingNoteByStoreMap.keySet().toArray();
 		Arrays.sort(receivingKeyList);
 
@@ -397,13 +407,14 @@ public abstract class RetailerDataConversionService {
 						+ "\t"
 						+ ((orderTO.getUnitPrice().equals("")) ? receivingNoteTO.getUnitPrice() : orderTO
 								.getUnitPrice());
-				try {
-					writer.write(mergedLine);
-					writer.newLine();
-				} catch (IOException e) {
-					FileUtil.closeFileWriter(writer);
-					throw new BaseException(e);
-				}
+				stringBuffer.append(mergedLine + "\r\n");
+				// try {
+				// writer.write(mergedLine);
+				// writer.newLine();
+				// } catch (IOException e) {
+				// FileUtil.closeFileWriter(writer);
+				// throw new BaseException(e);
+				// }
 				successCount++;
 			} else {
 				getLog().info("警告! 查不到收货单对应的订单信息. 收货单信息为: " + receivingNoteTO.toString());
@@ -413,13 +424,15 @@ public abstract class RetailerDataConversionService {
 		}
 
 		if (failedCount != 0) {
-			Utils.exportFailedReceivingToTXT( retailerID,  receivingDate,failedReceivingList);
+			Utils.exportFailedReceivingToTXT(retailerID, receivingDate, failedReceivingList);
 		}
 
-		getSummaryLog().info("订单合并成功数量："+successCount);
-		getLog().info("订单合并成功数量："+successCount);
-		getLog().info("订单合并失败数量："+failedCount);
-		getSummaryLog().info("订单合并失败数量："+failedCount);
+		getSummaryLog().info("订单合并成功数量：" + successCount);
+		getLog().info("订单合并成功数量：" + successCount);
+		getLog().info("订单合并失败数量：" + failedCount);
+		getSummaryLog().info("订单合并失败数量：" + failedCount);
+
+		return stringBuffer;
 	}
 
 	/**
@@ -480,7 +493,7 @@ public abstract class RetailerDataConversionService {
 	private void convertSalesData(String retailerID, String processDateStr, List<SalesTO> salesList)
 			throws BaseException {
 
-		getSummaryLog().info("销售单合并日期："+processDateStr);
+		getSummaryLog().info("销售单合并日期：" + processDateStr);
 		BufferedWriter writer = this.initSalesOutputFile(retailerID, processDateStr);
 
 		for (SalesTO salesTO : salesList) {
@@ -497,7 +510,7 @@ public abstract class RetailerDataConversionService {
 
 		FileUtil.closeFileWriter(writer);
 
-		getSummaryLog().info("销售单合并数量："+salesList.size());
+		getSummaryLog().info("销售单合并数量：" + salesList.size());
 	}
 
 	protected BufferedWriter initSalesOutputFile(String retailerID, String processDate) throws BaseException {
@@ -558,8 +571,6 @@ public abstract class RetailerDataConversionService {
 		getLog().info("读取订单数据结束:" + retailerID);
 
 		// Consolidate Receiving
-		
-		
 
 	}
 

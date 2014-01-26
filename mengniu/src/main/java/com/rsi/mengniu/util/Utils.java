@@ -468,7 +468,7 @@ public class Utils {
 			row.createCell(1).setCellValue(user.getUserId());
 			row.createCell(2).setCellValue(user.getPassword());
 			row.createCell(3).setCellValue(user.getUrl());
-			row.createCell(3).setCellValue(DateUtil.toString(new Date()));
+			row.createCell(4).setCellValue(DateUtil.toString(new Date()));
 
 			fileOut = new FileOutputStream(excelFile);
 			workbook.write(fileOut);

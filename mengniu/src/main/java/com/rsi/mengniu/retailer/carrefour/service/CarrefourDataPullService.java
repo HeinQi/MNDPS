@@ -35,15 +35,17 @@ import com.rsi.mengniu.util.Utils;
 //http://supplierweb.carrefour.com.cn/
 public class CarrefourDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(CarrefourDataPullService.class);
+	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_CARREFOUR);
 	private OCR ocr;
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+		StringBuffer summaryBuffer = new StringBuffer();
 		String loginResult = null;
 		int loginCount = 0; // 如果验证码出错重新login,最多15次
 		try {
 			do {
-				loginResult = login(httpClient, user);
+				loginResult = login(httpClient, user,summaryBuffer);
 				loginCount++;
 			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
 			// Invalid Password and others
@@ -74,11 +76,9 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			log.error(user + Utils.getTrace(e));
 			return;			
 		}
-			
-
 	}
 
-	public String login(CloseableHttpClient httpClient, User user) throws Exception {
+	public String login(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
 		log.info(user + "开始登录...");
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
@@ -101,6 +101,11 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = EntityUtils.toString(loginResponse.getEntity());
+		if (responseStr == null) {
+			log.info(user + "网站登录出错,退出!");
+			return "SystemError";
+		}
+		
 		if (responseStr.contains("验证码失效")) {
 			log.info(user + "验证码失效,Relogin...");
 			return "InvalidCode";
@@ -113,7 +118,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			Utils.recordIncorrectUser(user);
 			return "InvalidPassword"; 
 		} else if (responseStr.contains("系统出错") || !responseStr.contains("Welcome")) {
-			log.info(user + "系统出错,退出!");
+			log.info(user + "网站登录出错,退出!");
 			return "SystemError";
 		}
 		loginResponse.close();

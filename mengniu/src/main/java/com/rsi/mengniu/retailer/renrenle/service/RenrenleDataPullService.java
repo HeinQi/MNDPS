@@ -106,7 +106,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		String responseStr = new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK");
-
+		loginResponse.close();
 		if (responseStr.contains("验证码输入不正确")) {
 			log.info(user + "验证码输入不正确,Relogin...");
 			return "InvalidCode";
@@ -118,9 +118,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			log.info(user + "系统出错,退出!");
 			return "SystemError";
 		}
-		loginResponse.close();
 		log.info(user + "登录成功!");
-
 		return "Success";
 	}
 

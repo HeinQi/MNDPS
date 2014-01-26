@@ -11,6 +11,10 @@ public class CountTO {
 		this.counttotalNo = counttotalNo;
 	}
 	
+
+	public void increaseOne() {
+		 counttotalNo++;
+	}
 	
 
 }

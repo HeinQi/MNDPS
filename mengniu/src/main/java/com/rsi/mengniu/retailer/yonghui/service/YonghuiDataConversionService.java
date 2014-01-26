@@ -107,7 +107,7 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 			Set<String> orderNoSet) throws BaseException {
 		File receivingInboundFolder = new File(
 				Utils.getProperty(Constants.RETAILER_YONGHUI
-						+ Constants.ORDER_PATH));
+						+ Constants.ORDER_INBOUND_PATH));
 
 		File[] orderList = receivingInboundFolder.listFiles();
 

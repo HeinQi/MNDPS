@@ -232,8 +232,7 @@ public abstract class RetailerDataConversionService {
 	private void convertOrderData(String retailerID, String processDate, List<ReceivingNoteTO> receivingList,
 			Map<String, OrderTO> orderTOMap) throws BaseException {
 
-		BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
-
+		
 		// Convert Receiving info list to map
 		// Key: Store ID + Item Code
 		getLog().info("转换订单信息。 零售商: " + retailerID + " 日期:" + processDate + " 转换前的收货单数量:" + receivingList.size());
@@ -245,6 +244,7 @@ public abstract class RetailerDataConversionService {
 		// Merge to one record
 		// Write to merged txt file
 		getLog().info("开始整合订单和收货单信息. 零售商: " + retailerID + " 日期:" + processDate);
+		BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
 		mergeOrderAndReceiving(writer, receivingNoteByStoreMap, orderTOMap);
 		getLog().info("整合订单和收货单信息结束. 零售商: " + retailerID + " 日期:" + processDate);
 
@@ -618,7 +618,7 @@ public abstract class RetailerDataConversionService {
 	public Map<String, OrderTO> getOrderInfo2(String retailerID, Date startDate, Date endDate) throws BaseException {
 		Map<String, OrderTO> orderMap = new HashMap();
 
-		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_PATH));
+		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH));
 
 		File[] orderList = orderFolder.listFiles();
 		if (orderList != null) {

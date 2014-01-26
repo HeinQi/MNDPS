@@ -155,7 +155,7 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 	}
 
 	private Map<String, OrderTO> getOrderInfo(String orderNo) throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_CARREFOUR + Constants.ORDER_PATH) + "Order_"
+		String fileName = Utils.getProperty(Constants.RETAILER_CARREFOUR + Constants.ORDER_INBOUND_PATH) + "Order_"
 				+ Constants.RETAILER_CARREFOUR + "_" + orderNo + ".txt";
 		File orderFile = new File(fileName);
 

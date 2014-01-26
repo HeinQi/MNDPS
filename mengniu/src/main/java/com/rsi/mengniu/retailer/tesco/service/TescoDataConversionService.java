@@ -177,7 +177,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 	}
 
 	private Map<String, OrderTO> getOrderInfo(String orderNo) throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_TESCO + Constants.ORDER_PATH) + "Order_"
+		String fileName = Utils.getProperty(Constants.RETAILER_TESCO + Constants.ORDER_INBOUND_PATH) + "Order_"
 				+ Constants.RETAILER_TESCO + "_" + orderNo + ".txt";
 		File orderFile = new File(fileName);
 

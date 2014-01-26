@@ -30,12 +30,11 @@ public class FileUtil {
 
 	public static void main(String[] args) throws BaseException {
 		//testFileAmount("C:/mengniu/yonghui/output/");
-		List<String> stringList = getAllFile("C:/mengniu/carrefour/receiving/inbound/");
-		moveFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
+//		List<String> stringList = getAllFile("C:/mengniu/carrefour/receiving/inbound/");
+//		moveFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
+		//getOrderInfo("",new Date(), new Date());
 	}
 	
-	
-
 	/**
 	 * Export Order info from list to txt file
 	 * 
@@ -48,7 +47,7 @@ public class FileUtil {
 			List<OrderTO> orderList) throws BaseException {
 
 		String orderFolderPath = Utils.getProperty(retailerID
-				+ Constants.ORDER_PATH);
+				+ Constants.ORDER_INBOUND_PATH);
 		createFolder(orderFolderPath);
 		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_"
 				+ orderID + ".txt";

@@ -188,7 +188,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String startDate = DateUtil.toString(Utils.getStartDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
 		String endDate = DateUtil.toString(Utils.getEndDate(Constants.RETAILER_YONGHUI), "yyyy-MM-dd");
-		String orderPath = Utils.getProperty(user.getRetailer() + Constants.ORDER_PATH);
+		String orderPath = Utils.getProperty(user.getRetailer() + Constants.ORDER_INBOUND_PATH);
 		FileUtil.createFolder(orderPath);
 		String fileNm = "Order_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
 		FileOutputStream orderFos = new FileOutputStream(orderPath + fileNm);

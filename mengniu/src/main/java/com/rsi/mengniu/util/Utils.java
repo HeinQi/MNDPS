@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.springframework.util.StringUtils;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.exception.BaseException;
+import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
@@ -178,6 +180,103 @@ public class Utils {
 			}
 		}
 	}
+	
+
+	/**
+	 * Export Order info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param orderID
+	 * @param orderList
+	 * @param userID 
+	 * @param orderDate 
+	 * @throws BaseException
+	 */
+	public static void exportOrderInfoToTXT(String retailerID,String userID, String orderID,  Date orderDate,
+			List<OrderTO> orderList) throws BaseException {
+
+		String orderFolderPath = Utils.getProperty(retailerID
+				+ Constants.ORDER_INBOUND_PATH);
+		FileUtil.createFolder(orderFolderPath);
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_"+ orderID + "_"
+				+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+
+		File orderFile = new File(orderFilePath);
+		BufferedWriter writer = null;
+		if (!orderFile.exists()) {
+			try {
+				orderFile.createNewFile();
+				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+				writer.write(orderHeader);
+				writer.newLine();
+			} catch (IOException e) {
+
+				FileUtil.closeFileWriter(writer);
+				throw new BaseException(e);
+			}
+		} else {
+			try {
+
+				// TODO consider that re-run action
+				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			} catch (IOException e) {
+
+				FileUtil.closeFileWriter(writer);
+				throw new BaseException();
+			}
+		}
+
+		try {
+
+			for (int i = 0; i < orderList.size(); i++) {
+				OrderTO orderTO = orderList.get(i);
+				String orderRow = orderTO.toString();
+				writer.write(orderRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			FileUtil.closeFileWriter(writer);
+
+		}
+
+	}
+	
+
+
+	/**
+	 * Export Order info from list to txt file
+	 * 
+	 * @param retailerID
+	 * @param orderID
+	 * @param orderList
+	 * @throws BaseException
+	 */
+//	public static void exportOrderInfoListToTXT(String retailerID, String userID,String orderID, Date orderDate,
+//			List<OrderTO> orderList) throws BaseException {
+//		Map <String,List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+//		List<OrderTO> tempOrderList = null;
+//		for(OrderTO orderTO : orderList){
+//			String orderNo = orderTO.getOrderNo();
+//			
+//			if(orderMap.containsKey(orderNo)){
+//				tempOrderList = orderMap.get(orderNo);
+//			} else {
+//				tempOrderList = new ArrayList<OrderTO>();
+//				orderMap.put(orderNo, tempOrderList);
+//			}
+//			tempOrderList.add(orderTO);
+//		}
+//		for(Entry<String, List<OrderTO>> entry:orderMap.entrySet()){
+//			exportOrderInfoToTXT(retailerID,userID,orderID,orderDate,entry.getValue());
+//		}
+//	}
 
 	/**
 	 * Export Receiving Info from list to txt file

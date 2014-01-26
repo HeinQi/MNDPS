@@ -8,8 +8,9 @@ public final class Constants {
 	public static final String RETAILER_HUALIAN = "hualian";
 	public static final String RETAILER_RAINBOW = "rainbow";
 	public static final String RETAILER_RENRENLE = "renrenle";
-	
-	public static final String ORDER_PATH = ".order.filePath";
+
+	public static final String ORDER_INBOUND_PATH = ".order.inbound.filePath";
+	public static final String ORDER_PROCESSED_PATH = ".order.processed.filePath";
 	public static final String RECEIVING_INBOUND_PATH = ".receiving.inbound.filePath";
 	public static final String RECEIVING_PROCESSED_PATH = ".receiving.processed.filePath";
 	public static final String OUTPUT_ORDER_PATH = ".output.order.filePath";

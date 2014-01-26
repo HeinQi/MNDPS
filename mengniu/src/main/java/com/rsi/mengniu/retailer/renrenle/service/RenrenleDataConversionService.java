@@ -209,7 +209,7 @@ public class RenrenleDataConversionService extends
 	private Map<String, List<OrderTO>>  getOrderInfo(String retailerID, Date startDate, Date endDate) throws BaseException {
 		Map orderMap = new HashMap();
 
-		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_PATH));
+		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH));
 
 		File[] orderList = orderFolder.listFiles();
 		if (orderList != null) {

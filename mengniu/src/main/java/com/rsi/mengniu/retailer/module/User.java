@@ -1,10 +1,10 @@
 package com.rsi.mengniu.retailer.module;
 
 public class User {
-	String userId;
-	String password;
-	String retailer;
-	String url;
+	String userId="";
+	String password="";
+	String retailer="";
+	String url="";
 	
 	public String getUserId() {
 		return userId;

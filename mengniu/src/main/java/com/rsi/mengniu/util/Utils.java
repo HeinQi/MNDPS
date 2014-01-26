@@ -3,6 +3,8 @@ package com.rsi.mengniu.util;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,12 +21,12 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,36 +40,39 @@ import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
-
+import com.rsi.mengniu.retailer.module.User;
 
 public class Utils {
-	private static Properties properties; 
+	private static Properties properties;
 
 	public void setProperties(Properties p) {
 		properties = p;
 	}
-	
+
 	public static String getProperty(String key) {
 		return properties.getProperty(key);
 	}
 
 	public static Date getStartDate(String retailerId) throws BaseException {
-		if ("N".equalsIgnoreCase(getProperty(retailerId+".daterange.enable"))) {
+		if ("N".equalsIgnoreCase(getProperty(retailerId + ".daterange.enable"))) {
 			return DateUtil.getDateAfter(new Date(), -1);
 		} else {
-			return DateUtil.toDate(getProperty(retailerId+".daterange.startDate"));
+			return DateUtil.toDate(getProperty(retailerId + ".daterange.startDate"));
 		}
 	}
+
 	public static Date getEndDate(String retailerId) throws BaseException {
-		if ("N".equalsIgnoreCase(getProperty(retailerId+".daterange.enable"))) {
+		if ("N".equalsIgnoreCase(getProperty(retailerId + ".daterange.enable"))) {
 			return DateUtil.getDateAfter(new Date(), -1);
 		} else {
-			return DateUtil.toDate(getProperty(retailerId+".daterange.endDate"));
-		}		
+			return DateUtil.toDate(getProperty(retailerId + ".daterange.endDate"));
+		}
 	}
+
 	public static int getSleepTime(String retailerId) {
-		return Integer.parseInt(getProperty(retailerId+".sleep.time"));
+		return Integer.parseInt(getProperty(retailerId + ".sleep.time"));
 	}
+
 	public static String getTrace(Throwable t) {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(stringWriter);
@@ -76,12 +81,13 @@ public class Utils {
 		return buffer.toString();
 	}
 
-	public static String HttpExecute(CloseableHttpClient httpClient,HttpUriRequest request,String expectStr) throws Exception {
+	public static String HttpExecute(CloseableHttpClient httpClient, HttpUriRequest request, String expectStr)
+			throws Exception {
 		CloseableHttpResponse response = httpClient.execute(request);
 		HttpEntity entity = response.getEntity();
 		String responseStr = EntityUtils.toString(entity);
 		response.close();
-		if (!StringUtils.isEmpty(expectStr) && !StringUtils.isEmpty(responseStr)) { 
+		if (!StringUtils.isEmpty(expectStr) && !StringUtils.isEmpty(responseStr)) {
 			if (responseStr.contains(expectStr)) {
 				return responseStr;
 			} else {
@@ -91,7 +97,7 @@ public class Utils {
 			return responseStr;
 		}
 	}
-	
+
 	public static void binaryImage(String imageName) throws IOException {
 		File file = new File(imageName + ".jpg");
 		BufferedImage image = ImageIO.read(file);
@@ -107,24 +113,24 @@ public class Utils {
 		File newFile = new File(imageName + ".png");
 		ImageIO.write(grayImage, "png", newFile);
 	}
-	
-	public static String trimPrefixZero(String sourceStr){
+
+	public static String trimPrefixZero(String sourceStr) {
 		int indexNo = sourceStr.indexOf("0");
-		if(indexNo==0){
-			sourceStr = sourceStr.substring(indexNo+1);
+		if (indexNo == 0) {
+			sourceStr = sourceStr.substring(indexNo + 1);
 			sourceStr = trimPrefixZero(sourceStr);
-			
+
 		}
-		
+
 		return sourceStr;
 	}
-	
-	public static String getRaimbowStoreIDByName(String storeName) throws BaseException{
-		String storeID =  getRainbowStoreMapping().get(storeName);
-		return storeID==null?"":storeID;
+
+	public static String getRaimbowStoreIDByName(String storeName) throws BaseException {
+		String storeID = getRainbowStoreMapping().get(storeName);
+		return storeID == null ? "" : storeID;
 	}
-	
-	public static Map<String, String> getRainbowStoreMapping() throws BaseException{
+
+	public static Map<String, String> getRainbowStoreMapping() throws BaseException {
 
 		Map<String, String> storeMap = new HashMap<String, String>();
 		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Rainbow_store_mapping.xls");
@@ -135,10 +141,9 @@ public class Utils {
 		} catch (IOException e) {
 			throw new BaseException(e);
 		}
-		
+
 		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-		
-		
+
 		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 			Row sourceRow = sourceSheet.getRow(i);
 			if (sourceRow == null) {
@@ -148,28 +153,22 @@ public class Utils {
 			int cellType = sourceCell.getCellType();
 			String sourceCellValue;
 			if (cellType == Cell.CELL_TYPE_NUMERIC) {
-				sourceCellValue = Double.valueOf(
-						sourceCell.getNumericCellValue())
-						.toString();
+				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
 			} else {
 
 				sourceCellValue = sourceCell.getStringCellValue();
 			}
-			
-			String storeID = 
-					sourceCellValue;
-			String storeName = sourceRow.getCell(1)
-					.getStringCellValue();
-			
-			storeMap.put(storeName,storeID);
+
+			String storeID = sourceCellValue;
+			String storeName = sourceRow.getCell(1).getStringCellValue();
+
+			storeMap.put(storeName, storeID);
 		}
 		return storeMap;
 	}
 
-	public static void putSubMapToMainMap(Map<String, List> mainMap,
-			Map<String, List> subMap) {
-		for (Entry<String, List> entry : subMap
-				.entrySet()) {
+	public static void putSubMapToMainMap(Map<String, List> mainMap, Map<String, List> subMap) {
+		for (Entry<String, List> entry : subMap.entrySet()) {
 			String key = entry.getKey();
 			List valueList = entry.getValue();
 			if (mainMap.containsKey(key)) {
@@ -179,7 +178,6 @@ public class Utils {
 			}
 		}
 	}
-	
 
 	/**
 	 * Export Receiving Info from list to txt file
@@ -189,17 +187,13 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXT(String retailerID,
-			String userID, Date receivingDate, List<ReceivingNoteTO> receivingList)
-			throws BaseException {
+	public static void exportReceivingInfoToTXT(String retailerID, String userID, Date receivingDate,
+			List<ReceivingNoteTO> receivingList) throws BaseException {
 
-		String receivingInboundFolderPath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
+		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
-		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
-				+ retailerID + "_" + userID + "_"
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
-		
 
 		File receivingFile = new File(receivingFilePath);
 
@@ -231,7 +225,6 @@ public class Utils {
 
 	}
 
-	
 	/**
 	 * Export Receiving Info from list to txt file
 	 * 
@@ -240,46 +233,42 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXTForRainbow(String retailerID,
-			String userID,Date receivingDate, List<ReceivingNoteTO> receivingList)
-			throws BaseException {
-	
-		String receivingInboundFolderPath = getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
+	public static void exportReceivingInfoToTXTForRainbow(String retailerID, String userID, Date receivingDate,
+			List<ReceivingNoteTO> receivingList) throws BaseException {
+
+		String receivingInboundFolderPath = getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
-		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
-				+ retailerID + "_" + userID + "_"
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
-	
-	
+
 		File receivingFile = new File(receivingFilePath);
-	
+
 		BufferedWriter writer = null;
-	
+
 		try {
 			receivingFile.createNewFile();
 			String receivingHeader = getProperty(Constants.OUTPUT_ORDER_HEADER);
-	
+
 			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
 			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 			writer.write(receivingHeader);
 			writer.newLine();
-	
+
 			for (int i = 0; i < receivingList.size(); i++) {
 				RainbowReceivingTO receivingNoteTO = (RainbowReceivingTO) receivingList.get(i);
 				String receivingRow = receivingNoteTO.toString();
 				writer.write(receivingRow);
 				writer.newLine();
 			}
-	
+
 		} catch (IOException e) {
 			throw new BaseException(e);
 		} finally {
-	
+
 			FileUtil.closeFileWriter(writer);
-	
+
 		}
-	
+
 	}
 
 	/**
@@ -290,17 +279,13 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportSalesInfoToTXT(String retailerID,
-			String userID, Date slaesDate, List<SalesTO> salesList)
+	public static void exportSalesInfoToTXT(String retailerID, String userID, Date slaesDate, List<SalesTO> salesList)
 			throws BaseException {
 
-		String salesInboundFolderPath = Utils.getProperty(retailerID
-				+ Constants.SALES_INBOUND_PATH);
+		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesInboundFolderPath);
-		String salesFilePath = salesInboundFolderPath + "Sales_"
-				+ retailerID + "_" + userID + "_"
+		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
-		
 
 		File salesFile = new File(salesFilePath);
 
@@ -328,6 +313,79 @@ public class Utils {
 
 			FileUtil.closeFileWriter(writer);
 
+		}
+
+	}
+
+	public static void recordIncorrectUser(User user) throws BaseException {
+
+		String filePath = getProperty(Constants.INCORRECT_USER_HEADER);
+		FileUtil.createFolder(filePath);
+		String fileFullPath = filePath + user.getRetailer() + ".xls";
+		File excelFile = new File(fileFullPath);
+		if (!excelFile.exists()) {
+			// init Excel File
+			HSSFWorkbook workbook = new HSSFWorkbook();
+			HSSFSheet sheet = workbook.createSheet(user.getRetailer());
+			HSSFRow header = sheet.createRow(0);
+			header.createCell(0).setCellValue("序号");
+			header.createCell(1).setCellValue("用户名");
+			header.createCell(2).setCellValue("密码");
+			header.createCell(3).setCellValue("登录网站");
+
+			FileOutputStream fileOut = null;
+			try {
+				fileOut = new FileOutputStream(excelFile);
+				workbook.write(fileOut);
+				fileOut.close();
+			} catch (IOException e) {
+				throw new BaseException(e);
+			} finally {
+				try {
+					if (fileOut != null) {
+						fileOut.close();
+					}
+				} catch (IOException e) {
+					throw new BaseException(e);
+				}
+			}
+		}
+
+		FileOutputStream fileOut = null;
+
+		try {
+			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(excelFile));
+			HSSFSheet sheet = workbook.getSheet(user.getRetailer());
+			int lastRowNo = sheet.getLastRowNum();
+			for (int i = 1; i <= lastRowNo; i++) {
+
+				HSSFRow row = sheet.getRow(i);
+				if (row.getCell(1).getStringCellValue().equals(user.getUserId())
+						&& row.getCell(3).getStringCellValue().equals(user.getUrl())) {
+					return;
+				}
+			}
+			HSSFRow row = sheet.createRow(lastRowNo + 1);
+			row.createCell(0).setCellValue(String.valueOf(lastRowNo + 1));
+			row.createCell(1).setCellValue(user.getUserId());
+			row.createCell(2).setCellValue(user.getPassword());
+			row.createCell(3).setCellValue(user.getUrl());
+
+			fileOut = new FileOutputStream(excelFile);
+			workbook.write(fileOut);
+			fileOut.close();
+		} catch (FileNotFoundException e) {
+			throw new BaseException(e);
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+			try {
+				if (fileOut != null) {
+					fileOut.close();
+				}
+			} catch (IOException e) {
+				throw new BaseException(e);
+			}
 		}
 
 	}

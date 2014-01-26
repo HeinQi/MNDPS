@@ -18,16 +18,14 @@ public class MengniuPulling {
 	public static void main(String[] args) {
 		String retailerId = args[0];
 		try {
-			ApplicationContext appContext = new ClassPathXmlApplicationContext(
-					"applicationContext.xml");
+			ApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
 			// DataPullTaskPool.initTaskPool("ALL");
 			// DataPullTaskPool.initTaskPool("carrefour");
 			// DataPullTaskPool.initTaskPool("tesco");
 			// DataPullTaskPool.initTaskPool("yonghui");
 			// DataPullTaskPool.initTaskPool("metro");
 			DataPullTaskPool.initTaskPool(retailerId);
-			int threadNum = Integer.parseInt(Utils
-					.getProperty("datapull.thread.amount"));
+			int threadNum = Integer.parseInt(Utils.getProperty("datapull.thread.amount"));
 			final CountDownLatch mDoneSignal = new CountDownLatch(threadNum);
 
 			ExecutorService exec = Executors.newFixedThreadPool(threadNum);
@@ -41,9 +39,11 @@ public class MengniuPulling {
 				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService) appContext
 						.getBean("carrefour.data.conversion");
 				carrefourConversion.retailerDataProcessing();
+
 				RetailerDataConversionService tescoConversion = (RetailerDataConversionService) appContext
 						.getBean("tesco.data.conversion");
 				tescoConversion.retailerDataProcessing();
+
 				RetailerDataConversionService yonhuiConversion = (RetailerDataConversionService) appContext
 						.getBean("yonghui.data.conversion");
 				yonhuiConversion.retailerDataProcessing();
@@ -59,6 +59,10 @@ public class MengniuPulling {
 				RetailerDataConversionService hualianConversion = (RetailerDataConversionService) appContext
 						.getBean("hualian.data.conversion");
 				hualianConversion.retailerDataProcessing();
+
+				RetailerDataConversionService metroConversion = (RetailerDataConversionService) appContext
+						.getBean("metro.data.conversion");
+				metroConversion.retailerDataProcessing();
 
 			} else if (appContext.containsBean(retailerId + ".data.conversion")) {
 				RetailerDataConversionService dataConversion = (RetailerDataConversionService) appContext

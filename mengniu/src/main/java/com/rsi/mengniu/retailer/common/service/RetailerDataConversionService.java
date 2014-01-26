@@ -1,9 +1,13 @@
 package com.rsi.mengniu.retailer.common.service;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,7 +152,8 @@ public abstract class RetailerDataConversionService {
 	}
 
 	/**
-	 *  Get receiving data map
+	 * Get receiving data map
+	 * 
 	 * @param retailerID
 	 * @param startDate
 	 * @param endDate
@@ -506,4 +511,171 @@ public abstract class RetailerDataConversionService {
 		}
 	}
 
+	public void processOrderData2(String retailerID, Date startDate, Date endDate) throws BaseException {
+		// Get Receiving Data
+		getLog().info("读取收货单数据:" + retailerID);
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo2(retailerID, startDate, endDate);
+		if (receivingNoteMap == null || receivingNoteMap.size() == 0) {
+			getLog().info("零售商：" + retailerID + " 无收货单数据。");
+			return;
+		}
+		getLog().info("读取收货单数据结束:" + retailerID);
+
+		// Get Order Data
+
+		getLog().info("读取订单数据:" + retailerID);
+		Map<String, OrderTO> orderTOMap = getOrderInfo2(retailerID, startDate, endDate);
+
+		if (orderTOMap == null || orderTOMap.size() == 0) {
+			getLog().info("零售商：" + retailerID + " 无订单单数据。");
+			return;
+		}
+		getLog().info("读取订单数据结束:" + retailerID);
+
+		// Consolidate Receiving
+		
+		
+
+	}
+
+	public Map<String, List<ReceivingNoteTO>> getReceivingInfo2(String retailerID, Date startDate, Date endDate)
+			throws BaseException {
+		Map receivingNoteMap = new HashMap();
+
+		File receivingInboundFolder = new File(Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH));
+
+		File[] receivingList = receivingInboundFolder.listFiles();
+		if (receivingList != null) {
+			for (int i = 0; i < receivingList.length; i++) {
+
+				File receivingFile = receivingList[i];
+				getLog().info("收货单文件名: " + receivingFile.getName());
+
+				// Get Receiving Info
+				Map receivingNoteSingleMap = getReceivingInfoFromFile2(retailerID, startDate, endDate, receivingFile);
+
+				Utils.putSubMapToMainMap(receivingNoteMap, receivingNoteSingleMap);
+
+			}
+		}
+
+		return receivingNoteMap;
+
+	}
+
+	public Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile2(String retailerID, Date startDate,
+			Date endDate, File receivingFile) throws BaseException {
+
+		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
+
+		if (receivingFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				FileInputStream fileInput = new FileInputStream(receivingFile);
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
+				reader.readLine();
+				// Read line by line
+				String receivingLine = null;
+				while ((receivingLine = reader.readLine()) != null) {
+					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO(receivingLine);
+					String receivingDate = receivingNoteTO.getReceivingDate();
+
+					List<ReceivingNoteTO> receivingNoteTOList = null;
+					if (receivingNoteMap.containsKey(receivingDate)) {
+						receivingNoteTOList = receivingNoteMap.get(receivingDate);
+					} else {
+						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+						// Test the Hashmap
+						receivingNoteMap.put(receivingDate, receivingNoteTOList);
+					}
+
+					getLog().debug("收货单详细条目: " + receivingNoteTO.toString());
+					receivingNoteTOList.add(receivingNoteTO);
+
+				}
+
+			} catch (FileNotFoundException e) {
+				getLog().error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				getLog().error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			getLog().info("收货单: " + receivingFile.getName() + " 包含的详单数量为:" + receivingNoteMap.size());
+
+		}
+		return receivingNoteMap;
+	}
+
+	public Map<String, OrderTO> getOrderInfo2(String retailerID, Date startDate, Date endDate) throws BaseException {
+		Map<String, OrderTO> orderMap = new HashMap();
+
+		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_PATH));
+
+		File[] orderList = orderFolder.listFiles();
+		if (orderList != null) {
+			for (int i = 0; i < orderList.length; i++) {
+
+				File orderFile = orderList[i];
+
+				getLog().info("订单文件名: " + orderFile.getName());
+
+				// Get Receiving Info
+				Map<String, OrderTO> orderSingleMap = getOrderInfoFromFile2(orderFile, startDate, endDate);
+
+				orderMap.putAll(orderSingleMap);
+
+			}
+		}
+
+		return orderMap;
+	}
+
+	private Map<String, OrderTO> getOrderInfoFromFile2(File orderFile, Date startDate, Date endDate)
+			throws BaseException {
+		BufferedReader reader = null;
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+		try {
+			// Open the file
+			FileInputStream fileInput = new FileInputStream(orderFile);
+			InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
+			reader = new BufferedReader(inputStrReader);
+			reader.readLine();
+			// Read line by line
+			String orderLine = null;
+
+			int countNumber = 0;
+			while ((orderLine = reader.readLine()) != null) {
+				OrderTO orderTO = new OrderTO(orderLine);
+				String key = orderTO.getOrderNo() + orderTO.getStoreID() + orderTO.getItemID();
+
+				orderMap.put(key, orderTO);
+				countNumber++;
+			}
+			//
+			getLog().info("订单文件: " + orderFile + " 包含的详单数量为:" + countNumber);
+
+		} catch (FileNotFoundException e) {
+			getLog().error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+
+			getLog().error(e);
+			throw new BaseException(e);
+
+		} finally {
+
+			FileUtil.closeFileReader(reader);
+		}
+		return orderMap;
+
+	}
 }

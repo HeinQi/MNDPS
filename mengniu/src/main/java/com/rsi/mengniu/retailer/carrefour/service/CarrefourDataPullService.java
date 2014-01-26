@@ -40,18 +40,23 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		StringBuffer summaryBuffer = new StringBuffer();
+		summaryBuffer.append("运行时间: "+new Date()+"\r\n");
+		summaryBuffer.append("零售商: "+user.getRetailer()+"\r\n");
+		summaryBuffer.append("用户: "+user.getUserId()+"\r\n");
 		String loginResult = null;
 		int loginCount = 0; // 如果验证码出错重新login,最多15次
 		try {
 			do {
-				loginResult = login(httpClient, user,summaryBuffer);
+				loginResult = login(httpClient, user);
 				loginCount++;
 			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
+				summaryBuffer.append("登录失败!\r\n");
 				return;
 			}
 		} catch (Exception e) {
+			summaryBuffer.append("登录失败!\r\n");
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
 			return;
@@ -74,7 +79,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		}
 	}
 
-	public String login(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
+	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());

@@ -145,7 +145,6 @@ public abstract class RetailerDataConversionService {
 		String sourceFilePath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		getLog().info(sourceFilePath);
 		String destPath = Utils.getProperty(retailerID + Constants.RECEIVING_PROCESSED_PATH);
-		;
 		getLog().info(destPath);
 		// Copy processed receiving note from inbound to processed folder
 		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath, destPath);
@@ -245,7 +244,7 @@ public abstract class RetailerDataConversionService {
 		// Write to merged txt file
 		getLog().info("开始整合订单和收货单信息. 零售商: " + retailerID + " 日期:" + processDate);
 		BufferedWriter writer = initOrderOutputFile(retailerID, processDate);
-		mergeOrderAndReceiving(writer, receivingNoteByStoreMap, orderTOMap);
+		mergeOrderAndReceiving(retailerID,DateUtil.toDate(processDate), writer, receivingNoteByStoreMap, orderTOMap);
 		getLog().info("整合订单和收货单信息结束. 零售商: " + retailerID + " 日期:" + processDate);
 
 		// Close the opened file
@@ -325,19 +324,20 @@ public abstract class RetailerDataConversionService {
 	}
 
 	/**
-	 * Merge Order Info and Receiving Info to one txt record
+	 * Merge Order Info and Receiving Info in the DATE to one txt record
 	 * 
 	 * @param writer
 	 * @param receivingNoteByStoreMap
 	 * @param orderTOMap
 	 * @throws BaseException
 	 */
-	private void mergeOrderAndReceiving(BufferedWriter writer, Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
+	private void mergeOrderAndReceiving(String retailerID, Date receivingDate,BufferedWriter writer, Map<String, ReceivingNoteTO> receivingNoteByStoreMap,
 			Map<String, OrderTO> orderTOMap) throws BaseException {
 
 		Object[] receivingKeyList = receivingNoteByStoreMap.keySet().toArray();
 		Arrays.sort(receivingKeyList);
 
+		List<ReceivingNoteTO> failedReceivingList = new ArrayList<ReceivingNoteTO>();
 		int failedCount = 0;
 		for (int i = 0; i < receivingKeyList.length; i++) {
 			String combineKey = (String) receivingKeyList[i];
@@ -392,12 +392,14 @@ public abstract class RetailerDataConversionService {
 				}
 			} else {
 				getLog().info("警告! 查不到收货单对应的订单信息. 收货单信息为: " + receivingNoteTO.toString());
+				failedReceivingList.add(receivingNoteTO);
 				failedCount++;
 			}
 		}
 
 		if (failedCount != 0) {
 			getLog().info("收货单整合失败数量: " + failedCount);
+			Utils.exportFailedReceivingToTXT( retailerID,  receivingDate,failedReceivingList);
 		}
 	}
 

@@ -163,6 +163,15 @@ public class RenrenleDataConversionService extends
 		//Generate Output file
 		convertOrderData(retailerID,orderMap);
 		
+		//Move Order file to Processed
+		
+		String sourceFilePath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
+		getLog().info(sourceFilePath);
+		String destPath = Utils.getProperty(retailerID + Constants.ORDER_PROCESSED_PATH);
+		getLog().info(destPath);
+		// Copy processed receiving note from inbound to processed folder
+		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath, destPath);
+		
 	}
 
 	private void convertOrderData(String retailerID,Map<String, List<OrderTO>> orderMap) throws BaseException {
@@ -221,6 +230,8 @@ public class RenrenleDataConversionService extends
 				String orderDateStr = fileName.substring(fileName.lastIndexOf("_")+1, fileName.indexOf("."));
 				
 				Date orderDate = DateUtil.toDate(orderDateStr, "yyyyMMdd");
+				
+				orderDateStr = DateUtil.toString(orderDate);
 				
 				if(DateUtil.isInDateRange(orderDate, startDate, endDate)){
 					getLog().info("订单文件名: " + orderFile.getName());

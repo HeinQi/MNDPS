@@ -489,4 +489,41 @@ public class Utils {
 
 	}
 
+	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate,
+			List<ReceivingNoteTO> failedReceivingList) throws BaseException {
+		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		FileUtil.createFolder(receivingInboundFolderPath);
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_"
+				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+
+		File receivingFile = new File(receivingFilePath);
+
+		BufferedWriter writer = null;
+
+		try {
+			receivingFile.createNewFile();
+			String receivingHeader = Utils.getProperty(Constants.RECEIVING_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(receivingHeader);
+			writer.newLine();
+
+			for (int i = 0; i < failedReceivingList.size(); i++) {
+				ReceivingNoteTO receivingNoteTO = failedReceivingList.get(i);
+				String receivingRow = receivingNoteTO.toString();
+				writer.write(receivingRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			FileUtil.closeFileWriter(writer);
+
+		}
+		
+	}
+
 }

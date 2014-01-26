@@ -118,6 +118,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			return "InvalidCode";
 		} else if (responseStr.contains("登录失败,请检查登录名和密码")) {
 			log.info(user + "登录失败,请检查登录名和密码!");
+			Utils.recordIncorrectUser(user);
 			return "InvalidPassword";
 		} else if (!responseStr.contains("OK")) {
 			log.info(user + "系统出错,退出!");

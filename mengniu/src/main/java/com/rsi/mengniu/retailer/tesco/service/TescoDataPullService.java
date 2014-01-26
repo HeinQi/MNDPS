@@ -81,9 +81,11 @@ public class TescoDataPullService implements RetailerDataPullService {
 		String loginStr = EntityUtils.toString(entity);
 		if (loginStr.contains("密码错误")) {
 			log.info(user + "错误的密码,退出!");
+			Utils.recordIncorrectUser(user);
 			return "Error";
 		} else if (loginStr.contains("用户不存在")) {
 			log.info(user + "用户不存在,退出!");
+			Utils.recordIncorrectUser(user);
 			return "Error";
 		}
 		if (!loginStr.contains("mainMenu.hlt")) {

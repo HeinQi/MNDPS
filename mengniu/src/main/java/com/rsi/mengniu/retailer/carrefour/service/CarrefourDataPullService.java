@@ -24,6 +24,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.CountTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
@@ -53,30 +54,38 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
 				summaryBuffer.append("登录失败!\r\n");
+				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE);
 				return;
 			}
 		} catch (Exception e) {
 			summaryBuffer.append("登录失败!\r\n");
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
+			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE);
 			return;
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
 		try {
 			// receive
-			getReceiveExcel(httpClient, user);
+			getReceiveExcel(httpClient, user,summaryBuffer);
 		} catch (Exception e) {
+			summaryBuffer.append("收货单下载失败"+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查收货单功能是否正常！");
 			errorLog.error(user,e);
 			//log.error(user + Utils.getTrace(e));
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
+		CountTO orderCount = new CountTO();
 		try {
 			// order
-			getOrder(httpClient, user);
+			getOrder(httpClient, user,summaryBuffer,orderCount);
 			httpClient.close();
 		} catch (Exception e) {
+			summaryBuffer.append("订单下载出错"+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
 			errorLog.error(user,e);
 		}
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE);
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
@@ -127,7 +136,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getReceiveExcel(CloseableHttpClient httpClient, User user) throws Exception {
+	public void getReceiveExcel(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
 		log.info(user + "开始下载收货单...");
 		// goMenu('inyr.do?action=query','14','预估进退查询')
 
@@ -164,14 +173,18 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			downloadRes.close();
 			receiveFos.close();
 			log.info(user + "家乐福收货单Excel下载成功!");
+			summaryBuffer.append("收货单日期: "+DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+"\r\n");
+			summaryBuffer.append("收货单下载成功"+"\r\n");
+			summaryBuffer.append("文件: "+receiveFileNm+"\r\n");
 		} else {
 			log.info(user + "家乐福收货单Excel下载失败!");
+			summaryBuffer.append("收货单下载失败"+"\r\n");
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 
 	}
 
-	public void getOrder(CloseableHttpClient httpClient, User user) throws Exception {
+	public void getOrder(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer,CountTO orderCount) throws Exception {
 		log.info(user + "跳转到订单查询页面...");
 
 		// forward to PowerE2E Platform
@@ -253,6 +266,9 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
 		}
 		log.info(user + "订单数据下载成功!");
+		summaryBuffer.append("订单日期: "+DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+" - "+DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+"\r\n");
+		summaryBuffer.append("订单下载成功"+"\r\n");
+		summaryBuffer.append("数量: "+1+"\r\n");
 	}
 
 	// function gotoPage(page) {

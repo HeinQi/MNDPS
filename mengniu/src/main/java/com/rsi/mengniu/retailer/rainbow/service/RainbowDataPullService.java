@@ -36,11 +36,14 @@ import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
 public class RainbowDataPullService implements RetailerDataPullService {
+
 	private static Log log = LogFactory.getLog(RainbowDataPullService.class);
 
+	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RAINBOW);
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
+			summaryLog.info(user + "开始登陆");
 			String returnType = this.login(httpClient, user);
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 			if (!"Success".equals(returnType)) {
@@ -96,6 +99,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		if (forwardStr.contains("用户名或密码错误")) {
 			log.info(user + "用户名或密码错误,退出!");
+			Utils.recordIncorrectUser(user);
 			return "Error";
 		}
 

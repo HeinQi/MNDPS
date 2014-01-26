@@ -180,7 +180,6 @@ public class Utils {
 			}
 		}
 	}
-	
 
 	/**
 	 * Export Order info from list to txt file
@@ -188,17 +187,16 @@ public class Utils {
 	 * @param retailerID
 	 * @param orderID
 	 * @param orderList
-	 * @param userID 
-	 * @param orderDate 
+	 * @param userID
+	 * @param orderDate
 	 * @throws BaseException
 	 */
-	public static void exportOrderInfoToTXT(String retailerID,String userID, String orderID,  Date orderDate,
+	public static void exportOrderInfoToTXT(String retailerID, String userID, String orderID, Date orderDate,
 			List<OrderTO> orderList) throws BaseException {
 
-		String orderFolderPath = Utils.getProperty(retailerID
-				+ Constants.ORDER_INBOUND_PATH);
+		String orderFolderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		FileUtil.createFolder(orderFolderPath);
-		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_"+ orderID + "_"
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
 				+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
 
 		File orderFile = new File(orderFilePath);
@@ -207,7 +205,7 @@ public class Utils {
 			try {
 				orderFile.createNewFile();
 				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
-				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile, true);
 				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 				writer.write(orderHeader);
 				writer.newLine();
@@ -220,7 +218,7 @@ public class Utils {
 			try {
 
 				// TODO consider that re-run action
-				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile, true);
 				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 			} catch (IOException e) {
 
@@ -247,8 +245,6 @@ public class Utils {
 		}
 
 	}
-	
-
 
 	/**
 	 * Export Order info from list to txt file
@@ -258,25 +254,27 @@ public class Utils {
 	 * @param orderList
 	 * @throws BaseException
 	 */
-//	public static void exportOrderInfoListToTXT(String retailerID, String userID,String orderID, Date orderDate,
-//			List<OrderTO> orderList) throws BaseException {
-//		Map <String,List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
-//		List<OrderTO> tempOrderList = null;
-//		for(OrderTO orderTO : orderList){
-//			String orderNo = orderTO.getOrderNo();
-//			
-//			if(orderMap.containsKey(orderNo)){
-//				tempOrderList = orderMap.get(orderNo);
-//			} else {
-//				tempOrderList = new ArrayList<OrderTO>();
-//				orderMap.put(orderNo, tempOrderList);
-//			}
-//			tempOrderList.add(orderTO);
-//		}
-//		for(Entry<String, List<OrderTO>> entry:orderMap.entrySet()){
-//			exportOrderInfoToTXT(retailerID,userID,orderID,orderDate,entry.getValue());
-//		}
-//	}
+	// public static void exportOrderInfoListToTXT(String retailerID, String
+	// userID,String orderID, Date orderDate,
+	// List<OrderTO> orderList) throws BaseException {
+	// Map <String,List<OrderTO>> orderMap = new HashMap<String,
+	// List<OrderTO>>();
+	// List<OrderTO> tempOrderList = null;
+	// for(OrderTO orderTO : orderList){
+	// String orderNo = orderTO.getOrderNo();
+	//
+	// if(orderMap.containsKey(orderNo)){
+	// tempOrderList = orderMap.get(orderNo);
+	// } else {
+	// tempOrderList = new ArrayList<OrderTO>();
+	// orderMap.put(orderNo, tempOrderList);
+	// }
+	// tempOrderList.add(orderTO);
+	// }
+	// for(Entry<String, List<OrderTO>> entry:orderMap.entrySet()){
+	// exportOrderInfoToTXT(retailerID,userID,orderID,orderDate,entry.getValue());
+	// }
+	// }
 
 	/**
 	 * Export Receiving Info from list to txt file
@@ -489,9 +487,16 @@ public class Utils {
 
 	}
 
+	/**
+	 * Export the fialed receiving data to exception folder
+	 * @param retailerID
+	 * @param receivingDate
+	 * @param failedReceivingList
+	 * @throws BaseException
+	 */
 	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate,
 			List<ReceivingNoteTO> failedReceivingList) throws BaseException {
-		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
 		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_"
 				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
@@ -523,7 +528,61 @@ public class Utils {
 			FileUtil.closeFileWriter(writer);
 
 		}
-		
+
+	}
+
+	public static boolean isOrderFileExist(String retailerID, String userID, String orderID, Date orderDate) {
+		String folderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		String txtFileName = null;
+		String excelFileName = null;
+		if (orderID != null && !orderID.equals("")) {
+			txtFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
+					+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+			excelFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
+					+ DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+		} else {
+			txtFileName = "Order_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+			excelFileName = "Order_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+		}
+		File txtFile = new File(folderPath + txtFileName);
+		File excelFile = new File(folderPath + excelFileName);
+
+		if (txtFile.exists() || excelFile.exists()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static boolean isReceivingFileExist(String retailerID, String userID, Date orderDate) {
+		String folderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		String txtFileName = null;
+		String excelFileName = null;
+		txtFileName = "Receiving_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+		excelFileName = "Receiving_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+		File txtFile = new File(folderPath + txtFileName);
+		File excelFile = new File(folderPath + excelFileName);
+
+		if (txtFile.exists() || excelFile.exists()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public static boolean isSalesFileExist(String retailerID, String userID, Date orderDate) {
+		String folderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		String txtFileName = null;
+		String excelFileName = null;
+		txtFileName = "Sales_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+		excelFileName = "Sales_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+		File txtFile = new File(folderPath + txtFileName);
+		File excelFile = new File(folderPath + excelFileName);
+
+		if (txtFile.exists() || excelFile.exists()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

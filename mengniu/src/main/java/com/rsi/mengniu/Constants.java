@@ -13,6 +13,7 @@ public final class Constants {
 	public static final String ORDER_PROCESSED_PATH = ".order.processed.filePath";
 	public static final String RECEIVING_INBOUND_PATH = ".receiving.inbound.filePath";
 	public static final String RECEIVING_PROCESSED_PATH = ".receiving.processed.filePath";
+	public static final String RECEIVING_EXCEPTION_PATH = ".receiving.exception.filePath";
 	public static final String OUTPUT_ORDER_PATH = ".output.order.filePath";
 	public static final String OUTPUT_ORDER_EXCEPTION_PATH = ".output.order.exception.filePath";
 	
@@ -28,7 +29,18 @@ public final class Constants {
 	
 	public static final String INCORRECT_USER_HEADER = "incorrect.user.path";
 	
+
+	public static final String DOC_RECEIVING = "DOC_RECEIVING";
+	public static final String DOC_ORDER = "DOC_ORDER";
+	public static final String DOC_SALES = "DOC_SALES";
 	
-	
+
+	public static final String SUMMARY_CARREFOUR = "summary.carrefour";
+	public static final String SUMMARY_TESCO = "summary.tesco";
+	public static final String SUMMARY_YONGHUI = "summary.yonghui";
+	public static final String SUMMARY_METRO = "summary.metro";
+	public static final String SUMMARY_RENRENLE = "summary.renrenle";
+	public static final String SUMMARY_HUALIAN = "summary.hualian";
+	public static final String SUMMARY_RAINBOW = "summary.rainbow";
 
 }

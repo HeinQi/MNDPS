@@ -38,6 +38,12 @@ public class RenrenleDataConversionService extends
 		RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(RenrenleDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RENRENLE);
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 
 	@Override
 	protected String getRetailerID() {

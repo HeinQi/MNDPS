@@ -29,7 +29,12 @@ import com.rsi.mengniu.util.Utils;
 
 public class MetroDataConversionService extends RetailerDataConversionService {
 	private static Log log = LogFactory.getLog(MetroDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_METRO);
 
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 	@Override
 	protected String getRetailerID() {
 		return Constants.RETAILER_METRO;

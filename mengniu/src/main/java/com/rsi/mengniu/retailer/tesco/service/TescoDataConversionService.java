@@ -36,6 +36,12 @@ import com.rsi.mengniu.util.Utils;
 public class TescoDataConversionService extends RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(TescoDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_TESCO);
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 
 	@Override
 	protected String getRetailerID() {

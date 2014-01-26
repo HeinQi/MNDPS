@@ -39,6 +39,12 @@ import com.rsi.mengniu.util.Utils;
 public class YonghuiDataConversionService extends RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(YonghuiDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_YONGHUI);
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 	
 	@Override
 	protected String getRetailerID() {

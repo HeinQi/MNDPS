@@ -35,7 +35,12 @@ import com.rsi.mengniu.util.Utils;
 public class CarrefourDataConversionService extends RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(CarrefourDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_CARREFOUR);
 
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 	@Override
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
 			Date endDate, File receivingFile) throws BaseException {
@@ -209,5 +214,6 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }

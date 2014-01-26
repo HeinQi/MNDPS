@@ -40,6 +40,12 @@ import com.rsi.mengniu.util.Utils;
 public class RainbowDataConversionService extends RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(RainbowDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RAINBOW);
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 
 	@Override
 	protected String getRetailerID() {
@@ -175,7 +181,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 
 				getLog().info(
 						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
-								+ "订单数量:" + receivingList.size() + "\n");
+								+ "订单数量:" + receivingList.size() + "\r\n");
 			}
 		}
 		
@@ -203,7 +209,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 
 				getLog().info(
 						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr
-								+ "订单数量:" + receivingList.size() + "\n");
+								+ "订单数量:" + receivingList.size() + "\r\n");
 			}
 		}
 		

@@ -28,7 +28,12 @@ import com.rsi.mengniu.util.Utils;
 
 public class HualianDataConversionService extends RetailerDataConversionService {
 	private Log log = LogFactory.getLog(HualianDataConversionService.class);
+	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_HUALIAN);
 
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
 	@Override
 	protected String getRetailerID() {
 

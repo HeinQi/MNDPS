@@ -29,6 +29,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
@@ -77,6 +78,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("收货单下载失败"+"\r\n");
 			log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
 			errorLog.error(user, e);
+			DataPullTaskPool.addFailedUser(user);
 		}
 
 		try {
@@ -90,6 +92,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("订单下载失败" + "\r\n");
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			summaryLog.info(summaryBuffer);
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		List<Date> dates = null;
@@ -108,6 +111,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 				summaryBuffer.append("销售数据下载失败"+"\r\n");
 				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
 				errorLog.error(user, e);
+				DataPullTaskPool.addFailedUser(user);
 			}
 		}
 

@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.CountTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
@@ -74,6 +75,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("收货单下载失败"+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查收货单功能是否正常！");
 			errorLog.error(user,e);
+			DataPullTaskPool.addFailedUser(user);
 			//log.error(user + Utils.getTrace(e));
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
@@ -87,6 +89,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("成功数量: "+orderCount.getCounttotalNo()+"\r\n");
 			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
 			errorLog.error(user,e);
+			DataPullTaskPool.addFailedUser(user);
 		}
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
 		summaryLog.info(summaryBuffer);

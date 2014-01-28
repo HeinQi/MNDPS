@@ -3,7 +3,13 @@ package com.rsi.mengniu;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,11 +19,13 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 
 public class DataPullTaskPool {
 	private static Log log = LogFactory.getLog(DataPullTaskPool.class);
 	private static List<List<User>> taskPool = new ArrayList<List<User>>();
+	private static Set<User> failedTaskPool = new HashSet<User>();
 	private static int a = 0;
 	private static int retailerCount = 0;
 
@@ -84,4 +92,39 @@ public class DataPullTaskPool {
 		return null;
 	}
 
+	public static synchronized void addFailedUser(User user) {
+		failedTaskPool.add(user);
+	}
+
+	public static void processFaileTask() {
+		Map<String, List<User>> userMap = new HashMap<String, List<User>>();
+		List<User> userList = null;
+		Iterator<User> userIter = failedTaskPool.iterator();
+		while (userIter.hasNext()) {
+			User user = userIter.next();
+			String retailer = user.getRetailer();
+			if (userMap.containsKey(retailer)) {
+				userList = userMap.get(retailer);
+			} else {
+				userList = new ArrayList<User>();
+				userMap.put(retailer, userList);
+			}
+			userList.add(user);
+		}
+		
+		Iterator<Entry<String, List<User>>> iter = userMap.entrySet().iterator();
+		while (iter.hasNext()) {
+			taskPool.add(iter.next().getValue());
+		}
+		failedTaskPool = new HashSet<User>();
+		retailerCount = userMap.size();
+		a=0;
+	}
+
+	public static boolean hasRetryTask() {
+		return failedTaskPool.size() > 0 ? true : false;
+	}
+	public static boolean hasTask() {
+		return taskPool.size() > 0 ? true : false;
+	}
 }

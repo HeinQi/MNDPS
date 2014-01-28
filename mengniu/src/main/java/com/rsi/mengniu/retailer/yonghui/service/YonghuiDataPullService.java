@@ -24,6 +24,7 @@ import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
@@ -63,7 +64,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			 getReceive(httpClient, user);
 		} catch (Exception e) {
 			log.error(user+"页面加载失败，请登录网站检查收货单查询功能是否正常!");
-			errorLog.error(user,e);			
+			errorLog.error(user,e);	
+			DataPullTaskPool.addFailedUser(user);
 		}
 		
 		try {
@@ -71,7 +73,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			 getOrder(httpClient, user);
 		} catch (Exception e) {
 			log.error(user+"页面加载失败，请登录网站检查订单查询功能是否正常!");
-			errorLog.error(user,e);			
+			errorLog.error(user,e);	
+			DataPullTaskPool.addFailedUser(user);
 		}
 		try {
 			List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_YONGHUI),
@@ -82,7 +85,8 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			httpClient.close();
 		} catch (Exception e) {
 			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-			errorLog.error(user,e);			
+			errorLog.error(user,e);	
+			DataPullTaskPool.addFailedUser(user);
 		}			
 	}
 

@@ -154,7 +154,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getReceiveExcel(CloseableHttpClient httpClient, User user) throws Exception {
+	public synchronized void getReceiveExcel(CloseableHttpClient httpClient, User user) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sellGrnQry/init.hlt
 		// get vendorTaxRegistration
 		log.info(user + "开始下载收货单...");

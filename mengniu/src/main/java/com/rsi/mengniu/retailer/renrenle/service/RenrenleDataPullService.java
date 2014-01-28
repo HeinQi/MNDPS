@@ -152,6 +152,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate, StringBuffer summaryBuffer)
 			throws Exception {
+		if (Utils.isSalesFileExist(Constants.RETAILER_RENRENLE, user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
+			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
+			return;
+		}
+		
 		log.info(user + "开始下载" + searchDate + "的销售数据...");
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
@@ -238,6 +243,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		log.info(user + "查询到" + searchDate + "号订单共" + orderIdList.size() + "条");
 		for (int i = 0; i < orderIdList.size(); i++) {
 			String orderId = orderIdList.get(i);
+			if (Utils.isOrderFileExist(Constants.RETAILER_RENRENLE, user.getUserId(),orderId, DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
+				log.info(user+"订单日期: "+searchDate+" 订单号: "+orderId+"已存在,不再下载");
+				continue;
+			}
+			
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
 			getOrderDetail(httpClient, user, orderId, searchDate, orderList);
 			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId,

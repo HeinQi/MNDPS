@@ -227,7 +227,7 @@ public class Utils {
 			try {
 				orderFile.createNewFile();
 				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
-				FileOutputStream fileOutput = new FileOutputStream(orderFile, true);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile);
 				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 				writer.write(orderHeader);
 				writer.newLine();
@@ -240,7 +240,7 @@ public class Utils {
 			try {
 
 				// TODO consider that re-run action
-				FileOutputStream fileOutput = new FileOutputStream(orderFile, true);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile);
 				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 			} catch (IOException e) {
 
@@ -556,6 +556,25 @@ public class Utils {
 
 	}
 
+	public static boolean isOrderFileExistForCarrefour(String retailerID, String userID, Date orderDate) {
+		File folder = new File(Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH));
+
+		File[] fileList = folder.listFiles();
+		if (fileList != null) {
+			for (int i = 0; i < fileList.length; i++) {
+
+				File file = fileList[i];
+				String fileName = file.getName();
+
+				if((fileName.indexOf(userID)!=-1) &&(fileName.indexOf(DateUtil.toStringYYYYMMDD(orderDate))!=-1)){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	public static boolean isOrderFileExist(String retailerID, String userID, String orderID, Date orderDate) {
 		String folderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		String txtFileName = null;

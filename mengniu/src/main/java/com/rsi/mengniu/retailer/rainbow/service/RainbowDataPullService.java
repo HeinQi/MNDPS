@@ -28,6 +28,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.CountTO;
@@ -90,8 +91,9 @@ public class RainbowDataPullService implements RetailerDataPullService {
 				summaryBuffer.append("数量：" + countTO.getCounttotalNo() + " \r\n");
 			} catch (Exception e) {
 				summaryBuffer.append("收货单下载失败!" + "\r\n");
-				log.error("收货单下载失败!");
+				log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
 				errorLog.error(user, e);
+				DataPullTaskPool.addFailedUser(user);
 			}
 		}
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
@@ -110,8 +112,9 @@ public class RainbowDataPullService implements RetailerDataPullService {
 				summaryBuffer.append("销售单下载成功" + " \r\n");
 			} catch (Exception e) {
 				summaryBuffer.append("销售单下载失败!" + "\r\n");
-				log.error("销售单下载失败!");
-				errorLog.error(user + Utils.getTrace(e));
+				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+				errorLog.error(user, e);
+				DataPullTaskPool.addFailedUser(user);
 			}
 
 		}

@@ -114,7 +114,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		log.info(user + "开始登录...");
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
-		String validateImgPath = Utils.getProperty("validate.image.path");
+		String validateImgPath = Utils.getProperty(Constants.TEMP_PATH);
 		FileUtil.createFolder(validateImgPath);
 		FileOutputStream fos = new FileOutputStream(validateImgPath + imgName + ".jpg");
 		CloseableHttpResponse response = httpClient.execute(httpGet);

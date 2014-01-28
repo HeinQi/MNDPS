@@ -122,6 +122,11 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		summaryLog.info(summaryBuffer);
 
+		try {
+			httpClient.close();
+		} catch (IOException e) {
+			errorLog.error(user, e);
+		}
 	}
 
 	private String login(CloseableHttpClient httpClient, User user) throws Exception {

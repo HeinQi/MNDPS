@@ -1,6 +1,7 @@
 package com.rsi.mengniu.retailer.yonghui.service;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -84,12 +85,17 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 
 				getSales(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
 
-				httpClient.close();
 			} catch (Exception e) {
 				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
 				errorLog.error(user, e);
 				DataPullTaskPool.addFailedUser(user);
 			}
+		}
+
+		try {
+			httpClient.close();
+		} catch (IOException e) {
+			errorLog.error(user, e);
 		}
 	}
 
@@ -106,7 +112,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		// checkcode1="+ 57646
 		String checkcode1 = loginPageStr.substring(loginPageStr.indexOf("checkcode1=\"+") + 13);
 		checkcode1 = checkcode1.substring(0, checkcode1.indexOf("+")).trim();
-		String validateImgPath = Utils.getProperty("validate.image.path");
+		String validateImgPath = Utils.getProperty(Constants.TEMP_PATH);
 		FileUtil.createFolder(validateImgPath);
 		HttpGet httpCheckcodeGet = new HttpGet("http://vss.yonghui.cn:9999/vss/"
 				+ checkcodeUrl.substring(checkcodeUrl.indexOf("DaemonLogonVender")));

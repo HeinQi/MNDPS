@@ -113,7 +113,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		HttpGet httpGet = new HttpGet("http://www.renrenle.cn/scm/verifyCode.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());
-		String validateImgPath = Utils.getProperty("validate.image.path");
+		String validateImgPath = Utils.getProperty(Constants.TEMP_PATH);
 		FileUtil.createFolder(validateImgPath);
 		FileOutputStream fos = new FileOutputStream(validateImgPath + imgName + ".jpg");
 		CloseableHttpResponse response = httpClient.execute(httpGet);

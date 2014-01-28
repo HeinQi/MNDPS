@@ -25,7 +25,6 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
-import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -69,20 +68,16 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			return;
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
-		
-		List<Date> dates = null;
-		try {
-			dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE), Utils.getEndDate(Constants.RETAILER_RENRENLE));
-		} catch (BaseException e1) {
-			errorLog.error(user, e1);
-		}
+
+		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
+				Utils.getEndDate(Constants.RETAILER_RENRENLE));
 
 		for (Date searchDate : dates) {
 			try {
-				summaryBuffer.append("销售日期: "+searchDate+"\r\n");
-				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),summaryBuffer);
+				summaryBuffer.append("销售日期: " + searchDate + "\r\n");
+				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"), summaryBuffer);
 			} catch (Exception e) {
-				summaryBuffer.append("销售数据下载失败"+"\r\n");
+				summaryBuffer.append("销售数据下载失败" + "\r\n");
 				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
 				errorLog.error(user, e);
 				DataPullTaskPool.addFailedUser(user);
@@ -92,11 +87,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
 		for (Date searchDate : dates) {
 			try {
-				summaryBuffer.append("订单日期: "+searchDate+"\r\n");
+				summaryBuffer.append("订单日期: " + searchDate + "\r\n");
 				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
-				summaryBuffer.append("订单下载成功"+"\r\n");
+				summaryBuffer.append("订单下载成功" + "\r\n");
 			} catch (Exception e) {
-				summaryBuffer.append("订单下载失败"+"\r\n");
+				summaryBuffer.append("订单下载失败" + "\r\n");
 				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
 				errorLog.error(user, e);
 				DataPullTaskPool.addFailedUser(user);
@@ -155,7 +150,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate,StringBuffer summaryBuffer) throws Exception {
+	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate, StringBuffer summaryBuffer)
+			throws Exception {
 		log.info(user + "开始下载" + searchDate + "的销售数据...");
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
@@ -175,7 +171,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		// http://www.renrenle.cn/scm/sale/saleAction.do?method=querySale&download=1
 		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesFilePath);
-		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_" + searchDate.replaceAll("-", "") + ".xls";
+		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_"
+				+ searchDate.replaceAll("-", "") + ".xls";
 		FileOutputStream salseFos = new FileOutputStream(salesFilePath + receiveFileNm);
 
 		List<NameValuePair> salesformParams = new ArrayList<NameValuePair>();
@@ -192,9 +189,9 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		downloadRes.getEntity().writeTo(salseFos);
 		downloadRes.close();
 		salseFos.close();
-		 
-		summaryBuffer.append("销售单下载成功"+"\r\n");
-		summaryBuffer.append("文件: "+receiveFileNm+"\r\n");
+
+		summaryBuffer.append("销售单下载成功" + "\r\n");
+		summaryBuffer.append("文件: " + receiveFileNm + "\r\n");
 		log.info(user + searchDate + "的销售数据下载成功");
 	}
 
@@ -243,14 +240,15 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			String orderId = orderIdList.get(i);
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
 			getOrderDetail(httpClient, user, orderId, searchDate, orderList);
-			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId, DateUtil.toDate(searchDate, "yyyy-MM-dd"), orderList);
+			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId,
+					DateUtil.toDate(searchDate, "yyyy-MM-dd"), orderList);
 			log.info(user + "成功获取第" + (i + 1) + "条订单,订单号为" + orderId);
 		}
 		log.info(user + searchDate + "的订单数据下载成功");
 	}
 
-	private void getOrderDetail(CloseableHttpClient httpClient, User user, String orderId, String searchDate, List<OrderTO> orderList)
-			throws Exception {
+	private void getOrderDetail(CloseableHttpClient httpClient, User user, String orderId, String searchDate,
+			List<OrderTO> orderList) throws Exception {
 		// /scm/order/orderAction.do?method=printOrder&sheetID=A002201401024822
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		String url = "http://www.renrenle.cn/scm/order/orderAction.do?method=printOrder&sheetID=" + orderId;

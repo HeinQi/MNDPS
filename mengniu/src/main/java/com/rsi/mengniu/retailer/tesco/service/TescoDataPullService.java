@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import net.lingala.zip4j.exception.ZipException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -185,8 +187,16 @@ public class TescoDataPullService implements RetailerDataPullService {
 		receiveRes.getEntity().writeTo(receiveFos);
 		receiveFos.close();
 		receiveRes.close();
+		try{
 		FileUtil.unzip(receiveFilePath + fileNm, receiveFilePath, "");
 		log.info(user + "Tesco收货单Excel下载成功!");
+		} catch(ZipException e){
+
+			String receiveFileExceptionPath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_EXCEPTION_PATH);
+			FileUtil.moveFile(receiveFilePath, receiveFileExceptionPath, fileNm);
+			
+			log.info(user + "Tesco收货单Excel下载失败!");
+		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 	}
 

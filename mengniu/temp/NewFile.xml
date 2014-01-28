@@ -1,2652 +1,431 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xdoc>
-	<xout>
-		<catalogue rows="110" sheetname="receipt">
-			<row>
-				<sheetid>50000001092014MB</sheetid>
-				<refsheetid>4004531808</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0008</shopid>
-				<shopname>昌平区回龙观店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000001202014MB</sheetid>
-				<refsheetid>4004530436</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0018</shopid>
-				<shopname>顺义区新世界店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000001762014MB</sheetid>
-				<refsheetid>4004530564</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0015</shopid>
-				<shopname>海淀区清河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000034222014MB</sheetid>
-				<refsheetid>4004530559</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0007</shopid>
-				<shopname>丰台区草桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>李楠</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000037482014MB</sheetid>
-				<refsheetid>4004530471</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0006</shopid>
-				<shopname>朝阳区山水文园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000037982014MB</sheetid>
-				<refsheetid>4004530414</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0012</shopid>
-				<shopname>昌平区龙旗广场店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000039042014MB</sheetid>
-				<refsheetid>4004531800</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000040162014MB</sheetid>
-				<refsheetid>4004532543</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20131228-20131229</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000040292014MB</sheetid>
-				<refsheetid>4004530535</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0020</shopid>
-				<shopname>朝阳区百子湾店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20131231-20131220</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000041992014MB</sheetid>
-				<refsheetid>4004531992</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0001</shopid>
-				<shopname>丰台区六里桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20131228-20131230</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000043162014MB</sheetid>
-				<refsheetid>4004532003</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0014</shopid>
-				<shopname>海淀区金沟河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000045022014MB</sheetid>
-				<refsheetid>4004530494</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0002</shopid>
-				<shopname>石景山区鲁谷店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次:20131227-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000046612014MB</sheetid>
-				<refsheetid>4004530451</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000046752014MB</sheetid>
-				<refsheetid>4004531958</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000050462014MB</sheetid>
-				<refsheetid>4004531826</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0004</shopid>
-				<shopname>大兴区旧宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131220-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000050912014MB</sheetid>
-				<refsheetid>4004535409</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000051922014MB</sheetid>
-				<refsheetid>4004531775</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0011</shopid>
-				<shopname>丰台区千禧街店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000056962014MB</sheetid>
-				<refsheetid>4004532028</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0010</shopid>
-				<shopname>东城区恒基店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次 20131228-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000057662014MB</sheetid>
-				<refsheetid>4004530469</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0005</shopid>
-				<shopname>海淀区增光路店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131227-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000062662014MB</sheetid>
-				<refsheetid>4004530454</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0019</shopid>
-				<shopname>海淀区文慧园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131225-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000085502014MB</sheetid>
-				<refsheetid>4004532178</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>PI连接用</editor>
-				<editdate>2014-01-01</editdate>
-				<operator>PI连接用</operator>
-				<checker>PI连接用</checker>
-				<checkdate>2014-01-01</checkdate>
-				<touchtime>2014-01-01 00:00:00</touchtime>
-				<toucher>PI连接用</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000293062014MB</sheetid>
-				<refsheetid>4004550386</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0020</shopid>
-				<shopname>朝阳区百子湾店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20140101-20131226</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000295512014MB</sheetid>
-				<refsheetid>4004550052</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0006</shopid>
-				<shopname>朝阳区山水文园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000296312014MB</sheetid>
-				<refsheetid>4004550634</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000296842014MB</sheetid>
-				<refsheetid>4004550041</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0008</shopid>
-				<shopname>昌平区回龙观店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000298012014MB</sheetid>
-				<refsheetid>4004552553</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000306082014MB</sheetid>
-				<refsheetid>4004550713</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0002</shopid>
-				<shopname>石景山区鲁谷店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：2013131228-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000327022014MB</sheetid>
-				<refsheetid>4004548599</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0018</shopid>
-				<shopname>顺义区新世界店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000330792014MB</sheetid>
-				<refsheetid>4004551904</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0014</shopid>
-				<shopname>海淀区金沟河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000330862014MB</sheetid>
-				<refsheetid>4004549814</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0012</shopid>
-				<shopname>昌平区龙旗广场店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000332322014MB</sheetid>
-				<refsheetid>4004551088</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0001</shopid>
-				<shopname>丰台区六里桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20131229-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000333082014MB</sheetid>
-				<refsheetid>4004550716</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000333632014MB</sheetid>
-				<refsheetid>4004551071</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0011</shopid>
-				<shopname>丰台区千禧街店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000333952014MB</sheetid>
-				<refsheetid>4004552079</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000336372014MB</sheetid>
-				<refsheetid>4004548618</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000336382014MB</sheetid>
-				<refsheetid>4004554410</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000340502014MB</sheetid>
-				<refsheetid>4004549093</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0007</shopid>
-				<shopname>丰台区草桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>李俚</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000341752014MB</sheetid>
-				<refsheetid>4004551892</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0004</shopid>
-				<shopname>大兴区旧宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131228-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000343052014MB</sheetid>
-				<refsheetid>4004552097</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000348512014MB</sheetid>
-				<refsheetid>4004550031</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0015</shopid>
-				<shopname>海淀区清河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20131228-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-02</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-02</checkdate>
-				<touchtime>2014-01-02 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000685722014MB</sheetid>
-				<refsheetid>4004567468</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20131231-20140102</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000685772014MB</sheetid>
-				<refsheetid>4004567455</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000691942014MB</sheetid>
-				<refsheetid>4004567261</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0006</shopid>
-				<shopname>朝阳区山水文园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000692022014MB</sheetid>
-				<refsheetid>4004567710</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0014</shopid>
-				<shopname>海淀区金沟河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000693422014MB</sheetid>
-				<refsheetid>4004570132</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20131227-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000694152014MB</sheetid>
-				<refsheetid>4004567661</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0001</shopid>
-				<shopname>丰台区六里桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000695082014MB</sheetid>
-				<refsheetid>4004567294</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0012</shopid>
-				<shopname>昌平区龙旗广场店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000695382014MB</sheetid>
-				<refsheetid>4004567283</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0007</shopid>
-				<shopname>丰台区草桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>李俚</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000696322014MB</sheetid>
-				<refsheetid>4004567431</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000696942014MB</sheetid>
-				<refsheetid>4004567523</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0008</shopid>
-				<shopname>昌平区回龙观店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000697022014MB</sheetid>
-				<refsheetid>4004576357</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0004</shopid>
-				<shopname>大兴区旧宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000698072014MB</sheetid>
-				<refsheetid>4004567837</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0020</shopid>
-				<shopname>朝阳区百子湾店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20140101-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000702112014MB</sheetid>
-				<refsheetid>4004567507</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0011</shopid>
-				<shopname>丰台区千禧街店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000704002014MB</sheetid>
-				<refsheetid>4004567326</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000704782014MB</sheetid>
-				<refsheetid>4004567471</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0018</shopid>
-				<shopname>顺义区新世界店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000709852014MB</sheetid>
-				<refsheetid>4004567313</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0002</shopid>
-				<shopname>石景山区鲁谷店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次:20131230-20140102</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000720332014MB</sheetid>
-				<refsheetid>4004567525</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0010</shopid>
-				<shopname>东城区恒基店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次 20131225-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000733532014MB</sheetid>
-				<refsheetid>4004567303</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0015</shopid>
-				<shopname>海淀区清河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20131230-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000739862014MB</sheetid>
-				<refsheetid>4004584832</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0002</shopid>
-				<shopname>石景山区鲁谷店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000765152014MB</sheetid>
-				<refsheetid>4004567279</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0005</shopid>
-				<shopname>海淀区增光路店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：2013121231-20140102</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000771812014MB</sheetid>
-				<refsheetid>4004567663</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0019</shopid>
-				<shopname>海淀区文慧园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131231-20131231</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50000824402014MB</sheetid>
-				<refsheetid>4004567667</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9322</shopid>
-				<shopname>朝阳区太阳宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-03</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-03</checkdate>
-				<touchtime>2014-01-03 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 NULL</placename>
-			</row>
-			<row>
-				<sheetid>50001081802014MB</sheetid>
-				<refsheetid>4004585069</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0007</shopid>
-				<shopname>丰台区草桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>李俚</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001083812014MB</sheetid>
-				<refsheetid>4004584853</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0007</shopid>
-				<shopname>丰台区草桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>李俚</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001084722014MB</sheetid>
-				<refsheetid>4004584676</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0006</shopid>
-				<shopname>朝阳区山水文园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001085792014MB</sheetid>
-				<refsheetid>4004585061</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001087342014MB</sheetid>
-				<refsheetid>4004584498</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0001</shopid>
-				<shopname>丰台区六里桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001087532014MB</sheetid>
-				<refsheetid>4004594276</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001090792014MB</sheetid>
-				<refsheetid>4004584712</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001091502014MB</sheetid>
-				<refsheetid>4004586677</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001091912014MB</sheetid>
-				<refsheetid>4004586109</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001094662014MB</sheetid>
-				<refsheetid>4004586642</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0011</shopid>
-				<shopname>丰台区千禧街店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001095302014MB</sheetid>
-				<refsheetid>4004586103</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0020</shopid>
-				<shopname>朝阳区百子湾店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>欧辰20140104-20140101</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001095322014MB</sheetid>
-				<refsheetid>4004584889</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0012</shopid>
-				<shopname>昌平区龙旗广场店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001098552014MB</sheetid>
-				<refsheetid>4004591392</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0008</shopid>
-				<shopname>昌平区回龙观店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001099402014MB</sheetid>
-				<refsheetid>4004584450</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0014</shopid>
-				<shopname>海淀区金沟河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001102132014MB</sheetid>
-				<refsheetid>4004586052</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0002</shopid>
-				<shopname>石景山区鲁谷店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131231-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001102312014MB</sheetid>
-				<refsheetid>4004585036</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0018</shopid>
-				<shopname>顺义区新世界店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001108472014MB</sheetid>
-				<refsheetid>4004588853</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001109722014MB</sheetid>
-				<refsheetid>4004586657</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0010</shopid>
-				<shopname>东城区恒基店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次 20140101-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001123752014MB</sheetid>
-				<refsheetid>4004585321</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0015</shopid>
-				<shopname>海淀区清河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20140101-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001148362014MB</sheetid>
-				<refsheetid>4004586129</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0004</shopid>
-				<shopname>大兴区旧宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131230-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001162882014MB</sheetid>
-				<refsheetid>4004584913</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0005</shopid>
-				<shopname>海淀区增光路店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20140101-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001273572014MB</sheetid>
-				<refsheetid>4004593874</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9322</shopid>
-				<shopname>朝阳区太阳宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次 20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-04</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-04</checkdate>
-				<touchtime>2014-01-04 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 NULL</placename>
-			</row>
-			<row>
-				<sheetid>50001503942014MB</sheetid>
-				<refsheetid>4004605432</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001507512014MB</sheetid>
-				<refsheetid>4004605041</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0007</shopid>
-				<shopname>丰台区草桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>李俚</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001509732014MB</sheetid>
-				<refsheetid>4004605215</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0013</shopid>
-				<shopname>朝阳区垡头店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001509822014MB</sheetid>
-				<refsheetid>4004605145</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0006</shopid>
-				<shopname>朝阳区山水文园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001511402014MB</sheetid>
-				<refsheetid>4004604720</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次2014101-20140104</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001512282014MB</sheetid>
-				<refsheetid>4004605113</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9295</shopid>
-				<shopname>通州区半壁店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001512952014MB</sheetid>
-				<refsheetid>4004605104</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20140103-20140104</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001513202014MB</sheetid>
-				<refsheetid>4004605063</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0009</shopid>
-				<shopname>朝阳区双桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次20140102-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001513362014MB</sheetid>
-				<refsheetid>4004602236</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0018</shopid>
-				<shopname>顺义区新世界店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001516122014MB</sheetid>
-				<refsheetid>4004602234</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0006</shopid>
-				<shopname>朝阳区山水文园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001516282014MB</sheetid>
-				<refsheetid>4004605055</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0001</shopid>
-				<shopname>丰台区六里桥店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20140102-20140104</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001516672014MB</sheetid>
-				<refsheetid>4004605467</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0004</shopid>
-				<shopname>大兴区旧宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001518752014MB</sheetid>
-				<refsheetid>4004605486</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0017</shopid>
-				<shopname>丰台区马家堡店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001521442014MB</sheetid>
-				<refsheetid>4004602254</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0012</shopid>
-				<shopname>昌平区龙旗广场店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001528392014MB</sheetid>
-				<refsheetid>4004602241</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0008</shopid>
-				<shopname>昌平区回龙观店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001531602014MB</sheetid>
-				<refsheetid>4004605219</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0020</shopid>
-				<shopname>朝阳区百子湾店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001534072014MB</sheetid>
-				<refsheetid>4004616014</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0018</shopid>
-				<shopname>顺义区新世界店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001538982014MB</sheetid>
-				<refsheetid>4004606720</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>9322</shopid>
-				<shopname>朝阳区太阳宫店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 NULL</placename>
-			</row>
-			<row>
-				<sheetid>50001549592014MB</sheetid>
-				<refsheetid>4004605116</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0005</shopid>
-				<shopname>海淀区增光路店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20140102-20140104</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001551722014MB</sheetid>
-				<refsheetid>4004607949</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0011</shopid>
-				<shopname>丰台区千禧街店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001553722014MB</sheetid>
-				<refsheetid>4004605079</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0002</shopid>
-				<shopname>石景山区鲁谷店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131224-20140104</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001558802014MB</sheetid>
-				<refsheetid>4004602124</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0015</shopid>
-				<shopname>海淀区清河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20140101-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001558842014MB</sheetid>
-				<refsheetid>4004605201</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0015</shopid>
-				<shopname>海淀区清河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>20131228-20140102</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001559122014MB</sheetid>
-				<refsheetid>4004605465</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0014</shopid>
-				<shopname>海淀区金沟河店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001584642014MB</sheetid>
-				<refsheetid>4004605453</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0010</shopid>
-				<shopname>东城区恒基店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note />
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-			<row>
-				<sheetid>50001716702014MB</sheetid>
-				<refsheetid>4004602109</refsheetid>
-				<venderid>124746BJ</venderid>
-				<vendername>北京蒙牛乳业商贸有限公司(VIP)</vendername>
-				<paytypeid>0</paytypeid>
-				<paytypename>购销</paytypename>
-				<shopid>BJ0019</shopid>
-				<shopname>海淀区文慧园店</shopname>
-				<houseid>0001</houseid>
-				<logistics>直送</logistics>
-				<flag>100</flag>
-				<note>批次：20131225-20140103</note>
-				<totalqty>0.000</totalqty>
-				<totalcost>0.00</totalcost>
-				<editor>后台作业</editor>
-				<editdate>2014-01-05</editdate>
-				<operator>后台作业</operator>
-				<checker>后台作业</checker>
-				<checkdate>2014-01-05</checkdate>
-				<touchtime>2014-01-05 00:00:00</touchtime>
-				<toucher>后台作业</toucher>
-				<placename>0001 超市</placename>
-			</row>
-		</catalogue>
-	</xout>
-	<xerr>
-		<code>0</code>
-		<note>OK</note>
-		<time>2014-01-07 00:44:15</time>
-	</xerr>
-</xdoc>
+
+22:37:32,979 INFO - Refreshing
+org.springframework.context.support.ClassPathXmlApplicationContext@3a7a40fc:
+startup date [Wed Jan 22 22:37:32 CST 2014]; root of context hierarchy
+22:37:33,026 INFO - Loading XML bean definitions from class path
+resource [applicationContext.xml]
+22:37:33,197 INFO - Pre-instantiating
+singletons in
+org.springframework.beans.factory.support.DefaultListableBeanFactory@261a53b9:
+defining beans
+[retailerConfigs,utils,applicationContextHelper,carrefour,tesco,yonghui,metro,rainbow,renrenle,hualian,ocr,carrefour.data.conversion,tesco.data.conversion,yonghui.data.conversion,rainbow.data.conversion,hualian.data.conversion,renrenle.data.conversion,metro.data.conversion];
+root of factory hierarchy
+22:37:33,244 INFO - Loading properties file
+from class path resource [system.properties]
+22:37:33,244 INFO - Loading
+properties file from class path resource [carrefour.properties]
+22:37:33,244 INFO - Loading properties file from class path resource
+[tesco.properties]
+22:37:33,244 INFO - Loading properties file from class
+path resource [yonghui.properties]
+22:37:33,244 INFO - Loading properties
+file from class path resource [metro.properties]
+22:37:33,244 INFO -
+Loading properties file from class path resource [rainbow.properties]
+22:37:33,244 INFO - Loading properties file from class path resource
+[hualian.properties]
+22:37:33,244 INFO - Loading properties file from
+class path resource [renrenle.properties]
+22:37:33,322 INFO - Read User
+name and Password from User.xls
+22:37:33,541 INFO -
+UserId[202185],Password[12344321],Retailer[rainbow]
+22:37:33,776 INFO -
+UserId[202185],Password[12344321],Retailer[rainbow]开始登录...
+22:37:33,979
+INFO - http://vd.rainbow.cn:8080/homepage/index.jsp
+22:37:34,150 INFO -
+UserId[202185],Password[12344321],Retailer[rainbow]登录成功!
+22:37:37,480
+INFO -
+
+
+
+
+
+
+
+
+
+
+
+<html>
+	<head>
+		<style type="text/css">
+			body{margin-left:1px;margin-top:1px;margin-right:1px;margin-bottom:0px;background-color:#FFFFF0;font-size:13px;}
+			TD{FONT-FAMILY: "宋体"; COLOR: #000000; FONT-SIZE: 13px;padding:4px;}
+			.foot{border:1px solid
+			#D4D0C8;padding:5px;background-color:#ededed;height:24px;padding-left:10px;width:100%;}
+		</style>
+
+		<script type="text/javascript">
+			function selectAll(){
+			var sm =
+			document.getElementsByName('showSelectionModel');
+			for(var i=0;i
+			<sm.length ; i + alert ( document.getElementById (
+				showSelectionModel1 ' checked ) if ( document.getElementById (
+				showSelectionModel1 ' checked ) sm [ i ] checked=true; } else { sm [
+				i ] checked=false; } function test ( var sm=window.parent.getSelectData(); /
+				alert ( sm.length ) for ( var i=0;i
+				<sm.length ; i + alert ( sm [ i ] ZNAME ) function
+					jumpPage ( v ) document.getElementById ( start " value=(v-1)*20;
+					document.formToHTML.submit ( function doJump ( url , param ) var
+					width=screen.availWidth var height=screen.availHeight if (
+					navigator.userAgent.indexOf ( MSIE ">0) { //是否是 IE浏览器
+					if(navigator.userAgent.indexOf("MSIE 6.0")>0) { //IE 6.0
+					window.open (url, param, "toolbar=no, menubar=no, scrollbars=yes,
+					resizable=yes, location=no, status=no,width="+width +",height=" +
+					height + ",top=0px,left=0px")
+					} else if(navigator.userAgent.indexOf("MSIE 7.0")>0) { //IE 7.0
+					window.open (url, param, "toolbar=no, menubar=no, scrollbars=yes,
+					resizable=yes, location=no, status=no,width="+width +",height=" +
+					height + ",top=0px,left=0px")
+					} else if(navigator.userAgent.indexOf("MSIE 8.0")>0) { //IE 8.0
+					window.open (url, param, "fullscreen=yes,toolbar=no, menubar=no,
+					scrollbars=yes, resizable=yes, location=no, status=no,width="+width
+					+",height=" + height + ",top=0px,left=0px")
+					} else {
+					window.open (url, param, "toolbar=no, menubar=no, scrollbars=yes,
+					resizable=yes, location=no, status=no,width="+width +",height=" +
+					height + ",top=0px,left=0px")
+					}
+					} else {
+					window.open (url, param, "toolbar=no, menubar=no,
+					scrollbars=yes, resizable=yes, location=no, status=no,width="+width
+					+",height=" + height + ",top=0px,left=0px")
+					}
+					}
+		</script>
+	</head>
+	<body>
+		<form name="formToHTML" action="/object/getAdvReportData.jsp"
+			method="post">
+			<input type="hidden" name="start" value="0">
+				<input type="hidden" name="limit" value="20">
+					<input type="hidden" name="where"
+						value=" and TJRQ>=to_date('2014-01-01','yyyy-mm-dd') and TJRQ<=to_date('2014-01-19','yyyy-mm-dd')">
+						<input type="hidden" name="sqlWhere" value="">
+							<input type="hidden" name="rptId" value="4762">
+								<input type="hidden" name="html" value="Y">
+
+		</form>
+		<div id="center">
+			<script type="text/javascript">
+				var showdata;
+				showdata
+				=[{"PL":"常温奶制品","MDBM":"00103","SPGG":"125ml*20","YSJE":"46","SPMC":"蒙牛未来星儿童牛奶佳智型","SPDLM":"a000601692","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644270735"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"190ml*15","YSJE":"49.5","SPMC":"ng蒙牛未来星成长牛奶佳智型","SPDLM":"a000601691","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644270773"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"125ml*20","YSJE":"64","SPMC":"蒙牛妙妙儿童奶饮品原味","SPDLM":"a000601963","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"2","SPTXM":"6923644270339"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"250ml*12","YSJE":"64.9","SPMC":"蒙牛特仑苏低脂调制乳","SPDLM":"a000601479","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644269586"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(243ml*12)","YSJE":"223.6","SPMC":"#ng蒙牛奶特香草口味牛奶","SPDLM":"a000601352","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"4","SPTXM":"6923644267148"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"125ml*20","YSJE":"92","SPMC":"蒙牛未来星儿童成长牛奶消健型","SPDLM":"a006100225","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"2","SPTXM":"6923644273897"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(250ml*6)","YSJE":"97.2","SPMC":"蒙牛酸酸乳乳饮料(草莓味)J","SPDLM":"a000601212","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"9","SPTXM":"6923644264666"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(250ml*12)","YSJE":"36.5","SPMC":"蒙牛谷粒早餐牛奶饮品(黑谷)","SPDLM":"r000133373","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644276959"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(243ml*12)","YSJE":"391.3","SPMC":"#ng蒙牛奶特香蕉牛奶","SPDLM":"r000217854","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"7","SPTXM":"6923644277659"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(250ml*12)","YSJE":"69.9","SPMC":"ng蒙牛特仑苏醇纤调制乳","SPDLM":"a006100229","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644274238"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(250ml*16)","YSJE":"45.8","SPMC":"蒙牛早餐奶(核桃味)调制乳","SPDLM":"a000602109","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644264949"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(250ml*6)","YSJE":"156","SPMC":"蒙牛高钙牛奶","SPDLM":"a000601213","KQMC":"福民奶制品13税","TJRQ":"2014-01-01","XXSL":"8","SPTXM":"6923644665586"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"1L","YSJE":"33","SPMC":"δ蒙牛高钙低脂牛奶","SPDLM":"a000600888","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"3","SPTXM":"6923644264147"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"250ml*12","YSJE":"42","SPMC":"蒙牛真果粒牛奶饮品(草莓果粒)","SPDLM":"a000601397","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644268916"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"190ml*15","YSJE":"148.5","SPMC":"ng蒙牛未来星儿童成长牛奶消健型","SPDLM":"a006100226","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"3","SPTXM":"6923644273873"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"250ml*12","YSJE":"168","SPMC":"蒙牛真果粒牛奶饮品(椰果粒)","SPDLM":"a000601399","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"4","SPTXM":"6923644268923"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"125ml*20","YSJE":"46","SPMC":"蒙牛未来星儿童成长牛奶骨力型","SPDLM":"a000601693","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"6923644270728"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"[250ml*6]","YSJE":"205.2","SPMC":"蒙牛酸酸乳乳饮料(原味)","SPDLM":"6923644223397","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"19","SPTXM":"6923644223397"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"(125ml*4)","YSJE":"25.6","SPMC":"蒙牛妙妙乳饮料(草莓味)","SPDLM":"a000602033","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"4","SPTXM":"6923644272043"},{"PL":"常温奶制品","MDBM":"00103","SPGG":"1000ml","YSJE":"21.9","SPMC":"Arla
+				脱脂纯牛奶","SPDLM":"r000239316","KQMC":"福民奶制品17税","TJRQ":"2014-01-01","XXSL":"1","SPTXM":"4100290001940"}]
+			</script>
+			<table border="1" width="1170" id="dataTable" cellpadding="0"
+				cellspacing="0" bordercolor="#D4D0C8"
+				style="font-size: 13;border-collapse:collapse;">
+				<tr heigth='50'>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>商品店内码</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="160" align="center">
+						<strong>商品条形码</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>商品名称</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="80" align="center">
+						<strong>商品规格</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>库区名称</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="160" align="center">
+						<strong>门店编码</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>销售数量</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>销售金额</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>销售日期</strong>
+					</td>
+					<td style="font-size:13;background-color:#ededed;display:"
+						width="100" align="center">
+						<strong>品类</strong>
+					</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601692</td>
+					<td style="display: ">6923644270735</td>
+					<td style="display: ">蒙牛未来星儿童牛奶佳智型</td>
+					<td style="display: ">125ml*20</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">46</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601691</td>
+					<td style="display: ">6923644270773</td>
+					<td style="display: ">ng蒙牛未来星成长牛奶佳智型</td>
+					<td style="display: ">190ml*15</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">49.5</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601963</td>
+					<td style="display: ">6923644270339</td>
+					<td style="display: ">蒙牛妙妙儿童奶饮品原味</td>
+					<td style="display: ">125ml*20</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">2</td>
+					<td style="display: ">64</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601479</td>
+					<td style="display: ">6923644269586</td>
+					<td style="display: ">蒙牛特仑苏低脂调制乳</td>
+					<td style="display: ">250ml*12</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">64.9</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601352</td>
+					<td style="display: ">6923644267148</td>
+					<td style="display: ">#ng蒙牛奶特香草口味牛奶</td>
+					<td style="display: ">(243ml*12)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">4</td>
+					<td style="display: ">223.6</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a006100225</td>
+					<td style="display: ">6923644273897</td>
+					<td style="display: ">蒙牛未来星儿童成长牛奶消健型</td>
+					<td style="display: ">125ml*20</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">2</td>
+					<td style="display: ">92</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601212</td>
+					<td style="display: ">6923644264666</td>
+					<td style="display: ">蒙牛酸酸乳乳饮料(草莓味)J</td>
+					<td style="display: ">(250ml*6)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">9</td>
+					<td style="display: ">97.2</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">r000133373</td>
+					<td style="display: ">6923644276959</td>
+					<td style="display: ">蒙牛谷粒早餐牛奶饮品(黑谷)</td>
+					<td style="display: ">(250ml*12)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">36.5</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">r000217854</td>
+					<td style="display: ">6923644277659</td>
+					<td style="display: ">#ng蒙牛奶特香蕉牛奶</td>
+					<td style="display: ">(243ml*12)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">7</td>
+					<td style="display: ">391.3</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a006100229</td>
+					<td style="display: ">6923644274238</td>
+					<td style="display: ">ng蒙牛特仑苏醇纤调制乳</td>
+					<td style="display: ">(250ml*12)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">69.9</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000602109</td>
+					<td style="display: ">6923644264949</td>
+					<td style="display: ">蒙牛早餐奶(核桃味)调制乳</td>
+					<td style="display: ">(250ml*16)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">45.8</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601213</td>
+					<td style="display: ">6923644665586</td>
+					<td style="display: ">蒙牛高钙牛奶</td>
+					<td style="display: ">(250ml*6)</td>
+					<td style="display: ">福民奶制品13税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">8</td>
+					<td style="display: ">156</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000600888</td>
+					<td style="display: ">6923644264147</td>
+					<td style="display: ">δ蒙牛高钙低脂牛奶</td>
+					<td style="display: ">1L</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">3</td>
+					<td style="display: ">33</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601397</td>
+					<td style="display: ">6923644268916</td>
+					<td style="display: ">蒙牛真果粒牛奶饮品(草莓果粒)</td>
+					<td style="display: ">250ml*12</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">42</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a006100226</td>
+					<td style="display: ">6923644273873</td>
+					<td style="display: ">ng蒙牛未来星儿童成长牛奶消健型</td>
+					<td style="display: ">190ml*15</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">3</td>
+					<td style="display: ">148.5</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601399</td>
+					<td style="display: ">6923644268923</td>
+					<td style="display: ">蒙牛真果粒牛奶饮品(椰果粒)</td>
+					<td style="display: ">250ml*12</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">4</td>
+					<td style="display: ">168</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000601693</td>
+					<td style="display: ">6923644270728</td>
+					<td style="display: ">蒙牛未来星儿童成长牛奶骨力型</td>
+					<td style="display: ">125ml*20</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">46</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">6923644223397</td>
+					<td style="display: ">6923644223397</td>
+					<td style="display: ">蒙牛酸酸乳乳饮料(原味)</td>
+					<td style="display: ">[250ml*6]</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">19</td>
+					<td style="display: ">205.2</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">a000602033</td>
+					<td style="display: ">6923644272043</td>
+					<td style="display: ">蒙牛妙妙乳饮料(草莓味)</td>
+					<td style="display: ">(125ml*4)</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">4</td>
+					<td style="display: ">25.6</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<tr>
+					<td style="display: ">r000239316</td>
+					<td style="display: ">4100290001940</td>
+					<td style="display: ">Arla 脱脂纯牛奶</td>
+					<td style="display: ">1000ml</td>
+					<td style="display: ">福民奶制品17税</td>
+					<td style="display: ">00103</td>
+					<td style="display: ">1</td>
+					<td style="display: ">21.9</td>
+					<td style="display: ">2014-01-01</td>
+					<td style="display: ">常温奶制品</td>
+				</tr>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+				<td style="display: "></td>
+			</table>
+		</div>
+
+		<div id="bobar" class="foot" style="font-size:13;margin-top:1px;">
+			<a>第一页</a>
+			<a>上一页</a>
+			<a style='text-decoration:underline; color:#0000FF; cursor:pointer'
+				onclick="jumpPage(2)">下一页</a>
+			<a style='text-decoration:underline; color:#FF0000; cursor:pointer'
+				onclick="jumpPage(570)">最后一页</a>
+ &nbsp;&nbsp;&nbsp;
+			第1/570页&nbsp;&nbsp;&nbsp;每页
+			20 条
+		</div>
+
+	</body>
+</html>

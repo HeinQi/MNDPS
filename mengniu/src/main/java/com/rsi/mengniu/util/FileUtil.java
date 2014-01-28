@@ -28,13 +28,26 @@ import com.rsi.mengniu.retailer.module.SalesTO;
 
 public class FileUtil {
 
-	public static void main(String[] args) throws BaseException {
-		//testFileAmount("C:/mengniu/yonghui/output/");
-//		List<String> stringList = getAllFile("C:/mengniu/carrefour/receiving/inbound/");
-//		moveFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/", "C:/mengniu/carrefour/receiving/processed/");
-		//getOrderInfo("",new Date(), new Date());
+	public static void main(String[] args) throws BaseException, ZipException {
+		// testFileAmount("C:/mengniu/yonghui/output/");
+		// List<String> stringList =
+		// getAllFile("C:/mengniu/carrefour/receiving/inbound/");
+		// moveFiles(stringList, "C:/mengniu/carrefour/receiving/inbound/",
+		// "C:/mengniu/carrefour/receiving/processed/");
+		// getOrderInfo("",new Date(), new Date());
+
+		
+		
+		try{
+			FileUtil.unzip("C:/test/20140127171933.zip", "C:/test/", "");
+			} catch(ZipException e){
+
+				String receiveFileExceptionPath = "C:/test/exception/";
+				FileUtil.moveFile("C:/test/", receiveFileExceptionPath, "20140127171933.zip");
+				
+			}
 	}
-	
+
 	/**
 	 * Export Order info from list to txt file
 	 * 
@@ -43,14 +56,12 @@ public class FileUtil {
 	 * @param orderList
 	 * @throws BaseException
 	 */
-	public static void exportOrderInfoToTXT(String retailerID, String orderID,
-			List<OrderTO> orderList) throws BaseException {
+	public static void exportOrderInfoToTXT(String retailerID, String orderID, List<OrderTO> orderList)
+			throws BaseException {
 
-		String orderFolderPath = Utils.getProperty(retailerID
-				+ Constants.ORDER_INBOUND_PATH);
+		String orderFolderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		createFolder(orderFolderPath);
-		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_"
-				+ orderID + ".txt";
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + orderID + ".txt";
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
 		// File receivingInboundFolder = new File(orderFolderPath);
 		// if (!receivingInboundFolder.exists()) {
@@ -64,7 +75,7 @@ public class FileUtil {
 			try {
 				orderFile.createNewFile();
 				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
-				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile, true);
 				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 				writer.write(orderHeader);
 				writer.newLine();
@@ -77,7 +88,7 @@ public class FileUtil {
 			try {
 
 				// TODO consider that re-run action
-				FileOutputStream fileOutput = new FileOutputStream(orderFile,true);
+				FileOutputStream fileOutput = new FileOutputStream(orderFile, true);
 				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
 			} catch (IOException e) {
 
@@ -104,8 +115,6 @@ public class FileUtil {
 		}
 
 	}
-	
-
 
 	/**
 	 * Export Order info from list to txt file
@@ -115,14 +124,13 @@ public class FileUtil {
 	 * @param orderList
 	 * @throws BaseException
 	 */
-	public static void exportOrderInfoListToTXT(String retailerID, 
-			List<OrderTO> orderList) throws BaseException {
-		Map <String,List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+	public static void exportOrderInfoListToTXT(String retailerID, List<OrderTO> orderList) throws BaseException {
+		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
 		List<OrderTO> tempOrderList = null;
-		for(OrderTO orderTO : orderList){
+		for (OrderTO orderTO : orderList) {
 			String orderNo = orderTO.getOrderNo();
-			
-			if(orderMap.containsKey(orderNo)){
+
+			if (orderMap.containsKey(orderNo)) {
 				tempOrderList = orderMap.get(orderNo);
 			} else {
 				tempOrderList = new ArrayList<OrderTO>();
@@ -130,8 +138,8 @@ public class FileUtil {
 			}
 			tempOrderList.add(orderTO);
 		}
-		for(Entry<String, List<OrderTO>> entry:orderMap.entrySet()){
-			exportOrderInfoToTXT(retailerID,entry.getKey(),entry.getValue());
+		for (Entry<String, List<OrderTO>> entry : orderMap.entrySet()) {
+			exportOrderInfoToTXT(retailerID, entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -143,15 +151,12 @@ public class FileUtil {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXT(String retailerID,
-			String userID, List<ReceivingNoteTO> receivingList)
+	public static void exportReceivingInfoToTXT(String retailerID, String userID, List<ReceivingNoteTO> receivingList)
 			throws BaseException {
 
-		String receivingInboundFolderPath = Utils.getProperty(retailerID
-				+ Constants.RECEIVING_INBOUND_PATH);
+		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		createFolder(receivingInboundFolderPath);
-		String receivingFilePath = receivingInboundFolderPath + "Receiving_"
-				+ retailerID + "_" + userID + "_"
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_" + userID + "_"
 				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
 		// log.info("初始化整合文本文件. 文件名: " + receivingInboundFolderPath);
 		// File receivingInboundFolder = new File(receivingInboundFolderPath);
@@ -189,10 +194,6 @@ public class FileUtil {
 
 	}
 
-
-	
-
-	
 	public static List<String> getAllFile(String folderPath) {
 		File receivingInboundFolder = new File(folderPath);
 
@@ -203,7 +204,7 @@ public class FileUtil {
 
 			for (File receivingFile : receivingList) {
 				String receivingFileName = receivingFile.getName();
-				
+
 				fileNameList.add(receivingFileName);
 			}
 		}
@@ -217,19 +218,50 @@ public class FileUtil {
 	 * @param sourceFileName
 	 * @param destPath
 	 */
-	public static void copyFile(String sourceFileName, String sourcePath,
-			String destPath) {
-		// 文件原地址
-		File oldFile = new File(sourcePath + sourceFileName);
-		// 文件新（目标）地址
-		// new一个新文件夹
+	// public static void copyFile(String sourceFileName, String sourcePath,
+	// String destPath) {
+	// // 文件原地址
+	// File oldFile = new File(sourcePath + sourceFileName);
+	// // 文件新（目标）地址
+	// // new一个新文件夹
+	// File fnewpath = new File(destPath);
+	// // 判断文件夹是否存在
+	// if (!fnewpath.exists())
+	// fnewpath.mkdirs();
+	// // 将文件移到新文件里
+	// File fnew = new File(destPath + oldFile.getName());
+	// oldFile.renameTo(fnew);
+	//
+	// }
+
+	public static void moveFile(String sourcePath, String destPath, String sourceFileName) {
 		File fnewpath = new File(destPath);
-		// 判断文件夹是否存在
 		if (!fnewpath.exists())
 			fnewpath.mkdirs();
-		// 将文件移到新文件里
-		File fnew = new File(destPath + oldFile.getName());
-		oldFile.renameTo(fnew);
+		copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
+		// 文件原地址
+		File oldFile = new File(sourcePath + sourceFileName);
+
+		oldFile.delete();
+	}
+
+	/**
+	 * Copy selected files from sourcePath to dest path
+	 * 
+	 * @param sourceFileNameList
+	 * @param sourcePath
+	 * @param destPath
+	 * @throws BaseException
+	 */
+	public static void copyFiles(List<String> sourceFileNameList, String sourcePath, String destPath)
+			throws BaseException {
+
+		for (String sourceFileName : sourceFileNameList) {
+			File fnewpath = new File(destPath);
+			if (!fnewpath.exists())
+				fnewpath.mkdirs();
+			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
+		}
 
 	}
 
@@ -239,44 +271,17 @@ public class FileUtil {
 	 * @param sourceFileNameList
 	 * @param sourcePath
 	 * @param destPath
-	 * @throws BaseException 
+	 * @throws BaseException
 	 */
-	public static void moveFiles(List<String> sourceFileNameList,
-			String sourcePath, String destPath) throws BaseException {
+	public static void moveFiles(List<String> sourceFileNameList, String sourcePath, String destPath)
+			throws BaseException {
 
 		for (String sourceFileName : sourceFileNameList) {
-			File fnewpath = new File(destPath);
-			if (!fnewpath.exists())	fnewpath.mkdirs();
-			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
-			// 文件原地址
-			File oldFile = new File(sourcePath + sourceFileName);
-			
-			oldFile.delete();}
-
-	}
-	
-
-	/**
-	 * Copy selected files from sourcePath to dest path
-	 * 
-	 * @param sourceFileNameList
-	 * @param sourcePath
-	 * @param destPath
-	 * @throws BaseException 
-	 */
-	public static void copyFiles(List<String> sourceFileNameList,
-			String sourcePath, String destPath) throws BaseException {
-
-		for (String sourceFileName : sourceFileNameList) {
-			File fnewpath = new File(destPath);
-			if (!fnewpath.exists())	fnewpath.mkdirs();
-			copyFile(sourcePath + sourceFileName, destPath + sourceFileName);
+			moveFile(sourcePath, destPath, sourceFileName);
 		}
 
 	}
 
-
-	
 	public static void createFolder(String path) {
 		File fnewpath = new File(path);
 		// 判断文件夹是否存在
@@ -284,32 +289,31 @@ public class FileUtil {
 			fnewpath.mkdirs();
 	}
 
-	public static void copyFile( String oldPath, String newPath ) {
-        try {
-            int bytesum = 0;
-            int byteread = 0;
-            File oldfile = new File( oldPath );
-            if ( oldfile.exists() ) { //文件存在时
-               InputStream inStream = new FileInputStream( oldPath ); //读入原文件
-               FileOutputStream fs = new FileOutputStream( newPath );
-                byte[] buffer = new byte[1444];
-                int length;
-                while ( ( byteread = inStream.read( buffer ) ) != - 1 ) {
-                    bytesum += byteread; //字节数 文件大小
-                   
-                    fs.write( buffer, 0, byteread );
-                }
-                inStream.close();
-            }
-        } catch ( Exception e ) {
-            System.out.println( "复制单个文件操作出错" );
-            e.printStackTrace();
+	public static void copyFile(String oldPath, String newPath) {
+		try {
+			int bytesum = 0;
+			int byteread = 0;
+			File oldfile = new File(oldPath);
+			if (oldfile.exists()) { // 文件存在时
+				InputStream inStream = new FileInputStream(oldPath); // 读入原文件
+				FileOutputStream fs = new FileOutputStream(newPath);
+				byte[] buffer = new byte[1444];
+				int length;
+				while ((byteread = inStream.read(buffer)) != -1) {
+					bytesum += byteread; // 字节数 文件大小
 
-        }
+					fs.write(buffer, 0, byteread);
+				}
+				inStream.close();
+			}
+		} catch (Exception e) {
+			System.out.println("复制单个文件操作出错");
+			e.printStackTrace();
 
-    }
+		}
 
-	
+	}
+
 	/**
 	 * Close File Writer
 	 * 
@@ -343,25 +347,33 @@ public class FileUtil {
 		}
 	}
 
-	public static void unzip(String fileName, String dest, String passwd)
-			throws ZipException {
-
+	public static void unzip(String fileName, String dest, String passwd) throws ZipException {
 		File zipFile = new File(fileName);
-		ZipFile zFile = new ZipFile(zipFile); // 首先创建ZipFile指向磁盘上的.zip文件
-		// zFile.setFileNameCharset("GBK"); // 设置文件名编码，在GBK系统中需要设置
-		if (!zFile.isValidZipFile()) { // 验证.zip文件是否合法，包括文件是否存在、是否为zip文件、是否被损坏等
+		try {
+			ZipFile zFile = new ZipFile(zipFile); // 首先创建ZipFile指向磁盘上的.zip文件
+			// zFile.setFileNameCharset("GBK"); // 设置文件名编码，在GBK系统中需要设置
+			if (!zFile.isValidZipFile()) { // 验证.zip文件是否合法，包括文件是否存在、是否为zip文件、是否被损坏等
+				throw new ZipException("压缩文件不合法,可能被损坏.");
+			}
+			File destDir = new File(dest); // 解压目录
+			if (destDir.isDirectory() && !destDir.exists()) {
+				destDir.mkdirs();
+			}
+			if (zFile.isEncrypted()) {
+				zFile.setPassword(passwd.toCharArray()); // 设置密码
+			}
+
+			zFile.extractAll(dest);
+
+			zipFile.delete();
+		} catch (ZipException e) {
+			String distFileFullPath = fileName.substring(0, fileName.lastIndexOf(".")) + ".xls";
+			File distFile = new File(distFileFullPath);
+
+			distFile.deleteOnExit();
+
 			throw new ZipException("压缩文件不合法,可能被损坏.");
-		}
-		File destDir = new File(dest); // 解压目录
-		if (destDir.isDirectory() && !destDir.exists()) {
-			destDir.mkdirs();
-		}
-		if (zFile.isEncrypted()) {
-			zFile.setPassword(passwd.toCharArray()); // 设置密码
-		}
-		zFile.extractAll(dest); // 将文件抽出到解压目录(解压)
-		
-		zipFile.delete();
+		} // 将文件抽出到解压目录(解压)
 	}
 
 	public static void testFileAmount(String folderPath) {
@@ -379,8 +391,7 @@ public class FileUtil {
 			// Open the file
 			try {
 				FileInputStream fileInput = new FileInputStream(orderFile);
-				InputStreamReader inputStrReader = new InputStreamReader(
-						fileInput, "UTF-8");
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
 				reader = new BufferedReader(inputStrReader);
 				String orderLine;
 				while ((orderLine = reader.readLine()) != null) {

@@ -207,7 +207,7 @@ public class RenrenleDataConversionService extends
 						+ "\t"
 						+ ""
 						+ "\t"
-						+ "";
+						+ orderTO.getUnitPrice();
 				try {
 					writer.write(outputLine);
 					writer.newLine();
@@ -233,6 +233,8 @@ public class RenrenleDataConversionService extends
 				File orderFile = orderList[i];
 				
 				String fileName = orderFile.getName();
+				getLog().info("订单文件名: " + orderFile.getName());
+
 				String orderDateStr = fileName.substring(fileName.lastIndexOf("_")+1, fileName.indexOf("."));
 				
 				Date orderDate = DateUtil.toDate(orderDateStr, "yyyyMMdd");
@@ -240,8 +242,7 @@ public class RenrenleDataConversionService extends
 				orderDateStr = DateUtil.toString(orderDate);
 				
 				if(DateUtil.isInDateRange(orderDate, startDate, endDate)){
-					getLog().info("订单文件名: " + orderFile.getName());
-
+					
 					// Get Receiving Info
 					Map<String, List> orderSingleMap = getOrderInfoFromFile(orderFile,orderDateStr);
 

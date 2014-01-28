@@ -47,6 +47,15 @@ import com.rsi.mengniu.retailer.module.User;
 public class Utils {
 	private static Properties properties;
 
+	public static void main(String[] args) throws BaseException{
+		User user = new User();
+		user.setUserId("Test");
+		user.setRetailer(Constants.RETAILER_CARREFOUR);
+		user.setUrl("tttt");
+		user.setPassword("Password");
+		recordIncorrectUser(user);
+	}
+	
 	public void setProperties(Properties p) {
 		properties = p;
 	}
@@ -414,7 +423,8 @@ public class Utils {
 
 	}
 
-	public static void recordIncorrectUser(User user) throws BaseException {
+	
+	public static  synchronized void recordIncorrectUser(User user) throws BaseException {
 
 		String filePath = getProperty(Constants.INCORRECT_USER_HEADER);
 		FileUtil.createFolder(filePath);
@@ -452,7 +462,7 @@ public class Utils {
 		FileOutputStream fileOut = null;
 
 		try {
-			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(excelFile));
+			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(fileFullPath));
 			HSSFSheet sheet = workbook.getSheet(user.getRetailer());
 			int lastRowNo = sheet.getLastRowNum();
 			for (int i = 1; i <= lastRowNo; i++) {

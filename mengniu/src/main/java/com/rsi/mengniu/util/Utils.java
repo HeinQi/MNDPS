@@ -21,6 +21,8 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -46,8 +48,9 @@ import com.rsi.mengniu.retailer.module.User;
 
 public class Utils {
 	private static Properties properties;
+	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
-	public static void main(String[] args) throws BaseException{
+	public static void main(String[] args) throws BaseException {
 		User user = new User();
 		user.setUserId("Test");
 		user.setRetailer(Constants.RETAILER_CARREFOUR);
@@ -55,7 +58,7 @@ public class Utils {
 		user.setPassword("Password");
 		recordIncorrectUser(user);
 	}
-	
+
 	public void setProperties(Properties p) {
 		properties = p;
 	}
@@ -64,19 +67,29 @@ public class Utils {
 		return properties.getProperty(key);
 	}
 
-	public static Date getStartDate(String retailerId) throws BaseException {
+	public static Date getStartDate(String retailerId) {
 		if ("N".equalsIgnoreCase(getProperty(retailerId + ".daterange.enable"))) {
 			return DateUtil.getDateAfter(new Date(), -1);
 		} else {
-			return DateUtil.toDate(getProperty(retailerId + ".daterange.startDate"));
+			try {
+				return DateUtil.toDate(getProperty(retailerId + ".daterange.startDate"));
+			} catch (BaseException e) {
+				errorLog.error("日期转换错误", e);
+				return null;
+			}
 		}
 	}
 
-	public static Date getEndDate(String retailerId) throws BaseException {
+	public static Date getEndDate(String retailerId) {
 		if ("N".equalsIgnoreCase(getProperty(retailerId + ".daterange.enable"))) {
 			return DateUtil.getDateAfter(new Date(), -1);
 		} else {
-			return DateUtil.toDate(getProperty(retailerId + ".daterange.endDate"));
+			try {
+				return DateUtil.toDate(getProperty(retailerId + ".daterange.endDate"));
+			} catch (BaseException e) {
+				errorLog.error("日期转换错误", e);
+				return null;
+			}
 		}
 	}
 
@@ -423,8 +436,7 @@ public class Utils {
 
 	}
 
-	
-	public static  synchronized void recordIncorrectUser(User user) throws BaseException {
+	public static synchronized void recordIncorrectUser(User user) throws BaseException {
 
 		String filePath = getProperty(Constants.INCORRECT_USER_HEADER);
 		FileUtil.createFolder(filePath);
@@ -501,6 +513,7 @@ public class Utils {
 
 	/**
 	 * Export the fialed receiving data to exception folder
+	 * 
 	 * @param retailerID
 	 * @param receivingDate
 	 * @param failedReceivingList
@@ -544,7 +557,7 @@ public class Utils {
 	}
 
 	public static boolean isOrderFileExist(String retailerID, String userID, String orderID, Date orderDate) {
-		String folderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		String folderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		String txtFileName = null;
 		String excelFileName = null;
 		if (orderID != null && !orderID.equals("")) {
@@ -581,8 +594,9 @@ public class Utils {
 			return false;
 		}
 	}
+
 	public static boolean isSalesFileExist(String retailerID, String userID, Date orderDate) {
-		String folderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+		String folderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		String txtFileName = null;
 		String excelFileName = null;
 		txtFileName = "Sales_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
@@ -597,4 +611,39 @@ public class Utils {
 		}
 	}
 
+	public static boolean isOrderFileExist(String retailerID, String fileName) {
+		String folderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
+
+		File file = new File(folderPath + fileName);
+
+		if (file.exists()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static boolean isReceivingFileExist(String retailerID, String fileName) {
+		String folderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
+
+		File file = new File(folderPath + fileName);
+
+		if (file.exists()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static boolean isSalesFileExist(String retailerID, String fileName) {
+		String folderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
+
+		File file = new File(folderPath + fileName);
+
+		if (file.exists()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

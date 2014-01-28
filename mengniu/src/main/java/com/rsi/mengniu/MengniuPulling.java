@@ -22,14 +22,7 @@ public class MengniuPulling {
 			DataPullTaskPool.initTaskPool(retailerId);
 			int threadNum = Integer.parseInt(Utils.getProperty("datapull.thread.amount"));
 			int retryNum = Integer.parseInt(Utils.getProperty("datapull.retry.amount"));
-			for (int num = 0; num < retryNum; num++) {
-				if (DataPullTaskPool.hasRetryTask()) {
-					DataPullTaskPool.processFaileTask();
-					log.info("有失败的用户,系统将对失败的用户进行第"+num+"次重试下载!");
-				} else if (!DataPullTaskPool.hasTask()) {
-					break;
-				}
-				
+			for (int num = 0; num <= retryNum; num++) {
 				final CountDownLatch mDoneSignal = new CountDownLatch(threadNum);
 
 				ExecutorService exec = Executors.newFixedThreadPool(threadNum);
@@ -38,6 +31,13 @@ public class MengniuPulling {
 				}
 				exec.shutdown();
 				mDoneSignal.await(); // Wait all thread done
+				
+				if (DataPullTaskPool.hasRetryTask() && (num+1)<=retryNum) {
+					DataPullTaskPool.processFaileTask();
+					log.info("有失败的用户,系统将对失败的用户进行第"+(num+1)+"次重试下载!");
+				} else {
+					break;
+				}
 			}
 			if ("ALL".equalsIgnoreCase(retailerId)) {
 				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService) appContext.getBean("carrefour.data.conversion");

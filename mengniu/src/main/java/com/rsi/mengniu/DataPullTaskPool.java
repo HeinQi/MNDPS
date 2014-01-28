@@ -19,7 +19,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 
 public class DataPullTaskPool {
@@ -113,6 +112,7 @@ public class DataPullTaskPool {
 		}
 		
 		Iterator<Entry<String, List<User>>> iter = userMap.entrySet().iterator();
+		taskPool = new ArrayList<List<User>>();
 		while (iter.hasNext()) {
 			taskPool.add(iter.next().getValue());
 		}

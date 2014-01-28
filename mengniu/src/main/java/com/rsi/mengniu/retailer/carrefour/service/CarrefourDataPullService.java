@@ -202,7 +202,8 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			log.info(user + "订单查询页面加载出错,cannot forward to PowerE2E Platform");
 			summaryBuffer.append("订单下载出错"+"\r\n");
 			summaryBuffer.append("成功数量: 0\r\n");
-			return;
+			throw new Exception("订单查询页面加载出错");
+			//return;
 		}
 		response.close();
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));

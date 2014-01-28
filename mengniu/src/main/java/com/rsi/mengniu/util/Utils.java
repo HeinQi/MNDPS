@@ -665,4 +665,24 @@ public class Utils {
 			return false;
 		}
 	}
+	
+	public static void exportOrderInfoListToTXT(String retailerID,String userId,Date orderDate, List<OrderTO> orderList) throws BaseException {
+		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+		List<OrderTO> tempOrderList = null;
+		for (OrderTO orderTO : orderList) {
+			String orderNo = orderTO.getOrderNo();
+
+			if (orderMap.containsKey(orderNo)) {
+				tempOrderList = orderMap.get(orderNo);
+			} else {
+				tempOrderList = new ArrayList<OrderTO>();
+				orderMap.put(orderNo, tempOrderList);
+			}
+			tempOrderList.add(orderTO);
+		}
+		for (Entry<String, List<OrderTO>> entry : orderMap.entrySet()) {
+			exportOrderInfoToTXT(retailerID, userId, entry.getKey(),orderDate , entry.getValue());
+		}
+	}
+	
 }

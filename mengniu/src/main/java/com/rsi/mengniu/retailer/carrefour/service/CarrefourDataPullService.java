@@ -4,10 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +25,6 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
-import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.CountTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
@@ -216,6 +212,11 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	}
 
 	public void getOrder(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer,CountTO orderCount,String searchDate) throws Exception {
+		if (Utils.isOrderFileExistForCarrefour(Constants.RETAILER_CARREFOUR, user.getUserId(), DateUtil.toDate(searchDate,"dd-MM-yyyy"))) {
+			log.info(user+"订单日期: "+searchDate+"的订单已存在,不再下载");
+			return;
+		}
+		
 		log.info(user + "跳转到订单查询页面...");
 		summaryBuffer.append("订单日期: "+searchDate+"\r\n");
 		// forward to PowerE2E Platform
@@ -300,10 +301,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
 		}
 //		FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
-		
-		
-		
-		
+		Utils.exportOrderInfoListToTXT(Constants.RETAILER_CARREFOUR,user.getUserId(),DateUtil.toDate(searchDate,"dd-MM-yyyy"),orderItems);
 		log.info(user + "订单数据下载成功!");
 		summaryBuffer.append("订单下载成功"+"\r\n");
 		summaryBuffer.append("数量: "+orderCount.getCounttotalNo()+"\r\n");
@@ -327,26 +325,6 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		Elements msgIds = doc.select("input[name=msgId]");
 		for (Element msgId : msgIds) {
 			msgIdList.add(msgId.attr("value"));
-		}
-	}
-	
-	
-	private void exportOrderInfoListToTXT(String retailerID,String userId,Date orderDate, List<OrderTO> orderList) throws BaseException {
-		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
-		List<OrderTO> tempOrderList = null;
-		for (OrderTO orderTO : orderList) {
-			String orderNo = orderTO.getOrderNo();
-
-			if (orderMap.containsKey(orderNo)) {
-				tempOrderList = orderMap.get(orderNo);
-			} else {
-				tempOrderList = new ArrayList<OrderTO>();
-				orderMap.put(orderNo, tempOrderList);
-			}
-			tempOrderList.add(orderTO);
-		}
-		for (Entry<String, List<OrderTO>> entry : orderMap.entrySet()) {
-			Utils.exportOrderInfoToTXT(retailerID, userId, entry.getKey(),orderDate , entry.getValue());
 		}
 	}
 

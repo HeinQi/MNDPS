@@ -1,9 +1,13 @@
 package com.rsi.mengniu.retailer.carrefour.service;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +28,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
+import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.CountTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
@@ -79,18 +84,32 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			//log.error(user + Utils.getTrace(e));
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
-		CountTO orderCount = new CountTO();
-		try {
-			// order
-			getOrder(httpClient, user,summaryBuffer,orderCount);
-			httpClient.close();
-		} catch (Exception e) {
-			summaryBuffer.append("订单下载出错"+"\r\n");
-			summaryBuffer.append("成功数量: "+orderCount.getCounttotalNo()+"\r\n");
-			log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
-			errorLog.error(user,e);
-			DataPullTaskPool.addFailedUser(user);
+		
+		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_CARREFOUR),
+				Utils.getEndDate(Constants.RETAILER_CARREFOUR));
+
+		for (Date searchDate : dates) {
+			CountTO orderCount = new CountTO();
+			try {
+				// order
+				getOrder(httpClient, user,summaryBuffer,orderCount,DateUtil.toString(searchDate, "dd-MM-yyyy"));
+			} catch (Exception e) {
+				summaryBuffer.append("订单下载出错"+"\r\n");
+				summaryBuffer.append("成功数量: "+orderCount.getCounttotalNo()+"\r\n");
+				log.error(user+"页面加载失败，请登录网站检查订单功能是否正常！");
+				errorLog.error(user,e);
+				DataPullTaskPool.addFailedUser(user);
+			}			
 		}
+		
+		try {
+			httpClient.close();
+		} catch (IOException e) {
+			errorLog.error(user, e);
+		}
+		
+		
+
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
 		summaryLog.info(summaryBuffer);
 	}
@@ -196,9 +215,9 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 	}
 
-	public void getOrder(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer,CountTO orderCount) throws Exception {
+	public void getOrder(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer,CountTO orderCount,String searchDate) throws Exception {
 		log.info(user + "跳转到订单查询页面...");
-		summaryBuffer.append("订单日期: "+DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+" - "+DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "yyyy-MM-dd")+"\r\n");
+		summaryBuffer.append("订单日期: "+searchDate+"\r\n");
 		// forward to PowerE2E Platform
 		HttpGet httpGet = new HttpGet("https://supplierweb.carrefour.com.cn/callSSO.jsp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -215,8 +234,8 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		
 		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy"))); // "01-12-2013"
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy")));
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", searchDate)); // "01-12-2013"
+		searchformParams.add(new BasicNameValuePair("receivedDateTo", searchDate));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/openInbox.htm?");
 		searchPost.setEntity(searchFormEntity);
@@ -231,8 +250,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		recordStr = recordStr.replaceAll(",", "");
 		int record = Integer.parseInt(recordStr);
 		int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
-		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy") + "到"
-				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy") + ",共有" + record + "笔订单");
+		log.info(user + "查询到日期: "+searchDate+ ",共有" + record + "笔订单");
 		Elements msgIds = doc.select("input[name=msgId]");
 		List<String> msgIdList = new ArrayList<String>();
 		for (Element msgId : msgIds) {
@@ -241,10 +259,11 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		// 取得每页的MsgId
 		while (page > 1) {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
-			getMsgIdByPage(page, msgIdList, httpClient);
+			getMsgIdByPage(page, msgIdList, httpClient,searchDate);
 			page--;
 		}
 		int count = 0;
+		List<OrderTO> orderItems = new ArrayList<OrderTO>();
 		for (String msgId : msgIdList) {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid=" + msgId);
@@ -254,7 +273,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			if (!orderDetail.contains("Carrefour Purchase Order")) {
 				continue;
 			}
-			List<OrderTO> orderItems = new ArrayList<OrderTO>();
+			
 			Document orderDoc = Jsoup.parse(orderDetail);
 			Element orderTable = orderDoc.select("table.tab2").first();
 			String storeName = orderTable.select("tr:eq(1)").select("td").get(0).text();// store
@@ -276,11 +295,15 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 				orderTo.setTotalPrice(tds.get(8).text());// 总金额
 				orderItems.add(orderTo);
 			}
-			FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
 			count++;
 			orderCount.increaseOne();
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
 		}
+//		FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
+		
+		
+		
+		
 		log.info(user + "订单数据下载成功!");
 		summaryBuffer.append("订单下载成功"+"\r\n");
 		summaryBuffer.append("数量: "+orderCount.getCounttotalNo()+"\r\n");
@@ -290,10 +313,10 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	// document.forms[0].action = "/platform/mailbox/navigateInbox.htm?gotoPage="+ page;
 	// document.forms[0].submit();
 	// }
-	private void getMsgIdByPage(int page, List<String> msgIdList, CloseableHttpClient httpClient) throws Exception {
+	private void getMsgIdByPage(int page, List<String> msgIdList, CloseableHttpClient httpClient,String searchDate) throws Exception {
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", DateUtil.toString(Utils.getStartDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy")));
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", DateUtil.toString(Utils.getEndDate(Constants.RETAILER_CARREFOUR), "dd-MM-yyyy")));
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", searchDate));
+		searchformParams.add(new BasicNameValuePair("receivedDateTo", searchDate));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/navigateInbox.htm?gotoPage=" + page);
 		searchPost.setEntity(searchFormEntity);
@@ -304,6 +327,26 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		Elements msgIds = doc.select("input[name=msgId]");
 		for (Element msgId : msgIds) {
 			msgIdList.add(msgId.attr("value"));
+		}
+	}
+	
+	
+	private void exportOrderInfoListToTXT(String retailerID,String userId,Date orderDate, List<OrderTO> orderList) throws BaseException {
+		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
+		List<OrderTO> tempOrderList = null;
+		for (OrderTO orderTO : orderList) {
+			String orderNo = orderTO.getOrderNo();
+
+			if (orderMap.containsKey(orderNo)) {
+				tempOrderList = orderMap.get(orderNo);
+			} else {
+				tempOrderList = new ArrayList<OrderTO>();
+				orderMap.put(orderNo, tempOrderList);
+			}
+			tempOrderList.add(orderTO);
+		}
+		for (Entry<String, List<OrderTO>> entry : orderMap.entrySet()) {
+			Utils.exportOrderInfoToTXT(retailerID, userId, entry.getKey(),orderDate , entry.getValue());
 		}
 	}
 

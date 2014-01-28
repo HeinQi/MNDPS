@@ -144,6 +144,12 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	}
 
 	public void getReceiveExcel(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
+		String receiveFileNm = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
+		
+		if (Utils.isReceivingFileExist(user.getRetailer(), receiveFileNm)) {
+			log.info(user+"收货单已存在,不再下载");
+			return;
+		}
 		log.info(user + "开始下载收货单...");
 		// goMenu('inyr.do?action=query','14','预估进退查询')
 
@@ -166,7 +172,6 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			String inyrFileName = responseStr.substring(0, responseStr.indexOf("'"));
 			String receiveFilePath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_INBOUND_PATH);
 			FileUtil.createFolder(receiveFilePath);
-			String receiveFileNm = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(new Date()) + ".xls";
 			FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + receiveFileNm);
 
 			List<NameValuePair> downloadformParams = new ArrayList<NameValuePair>();

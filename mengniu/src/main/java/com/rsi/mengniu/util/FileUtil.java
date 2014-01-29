@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
@@ -27,6 +30,7 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 
 public class FileUtil {
+	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
 	public static void main(String[] args) throws BaseException, ZipException {
 		// testFileAmount("C:/mengniu/yonghui/output/");
@@ -36,16 +40,14 @@ public class FileUtil {
 		// "C:/mengniu/carrefour/receiving/processed/");
 		// getOrderInfo("",new Date(), new Date());
 
-		
-		
-		try{
+		try {
 			FileUtil.unzip("C:/test/20140127171933.zip", "C:/test/", "");
-			} catch(ZipException e){
+		} catch (ZipException e) {
 
-				String receiveFileExceptionPath = "C:/test/exception/";
-				FileUtil.moveFile("C:/test/", receiveFileExceptionPath, "20140127171933.zip");
-				
-			}
+			String receiveFileExceptionPath = "C:/test/exception/";
+			FileUtil.moveFile("C:/test/", receiveFileExceptionPath, "20140127171933.zip");
+
+		}
 	}
 
 	/**
@@ -307,8 +309,7 @@ public class FileUtil {
 				inStream.close();
 			}
 		} catch (Exception e) {
-			System.out.println("复制单个文件操作出错");
-			e.printStackTrace();
+			errorLog.error("复制单个文件操作出错", e);
 
 		}
 
@@ -325,8 +326,8 @@ public class FileUtil {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				errorLog.error("", e);
+
 			}
 		}
 	}
@@ -341,8 +342,7 @@ public class FileUtil {
 			try {
 				reader.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				errorLog.error("", e);
 			}
 		}
 	}
@@ -398,11 +398,9 @@ public class FileUtil {
 					j++;
 				}
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				errorLog.error("", e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				errorLog.error("", e);
 			}
 			j = j - 1;
 

@@ -109,11 +109,12 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		return log;
 	}
 
-//	@Override
-//	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	// @Override
+	// protected Map<String, OrderTO> getOrderInfo(String retailerID,
+	// Set<String> orderNoSet) throws BaseException {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 	public void processOrderData(String retailerID, Date startDate, Date endDate) throws BaseException {
 		// Get Receiving Note
@@ -153,7 +154,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		// Iterator Receiving Map by Date
 		for (int i = 0; i < receivingNormalKeyList.length; i++) {
 			String processDateStr = (String) receivingNormalKeyList[i];
-			getSummaryLog().info("订单收货日期："+processDateStr);
+			getSummaryLog().info("订单收货日期：" + processDateStr);
 			List<ReceivingNoteTO> receivingList = receivingNormalByDateMap.get(processDateStr);
 
 			if (!(receivingList.size() == 0)) {
@@ -163,7 +164,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 
 				getLog().info(
 						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size() + "\r\n");
-				getSummaryLog().info("订单合并成功数量："+receivingList.size());
+				getSummaryLog().info("订单合并成功数量：" + receivingList.size());
 			}
 		}
 
@@ -178,7 +179,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		for (int i = 0; i < receivingAbnormalKeyList.length; i++) {
 			String processDateStr = (String) receivingAbnormalKeyList[i];
 			List<ReceivingNoteTO> receivingList = receivingAbnormalByDateMap.get(processDateStr);
-			getSummaryLog().info("订单收货日期："+processDateStr);
+			getSummaryLog().info("订单收货日期：" + processDateStr);
 			if (!(receivingList.size() == 0)) {
 
 				getLog().info("开始整合. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size());
@@ -187,7 +188,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 				getLog().info(
 						"整合结束. 零售商: " + retailerID + " 日期:" + processDateStr + "订单数量:" + receivingList.size() + "\r\n");
 
-				getSummaryLog().info("有问题的订单数量："+receivingList.size());
+				getSummaryLog().info("有问题的订单数量：" + receivingList.size());
 			}
 		}
 
@@ -317,40 +318,41 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 			InputStream sourceExcel = new FileInputStream(salesFile);
 
 			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-
-			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-			for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
-				Row sourceRow = sourceSheet.getRow(i);
-				if (sourceRow == null) {
-					continue;
-				}
-
-				String salesDateStr = sourceRow.getCell(8).getStringCellValue();
-				Date salesDate = DateUtil.toDate(salesDateStr);
-
-				// If receivingDate is in the date range
-				if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {
-
-					SalesTO salesTO = new SalesTO();
-					List<SalesTO> salesTOList = null;
-
-					salesTO.setItemID(sourceRow.getCell(1).getStringCellValue());
-					salesTO.setItemName(sourceRow.getCell(2).getStringCellValue());
-					salesTO.setStoreID(sourceRow.getCell(5).getStringCellValue());
-					salesTO.setSalesDate(salesDateStr);
-					salesTO.setSalesQuantity(sourceRow.getCell(6).getStringCellValue());
-					salesTO.setSalesAmount(sourceRow.getCell(7).getStringCellValue());
-
-					if (salesMap.containsKey(salesDateStr)) {
-						salesTOList = salesMap.get(salesDateStr);
-					} else {
-						salesTOList = new ArrayList<SalesTO>();
-						salesMap.put(salesDateStr, salesTOList);
+			if (sourceWorkbook.getNumberOfSheets() != 0) {
+				Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+				for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+					Row sourceRow = sourceSheet.getRow(i);
+					if (sourceRow == null) {
+						continue;
 					}
 
-					log.debug("销售单详细条目: " + salesTO.toString());
-					salesTOList.add(salesTO);
+					String salesDateStr = sourceRow.getCell(8).getStringCellValue();
+					Date salesDate = DateUtil.toDate(salesDateStr);
 
+					// If receivingDate is in the date range
+					if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {
+
+						SalesTO salesTO = new SalesTO();
+						List<SalesTO> salesTOList = null;
+
+						salesTO.setItemID(sourceRow.getCell(1).getStringCellValue());
+						salesTO.setItemName(sourceRow.getCell(2).getStringCellValue());
+						salesTO.setStoreID(sourceRow.getCell(5).getStringCellValue());
+						salesTO.setSalesDate(salesDateStr);
+						salesTO.setSalesQuantity(sourceRow.getCell(6).getStringCellValue());
+						salesTO.setSalesAmount(sourceRow.getCell(7).getStringCellValue());
+
+						if (salesMap.containsKey(salesDateStr)) {
+							salesTOList = salesMap.get(salesDateStr);
+						} else {
+							salesTOList = new ArrayList<SalesTO>();
+							salesMap.put(salesDateStr, salesTOList);
+						}
+
+						log.debug("销售单详细条目: " + salesTO.toString());
+						salesTOList.add(salesTO);
+
+					}
 				}
 			}
 		} catch (FileNotFoundException e) {

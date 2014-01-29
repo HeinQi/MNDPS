@@ -234,7 +234,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		contextMap.put("parentVender", parentVendor);
 		List<TescoOrderNotifyTO> notifyList = new ArrayList<TescoOrderNotifyTO>();
 
-		getNotifyList(httpClient, parentVendor, notifyList, user);
+		getNotifyList(httpClient, parentVendor, notifyList, user,searchDate);
 		// get order detail
 		int count = 0;
 		for (TescoOrderNotifyTO notify : notifyList) {
@@ -251,14 +251,14 @@ public class TescoDataPullService implements RetailerDataPullService {
 			orderDetailResponse.close();
 			count++;
 			log.info(user + "成功下载订单通知明细[" + count + "]");
-			readOrder(br, user);
+			readOrder(br, user,searchDate);
 			log.info(user + "订单数据下载成功!");
 		}
 
 	}
 
 	private void getNotifyList(CloseableHttpClient httpClient, String parentVendor,
-			List<TescoOrderNotifyTO> notifyList, User user) throws Exception {
+			List<TescoOrderNotifyTO> notifyList, User user,Date searchDate) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sp/purOrder/sellPubOrderQry.hlt
 		log.info(user + "查询订单通知...");
 		int pageNo = 1;
@@ -266,10 +266,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 		do {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 			List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-			searchformParams.add(new BasicNameValuePair("orderDateStart", DateUtil.toString(
-					Utils.getStartDate(Constants.RETAILER_TESCO), "yyyy-MM-dd")));// 通知日期
-			searchformParams.add(new BasicNameValuePair("orderDateEnd", DateUtil.toString(
-					Utils.getEndDate(Constants.RETAILER_TESCO), "yyyy-MM-dd"))); // 通知日期
+			searchformParams.add(new BasicNameValuePair("orderDateStart", DateUtil.toString(searchDate, "yyyy-MM-dd")));// 通知日期
+			searchformParams.add(new BasicNameValuePair("orderDateEnd", DateUtil.toString(searchDate, "yyyy-MM-dd"))); // 通知日期
 			searchformParams.add(new BasicNameValuePair("parentVendor", parentVendor));// parentVendor
 			searchformParams.add(new BasicNameValuePair("page.pageSize", "50"));// pageSize
 			searchformParams.add(new BasicNameValuePair("page.pageNo", String.valueOf(pageNo))); // pageSize
@@ -302,13 +300,13 @@ public class TescoDataPullService implements RetailerDataPullService {
 			}
 			pageNo++;
 		} while (pageNo <= totalPages);
-		log.info(user + "查询到从" + DateUtil.toString(Utils.getStartDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + "到"
-				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_TESCO), "yyyy-MM-dd") + ",共有"
+		log.info(user + "查询到从" + DateUtil.toString(searchDate, "yyyy-MM-dd") + "到"
+				+ DateUtil.toString(searchDate, "yyyy-MM-dd") + ",共有"
 				+ notifyList.size() + "条订单通知");
 
 	}
 
-	private void readOrder(BufferedReader br, User user) throws Exception {
+	private void readOrder(BufferedReader br, User user,Date searchDate) throws Exception {
 		log.info(user + "读取订单通知明细");
 		String line = null;
 		int count = 0;
@@ -325,6 +323,11 @@ public class TescoDataPullService implements RetailerDataPullService {
 				if (!line.contains("DSD PO")) {
 					continue;
 				}
+				
+				if (Utils.isOrderFileExist(user.getRetailer(), user.getUserId(),orderNo,searchDate)) {
+					log.info(user+"订单日期: "+DateUtil.toString(searchDate,"yyyy-MM-dd")+" 订单号: "+orderNo+"已存在,不再下载");
+					continue;
+				}
 
 				String orderDate = line.substring(line.indexOf("订单日期") + 6, line.indexOf("交货日期")).trim();
 				for (int i = 0; i < 10; i++) {
@@ -332,7 +335,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 				}
 				List<OrderTO> orderItems = new ArrayList<OrderTO>();
 				readOrderItem(br, orderItems, storeNm, orderNo, orderDate);
-				//Utils.exportOrderInfoToTXT(user.getRetailer(), user.getUserId(), orderNo, orderDate, orderItems);
+				Utils.exportOrderInfoToTXT(user.getRetailer(), user.getUserId(), orderNo, searchDate, orderItems);
 				log.info(user + "成功读取订单,订单号:" + orderNo);
 				count++;
 			}

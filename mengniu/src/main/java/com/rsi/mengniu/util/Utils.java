@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -683,6 +684,9 @@ public class Utils {
 		for (Entry<String, List<OrderTO>> entry : orderMap.entrySet()) {
 			exportOrderInfoToTXT(retailerID, userId, entry.getKey(),orderDate , entry.getValue());
 		}
+	}
+	public static RequestConfig getTimeoutConfig() {
+		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();//设置请求和传输超时时间
 	}
 	
 }

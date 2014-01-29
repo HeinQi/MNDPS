@@ -202,7 +202,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 
 			// Update file name follow the naming conversion
 			String receiveFilePath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_INBOUND_PATH);
-			
+			FileUtil.createFolder(receiveFilePath);
 			String oldFileName = zipFileNm.substring(0, zipFileNm.lastIndexOf(".")) + ".xls";
 
 			File oldFile = new File(tempPath+oldFileName);

@@ -108,26 +108,33 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 		return receivingNoteMap;
 	}
 
+//	@Override
+//	protected Map<String, OrderTO> getOrderInfo(String retailerID,
+//			Set<String> orderNoSet) throws BaseException {
+//		File orderInboundFolder = new File(
+//				Utils.getProperty(Constants.RETAILER_YONGHUI
+//						+ Constants.ORDER_INBOUND_PATH));
+//
+//		File[] orderList = orderInboundFolder.listFiles();
+//
+//		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+//		for (int i = 0; i < orderList.length; i++) {
+//
+//			File orderFile = orderList[i];
+//			orderMap.putAll(getOrderInfoForYonghui(orderFile));
+//			log.info("订单文件名: " + orderFile.getName());
+//
+//		}
+//
+//		return orderMap;
+//	}
+	
 	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
-		File receivingInboundFolder = new File(
-				Utils.getProperty(Constants.RETAILER_YONGHUI
-						+ Constants.ORDER_INBOUND_PATH));
-
-		File[] orderList = receivingInboundFolder.listFiles();
-
-		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-		for (int i = 0; i < orderList.length; i++) {
-
-			File orderFile = orderList[i];
-			orderMap.putAll(getOrderInfoForYonghui(orderFile));
-			log.info("订单文件名: " + orderFile.getName());
-
-		}
-
-		return orderMap;
+	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
+		return this.getOrderInfoForYonghui(orderFile);
 	}
+
+	
 	private Map<String, OrderTO> getOrderInfoForYonghui(File orderFile)
 			throws BaseException {
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
@@ -137,20 +144,20 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 			excelReader = new ExcelReader();
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			errorLog.error(e);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			errorLog.error(e);
 		}
 		nl.fountain.xelem.excel.Workbook wb = null;
 		try {
 			wb = excelReader.getWorkbook(orderFile.getPath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			errorLog.error(e);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			errorLog.error(e);
 		}
 
 		nl.fountain.xelem.excel.Worksheet sourceSheet = wb.getWorksheetAt(0);
@@ -215,7 +222,7 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 
 			}
 
-			String key = orderTO.getOrderNo() + orderTO.getStoreName()
+			String key = orderTO.getOrderNo() + orderTO.getStoreID()
 					+ orderTO.getItemID();
 			orderMap.put(key, orderTO);
 
@@ -230,6 +237,41 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 		return log;
 	}
 
+	/**
+	 * Parse the receiving list of one day to map The key is:
+	 * Order Number + Store Name + Item ID
+	 * 
+	 * @param receivingNoteList
+	 * @return
+	 * @throws BaseException
+	 */
+	public Map<String, ReceivingNoteTO> generateReceivingMapForComparison(List<ReceivingNoteTO> receivingNoteList)
+			throws BaseException {
+		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
+
+		for (int i = 0; i < receivingNoteList.size(); i++) {
+			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
+			String storeID = receivingNoteByStoreTO.getStoreID();
+			String key = receivingNoteByStoreTO.getOrderNo() + storeID + receivingNoteByStoreTO.getItemID();
+			if (receivingNoteByStoreMap.containsKey(key)) {
+				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
+				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity())
+						+ Double.parseDouble(existTO.getQuantity())));
+				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getTotalPrice())
+						+ Double.parseDouble(existTO.getTotalPrice())));
+				getLog().info(
+						"整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity() + " 原始总价: "
+								+ receivingNoteByStoreTO.getTotalPrice());
+
+				getLog().info("整合收货单: 整合后数量: " + existTO.getQuantity() + " 整合后总价: " + existTO.getTotalPrice());
+			} else {
+				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
+			}
+
+		}
+		return receivingNoteByStoreMap;
+	}
+	
 	@Override
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
 			String retailerID, Date startDate, Date endDate, File salesFile)
@@ -281,4 +323,5 @@ public class YonghuiDataConversionService extends RetailerDataConversionService 
 		return salesMap;
 	}
 
+	
 }

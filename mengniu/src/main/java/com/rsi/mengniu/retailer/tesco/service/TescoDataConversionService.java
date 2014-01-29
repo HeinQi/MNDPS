@@ -165,28 +165,25 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 		return receivingNoteMap;
 	}
 
+//	@Override
+//	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
+//		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
+//		for (String orderNo : orderNoSet) {
+//			// Get order info map
+//			// Key: Store ID + Item Code
+//			Map<String, OrderTO> orderMap = null;
+//			orderMap = getOrderInfo(orderNo);
+//			log.info("读取订单信息. 订单号:" + orderNo);
+//			orderTOMap.putAll(orderMap);
+//
+//			log.info("读取订单信息结束. 订单号:" + orderNo);
+//		}
+//
+//		return orderTOMap;
+//	}
+	
 	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
-		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
-		for (String orderNo : orderNoSet) {
-			// Get order info map
-			// Key: Store ID + Item Code
-			Map<String, OrderTO> orderMap = null;
-			orderMap = getOrderInfo(orderNo);
-			log.info("读取订单信息. 订单号:" + orderNo);
-			orderTOMap.putAll(orderMap);
-
-			log.info("读取订单信息结束. 订单号:" + orderNo);
-		}
-
-		return orderTOMap;
-	}
-
-	private Map<String, OrderTO> getOrderInfo(String orderNo) throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_TESCO + Constants.ORDER_INBOUND_PATH) + "Order_"
-				+ Constants.RETAILER_TESCO + "_" + orderNo + ".txt";
-		File orderFile = new File(fileName);
-
+	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
 
 		if (orderFile.exists()) {
@@ -220,11 +217,55 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 				FileUtil.closeFileReader(reader);
 			}
 
-			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
+			log.info("订单文件: " + orderFile + " 包含的详单数量为:" + orderMap.size());
 
 		}
 		return orderMap;
 	}
+
+//	private Map<String, OrderTO> getOrderInfo(String orderNo) throws BaseException {
+//		String fileName = Utils.getProperty(Constants.RETAILER_TESCO + Constants.ORDER_INBOUND_PATH) + "Order_"
+//				+ Constants.RETAILER_TESCO + "_" + orderNo + ".txt";
+//		File orderFile = new File(fileName);
+//
+//		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+//
+//		if (orderFile.exists()) {
+//			BufferedReader reader = null;
+//			try {
+//				// Open the file
+//				FileInputStream fileInput = new FileInputStream(orderFile);
+//				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
+//				reader = new BufferedReader(inputStrReader);
+//				reader.readLine();
+//				// Read line by line
+//				String orderLine = null;
+//				while ((orderLine = reader.readLine()) != null) {
+//					OrderTO orderTO = new OrderTO(orderLine);
+//					String key = orderTO.getOrderNo() + orderTO.getStoreName() + orderTO.getItemID();
+//					orderMap.put(key, orderTO);
+//
+//				}
+//				// orderTOList.add(orderTO);
+//
+//			} catch (FileNotFoundException e) {
+//				log.error(e);
+//				throw new BaseException(e);
+//			} catch (IOException e) {
+//
+//				log.error(e);
+//				throw new BaseException(e);
+//
+//			} finally {
+//
+//				FileUtil.closeFileReader(reader);
+//			}
+//
+//			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
+//
+//		}
+//		return orderMap;
+//	}
 
 	@Override
 	protected Log getLog() {
@@ -280,5 +321,7 @@ public class TescoDataConversionService extends RetailerDataConversionService {
 		}
 		return salesMap;
 	}
+
+	
 
 }

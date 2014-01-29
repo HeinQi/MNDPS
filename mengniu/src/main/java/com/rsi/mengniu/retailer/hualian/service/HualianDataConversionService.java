@@ -117,12 +117,17 @@ public class HualianDataConversionService extends RetailerDataConversionService 
 		}
 		return salesMap;
 	}
-
 	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
+	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+//	@Override
+//	protected Map<String, OrderTO> getOrderInfo(String retailerID,
+//			Set<String> orderNoSet) throws BaseException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 }

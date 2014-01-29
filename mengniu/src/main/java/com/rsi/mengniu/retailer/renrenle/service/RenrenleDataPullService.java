@@ -225,6 +225,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			response.close();
 			if (!responseStr.contains("泰斯玛供应链关系管理系统")) {
 				log.error(user + "订单查询失败,请登录网站检查");
+				DataPullTaskPool.addFailedUser(user);
 				return;
 			}
 			String totalPageStr = responseStr.substring(responseStr.indexOf("</B>/<B>") + 8);
@@ -268,6 +269,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		String orderStr = new String(EntityUtils.toString(orderEntity).getBytes("ISO_8859_1"), "GBK");
 		if (!orderStr.contains(orderId)) {
 			log.error(user + "获取订单失败订单号为" + orderId + ",请登录网站检查");
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		Document orderDoc = Jsoup.parse(orderStr);

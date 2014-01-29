@@ -161,8 +161,15 @@ public class TescoDataPullService implements RetailerDataPullService {
 	public synchronized void getReceiveExcel(CloseableHttpClient httpClient, User user,Date searchDate) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sellGrnQry/init.hlt
 		// get vendorTaxRegistration
-		log.info(user + "开始下载收货单...");
+		String excelFileName = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_"
+				+ DateUtil.toStringYYYYMMDD(searchDate) + ".xls";
+		if (Utils.isReceivingFileExist(user.getRetailer(), excelFileName)) {
+			log.info(user+"收货单已存在,不再下载");
+			return;
+		}
+		
 		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
+		log.info(user + "开始下载"+searchDateStr+"收货单...");
 		HttpGet httpGet = new HttpGet("https://tesco.chinab2bi.com/tesco/sellGrnQry/init.hlt");
 		CloseableHttpResponse formResponse = httpClient.execute(httpGet);
 		HttpEntity taxEntity = formResponse.getEntity();
@@ -196,8 +203,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			//Update file name follow the naming conversion
 			String oldFileName = zipFileNm.substring(0, zipFileNm.lastIndexOf(".")) + ".xls";
 			File oldFile = new File(receiveFilePath+oldFileName);
-			String excelFileName = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_"
-					+ DateUtil.toStringYYYYMMDD(searchDate) + ".xls";
+			
 			File newFile = new File(receiveFilePath+excelFileName);
 			oldFile.renameTo(newFile);
 			
@@ -326,7 +332,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 				}
 				List<OrderTO> orderItems = new ArrayList<OrderTO>();
 				readOrderItem(br, orderItems, storeNm, orderNo, orderDate);
-				FileUtil.exportOrderInfoToTXT("tesco", orderNo, orderItems);
+				//Utils.exportOrderInfoToTXT(user.getRetailer(), user.getUserId(), orderNo, orderDate, orderItems);
 				log.info(user + "成功读取订单,订单号:" + orderNo);
 				count++;
 			}
@@ -374,7 +380,11 @@ public class TescoDataPullService implements RetailerDataPullService {
 
 	public void getSales(CloseableHttpClient httpClient, User user, String searchDate,
 			HashMap<String, Object> contextMap) throws Exception {
-		log.info(user + "查询销售数据...");
+		if (Utils.isSalesFileExist(user.getRetailer(), user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
+			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
+			return;			
+		}
+		log.info(user + "查询"+searchDate+"销售数据...");
 		int pageNo = 1;
 		int totalPages = 1;
 		String parentVendor = (String) contextMap.get("parentVendor");

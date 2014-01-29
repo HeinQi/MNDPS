@@ -161,6 +161,10 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 	}
 
 	public void getReceive(CloseableHttpClient httpClient, User user, Date searchDate) throws Exception {
+		if (Utils.isReceivingFileExist(user.getRetailer(),user.getUserId(),searchDate)) {
+			log.info(user+"收货单已存在,不再下载");
+			return;
+		}
 		log.info(user + "开始下载收货单...");
 		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
@@ -218,14 +222,20 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 	}
 
 	public void getOrder(CloseableHttpClient httpClient, User user, Date searchDate) throws Exception {
-		log.info(user + "订单数据下载...");
+		String fileNm = "Order_" + user.getRetailer() + "_" + user.getUserId() + "_"
+				+ DateUtil.toStringYYYYMMDD(searchDate) + ".xls";
 		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
+		if (Utils.isOrderFileExist(user.getRetailer(),fileNm)) {
+			log.info(user+"订单日期: "+searchDateStr+"的订单已存在,不再下载");
+			return;
+		}
+		log.info(user + "订单数据下载...");
+		
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String orderPath = Utils.getProperty(user.getRetailer() + Constants.ORDER_INBOUND_PATH);
 		FileUtil.createFolder(orderPath);
-		String fileNm = "Order_" + user.getRetailer() + "_" + user.getUserId() + "_"
-				+ DateUtil.toStringYYYYMMDD(searchDate) + ".xls";
+
 		FileOutputStream orderFos = new FileOutputStream(orderPath + fileNm);
 		String url = "http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=" + searchDateStr + "&orderdate_max="
 				+ searchDateStr + "&operation=eptOrderSheet";
@@ -237,6 +247,10 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 	}
 
 	public void getSales(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+		if (Utils.isSalesFileExist(user.getRetailer(), user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
+			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
+			return;			
+		}		
 		log.info(user + "下载日期为" + searchDate + "的销售数据...");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();

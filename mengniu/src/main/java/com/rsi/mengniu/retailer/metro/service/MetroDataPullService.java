@@ -119,6 +119,12 @@ public class MetroDataPullService implements RetailerDataPullService {
 	}
 
 	public void getReceive(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
+		String receiveFileNm = "Receiving_" + Constants.RETAILER_METRO + "_" + user.getUserId() + "_"
+				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
+		if (Utils.isReceivingFileExist(Constants.RETAILER_METRO, receiveFileNm)) {
+			log.info(user+"收货单已存在,不再下载");
+			return;
+		}
 		log.info(user+"下载收货单...");
 
 		/*
@@ -375,6 +381,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 	}
 
 	public void getOrder(CloseableHttpClient httpClient,User user,StringBuffer summaryBuffer) throws Exception {
+		
 		log.info(user+"订单数据下载...");
 		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
 		orderformParams.add(new BasicNameValuePair("NavigationTarget", "navurl://2acb0a958f2485c518851f9e303d829f"));

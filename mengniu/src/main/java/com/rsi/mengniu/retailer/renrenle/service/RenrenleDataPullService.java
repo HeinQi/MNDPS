@@ -152,6 +152,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate, StringBuffer summaryBuffer)
 			throws Exception {
+		if (Utils.isSalesFileExist(Constants.RETAILER_RENRENLE, user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
+			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
+			return;
+		}
+		
 		log.info(user + "开始下载" + searchDate + "的销售数据...");
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
@@ -220,6 +225,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			response.close();
 			if (!responseStr.contains("泰斯玛供应链关系管理系统")) {
 				log.error(user + "订单查询失败,请登录网站检查");
+				DataPullTaskPool.addFailedUser(user);
 				return;
 			}
 			String totalPageStr = responseStr.substring(responseStr.indexOf("</B>/<B>") + 8);
@@ -238,6 +244,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		log.info(user + "查询到" + searchDate + "号订单共" + orderIdList.size() + "条");
 		for (int i = 0; i < orderIdList.size(); i++) {
 			String orderId = orderIdList.get(i);
+			if (Utils.isOrderFileExist(Constants.RETAILER_RENRENLE, user.getUserId(),orderId, DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
+				log.info(user+"订单日期: "+searchDate+" 订单号: "+orderId+"已存在,不再下载");
+				continue;
+			}
+			
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
 			getOrderDetail(httpClient, user, orderId, searchDate, orderList);
 			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId,
@@ -258,6 +269,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		String orderStr = new String(EntityUtils.toString(orderEntity).getBytes("ISO_8859_1"), "GBK");
 		if (!orderStr.contains(orderId)) {
 			log.error(user + "获取订单失败订单号为" + orderId + ",请登录网站检查");
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		Document orderDoc = Jsoup.parse(orderStr);

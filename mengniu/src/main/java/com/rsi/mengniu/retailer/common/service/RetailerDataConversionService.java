@@ -345,10 +345,10 @@ public abstract class RetailerDataConversionService {
 			String key = receivingNoteByStoreTO.getOrderNo() + storeName + receivingNoteByStoreTO.getItemID();
 			if (receivingNoteByStoreMap.containsKey(key)) {
 				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
-				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity())
-						+ Double.parseDouble(existTO.getQuantity())));
-				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getTotalPrice())
-						+ Double.parseDouble(existTO.getTotalPrice())));
+				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity().replaceAll(",", ""))
+						+ Double.parseDouble(existTO.getQuantity().replaceAll(",", ""))));
+				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getTotalPrice().replaceAll(",", ""))
+						+ Double.parseDouble(existTO.getTotalPrice().replaceAll(",", ""))));
 				getLog().info(
 						"整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity() + " 原始总价: "
 								+ receivingNoteByStoreTO.getTotalPrice());

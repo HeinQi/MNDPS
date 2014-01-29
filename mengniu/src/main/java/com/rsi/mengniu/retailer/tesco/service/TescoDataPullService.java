@@ -205,7 +205,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			
 			String oldFileName = zipFileNm.substring(0, zipFileNm.lastIndexOf(".")) + ".xls";
 
-			File oldFile = new File(receiveFilePath+oldFileName);
+			File oldFile = new File(tempPath+oldFileName);
 			
 			File newFile = new File(receiveFilePath+excelFileName);
 			oldFile.renameTo(newFile);

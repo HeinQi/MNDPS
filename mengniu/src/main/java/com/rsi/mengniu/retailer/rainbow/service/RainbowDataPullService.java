@@ -79,21 +79,24 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING + "\r\n");
-		
+
 		for (Date receivingDate : dateList) {
 			CountTO countTO = new CountTO();
 
 			String receivingDateStr = DateUtil.toString(receivingDate);
 			summaryBuffer.append("收货单日期：" + receivingDateStr + " \r\n");
-			try {
-				this.getReceiving(httpClient, user, receivingDate, summaryBuffer, countTO);
-				summaryBuffer.append("收货单下载成功" + "\r\n");
-				summaryBuffer.append("数量：" + countTO.getCounttotalNo() + " \r\n");
-			} catch (Exception e) {
-				summaryBuffer.append("收货单下载失败!" + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
+			if (!Utils.isReceivingFileExist(user.getRetailer(), user.getUserId(), receivingDate)) {
+
+				try {
+					this.getReceiving(httpClient, user, receivingDate, summaryBuffer, countTO);
+					summaryBuffer.append("收货单下载成功" + "\r\n");
+					summaryBuffer.append("数量：" + countTO.getCounttotalNo() + " \r\n");
+				} catch (Exception e) {
+					summaryBuffer.append("收货单下载失败!" + "\r\n");
+					log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
+					errorLog.error(user, e);
+					DataPullTaskPool.addFailedUser(user);
+				}
 			}
 		}
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
@@ -104,19 +107,20 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 			String salesDateStr = DateUtil.toString(salesDate);
 			summaryBuffer.append("销售日期：" + salesDateStr + " \r\n");
+			if (!Utils.isSalesFileExist(user.getRetailer(), user.getUserId(), salesDate)) {
+				try {
 
-			try {
+					this.getSales(httpClient, user, salesDate, summaryBuffer);
 
-				this.getSales(httpClient, user, salesDate, summaryBuffer);
+					summaryBuffer.append("销售单下载成功" + " \r\n");
+				} catch (Exception e) {
+					summaryBuffer.append("销售单下载失败!" + "\r\n");
+					log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+					errorLog.error(user, e);
+					DataPullTaskPool.addFailedUser(user);
+				}
 
-				summaryBuffer.append("销售单下载成功" + " \r\n");
-			} catch (Exception e) {
-				summaryBuffer.append("销售单下载失败!" + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
 			}
-
 		}
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 

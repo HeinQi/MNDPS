@@ -34,8 +34,7 @@ import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
-public class RenrenleDataConversionService extends
-		RetailerDataConversionService {
+public class RenrenleDataConversionService extends RetailerDataConversionService {
 
 	private Log log = LogFactory.getLog(RenrenleDataConversionService.class);
 	private Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RENRENLE);
@@ -56,31 +55,27 @@ public class RenrenleDataConversionService extends
 	}
 
 	@Override
-	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File receivingFile)
-			throws BaseException {
+	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
+			Date endDate, File receivingFile) throws BaseException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-//	@Override
-//	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-//			Set<String> orderNoSet) throws BaseException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	// @Override
+	// protected Map<String, OrderTO> getOrderInfo(String retailerID,
+	// Set<String> orderNoSet) throws BaseException {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 	@Override
-	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
-			String retailerID, Date startDate, Date endDate, File salesFile)
-			throws BaseException {
+	protected Map<String, List<SalesTO>> getSalesInfoFromFile(String retailerID, Date startDate, Date endDate,
+			File salesFile) throws BaseException {
 
 		String fileName = salesFile.getName();
-		String salesDate = fileName.substring(fileName.lastIndexOf("_") + 1,
-				fileName.indexOf("."));
+		String salesDate = fileName.substring(fileName.lastIndexOf("_") + 1, fileName.indexOf("."));
 		salesDate = DateUtil.toString(DateUtil.toDate(salesDate, "yyyyMMdd"));
-		log.info("销售单生成日期：" + salesDate + "。销售开始日期："
-				+ DateUtil.toString(startDate) + "。销售截至日期："
+		log.info("销售单生成日期：" + salesDate + "。销售开始日期：" + DateUtil.toString(startDate) + "。销售截至日期："
 				+ DateUtil.toString(endDate));
 		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
 		try {
@@ -88,65 +83,66 @@ public class RenrenleDataConversionService extends
 
 			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
 
-			Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-			for (int i = 3; i < sourceSheet.getPhysicalNumberOfRows() - 1; i++) {
-				Row sourceRow = sourceSheet.getRow(i);
-				if (sourceRow == null) {
-					continue;
-				}
-				SalesTO salesTO = new SalesTO();
-				salesTO.setSalesDate(salesDate);
-				List<SalesTO> salesTOList = null;
+			if (sourceWorkbook.getNumberOfSheets() != 0) {
+				Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+				for (int i = 3; i < sourceSheet.getPhysicalNumberOfRows() - 1; i++) {
+					Row sourceRow = sourceSheet.getRow(i);
+					if (sourceRow == null) {
+						continue;
+					}
+					SalesTO salesTO = new SalesTO();
+					salesTO.setSalesDate(salesDate);
+					List<SalesTO> salesTOList = null;
 
-				for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+					for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
 
-					Cell sourceCell = sourceRow.getCell(j);
+						Cell sourceCell = sourceRow.getCell(j);
 
-					String sourceCellValue;
-					if (sourceCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-						sourceCellValue = Double.valueOf(
-								sourceCell.getNumericCellValue()).toString();
+						String sourceCellValue;
+						if (sourceCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+							sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
+						} else {
+
+							sourceCellValue = sourceCell.getStringCellValue();
+						}
+
+						switch (j) {
+						case 0:
+							salesTO.setStoreID(sourceCellValue);
+
+							continue;
+						case 2:
+							salesTO.setItemName(sourceCellValue);
+
+							continue;
+						case 3:
+							salesTO.setItemID(sourceCellValue);
+
+							continue;
+						case 6:
+							salesTO.setSalesQuantity(sourceCellValue);
+
+							continue;
+						case 7:
+							salesTO.setSalesAmount(sourceCellValue);
+
+							continue;
+
+						}
+
+					}
+
+					if (salesMap.containsKey(salesDate)) {
+						salesTOList = salesMap.get(salesDate);
 					} else {
-
-						sourceCellValue = sourceCell.getStringCellValue();
+						salesTOList = new ArrayList<SalesTO>();
+						// Test the Hashmap
+						salesMap.put(salesDate, salesTOList);
 					}
 
-					switch (j) {
-					case 0:
-						salesTO.setStoreID(sourceCellValue);
-
-						continue;
-					case 2:
-						salesTO.setItemName(sourceCellValue);
-
-						continue;
-					case 3:
-						salesTO.setItemID(sourceCellValue);
-
-						continue;
-					case 6:
-						salesTO.setSalesQuantity(sourceCellValue);
-
-						continue;
-					case 7:
-						salesTO.setSalesAmount(sourceCellValue);
-
-						continue;
-
-					}
-
+					log.debug("收货单详细条目: " + salesTO.toString());
+					salesTOList.add(salesTO);
 				}
-				if (salesMap.containsKey(salesDate)) {
-					salesTOList = salesMap.get(salesDate);
-				} else {
-					salesTOList = new ArrayList<SalesTO>();
-					// Test the Hashmap
-					salesMap.put(salesDate, salesTOList);
-				}
-
-				log.debug("收货单详细条目: " + salesTO.toString());
-				salesTOList.add(salesTO);
-
 			}
 		} catch (FileNotFoundException e) {
 			log.error(e);
@@ -159,55 +155,37 @@ public class RenrenleDataConversionService extends
 	}
 
 	public void processOrderData(String retailerID, Date startDate, Date endDate) throws BaseException {
-		//Get Receiving Data
-		//Map<String, List<ReceivingNoteTO>> receivingNoteMap = getReceivingInfo(retailerID, startDate, endDate);
+		// Get Receiving Data
+		// Map<String, List<ReceivingNoteTO>> receivingNoteMap =
+		// getReceivingInfo(retailerID, startDate, endDate);
 
-		//Get Order Data
+		// Get Order Data
 		Map<String, List<OrderTO>> orderMap = this.getOrderInfo(retailerID, startDate, endDate);
-		//Match
-		
-		//Generate Output file
-		convertOrderData(retailerID,orderMap);
-		
-		//Move Order file to Processed
-		
+		// Match
+
+		// Generate Output file
+		convertOrderData(retailerID, orderMap);
+
+		// Move Order file to Processed
+
 		String sourceFilePath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		getLog().info(sourceFilePath);
 		String destPath = Utils.getProperty(retailerID + Constants.ORDER_PROCESSED_PATH);
 		getLog().info(destPath);
 		// Copy processed receiving note from inbound to processed folder
 		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath, destPath);
-		
+
 	}
 
-	private void convertOrderData(String retailerID,Map<String, List<OrderTO>> orderMap) throws BaseException {
-		for(String orderDateStr:orderMap.keySet()){
+	private void convertOrderData(String retailerID, Map<String, List<OrderTO>> orderMap) throws BaseException {
+		for (String orderDateStr : orderMap.keySet()) {
 			BufferedWriter writer = initOrderOutputFile(retailerID, orderDateStr);
 			List<OrderTO> orderList = orderMap.get(orderDateStr);
-			for(OrderTO orderTO : orderList){
-				String outputLine = orderTO.getOrderNo()
-						+ "\t"
-						+ orderTO.getStoreID()
-						+ "\t"
-						+ orderTO.getStoreName()
-						+ "\t"
-						+ ""
-						+ "\t"
-						+ orderTO.getItemID()
-						+ "\t"
-						+ orderTO.getBarcode()
-						+ "\t"
-						+ orderTO.getItemName()
-						+ "\t"
-						+ orderTO.getQuantity()
-						+ "\t"
-						+ orderTO.getTotalPrice()
-						+ "\t"
-						+ ""
-						+ "\t"
-						+ ""
-						+ "\t"
-						+ orderTO.getUnitPrice();
+			for (OrderTO orderTO : orderList) {
+				String outputLine = orderTO.getOrderNo() + "\t" + orderTO.getStoreID() + "\t" + orderTO.getStoreName()
+						+ "\t" + "" + "\t" + orderTO.getItemID() + "\t" + orderTO.getBarcode() + "\t"
+						+ orderTO.getItemName() + "\t" + orderTO.getQuantity() + "\t" + orderTO.getTotalPrice() + "\t"
+						+ "" + "\t" + "" + "\t" + orderTO.getUnitPrice();
 				try {
 					writer.write(outputLine);
 					writer.newLine();
@@ -218,10 +196,11 @@ public class RenrenleDataConversionService extends
 			}
 
 		}
-		
+
 	}
 
-	private Map<String, List<OrderTO>>  getOrderInfo(String retailerID, Date startDate, Date endDate) throws BaseException {
+	private Map<String, List<OrderTO>> getOrderInfo(String retailerID, Date startDate, Date endDate)
+			throws BaseException {
 		Map orderMap = new HashMap();
 
 		File orderFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH));
@@ -231,34 +210,32 @@ public class RenrenleDataConversionService extends
 			for (int i = 0; i < orderList.length; i++) {
 
 				File orderFile = orderList[i];
-				
+
 				String fileName = orderFile.getName();
 				getLog().info("订单文件名: " + orderFile.getName());
 
-				String orderDateStr = fileName.substring(fileName.lastIndexOf("_")+1, fileName.indexOf("."));
-				
+				String orderDateStr = fileName.substring(fileName.lastIndexOf("_") + 1, fileName.indexOf("."));
+
 				Date orderDate = DateUtil.toDate(orderDateStr, "yyyyMMdd");
-				
+
 				orderDateStr = DateUtil.toString(orderDate);
-				
-				if(DateUtil.isInDateRange(orderDate, startDate, endDate)){
-					
+
+				if (DateUtil.isInDateRange(orderDate, startDate, endDate)) {
+
 					// Get Receiving Info
-					Map<String, List> orderSingleMap = getOrderInfoFromFile(orderFile,orderDateStr);
+					Map<String, List> orderSingleMap = getOrderInfoFromFile(orderFile, orderDateStr);
 
 					Utils.putSubMapToMainMap(orderMap, orderSingleMap);
 				}
-				
-				
 
 			}
 		}
 
 		return orderMap;
-		
+
 	}
 
-	private Map<String, List> getOrderInfoFromFile(File orderFile,String orderDateStr) throws BaseException {
+	private Map<String, List> getOrderInfoFromFile(File orderFile, String orderDateStr) throws BaseException {
 		BufferedReader reader = null;
 		Map<String, List> orderMap = new HashMap<String, List>();
 		try {
@@ -275,7 +252,7 @@ public class RenrenleDataConversionService extends
 				orderTOList.add(orderTO);
 
 			}
-			// 
+			//
 			log.info("订单日期: " + orderDateStr + " 包含的详单数量为:" + orderTOList.size());
 			orderMap.put(orderDateStr, orderTOList);
 
@@ -293,8 +270,6 @@ public class RenrenleDataConversionService extends
 		}
 		return orderMap;
 
-		
-
 	}
 
 	@Override
@@ -302,6 +277,5 @@ public class RenrenleDataConversionService extends
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
 }

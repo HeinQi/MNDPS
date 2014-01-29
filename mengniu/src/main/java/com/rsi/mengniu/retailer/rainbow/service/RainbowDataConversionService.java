@@ -109,11 +109,11 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 		return log;
 	}
 
-	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	public void processOrderData(String retailerID, Date startDate, Date endDate) throws BaseException {
 		// Get Receiving Note
@@ -361,5 +361,11 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 			throw new BaseException(e);
 		}
 		return salesMap;
+	}
+
+	@Override
+	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

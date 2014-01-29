@@ -73,9 +73,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 				Utils.getEndDate(Constants.RETAILER_TESCO));
 		for (Date searchDate : dates) {
 			try {
-				summaryBuffer.append("收货单日期: "
-						+ DateUtil.toString(searchDate, "yyyy-MM-dd")  + "\r\n");
-				getReceiveExcel(httpClient, user,searchDate);
+				summaryBuffer.append("收货单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+				getReceiveExcel(httpClient, user, searchDate);
 				summaryBuffer.append("收货单下载成功" + "\r\n");
 			} catch (Exception e) {
 				summaryBuffer.append("收货单下载失败" + "\r\n");
@@ -87,9 +86,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 		for (Date searchDate : dates) {
 
 			try {
-				summaryBuffer.append("订单日期: "
-						+ DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getOrder(httpClient, user, contextMap,searchDate);
+				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+				getOrder(httpClient, user, contextMap, searchDate);
 				summaryBuffer.append("订单下载成功" + "\r\n");
 			} catch (Exception e) {
 				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
@@ -158,7 +156,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public synchronized void getReceiveExcel(CloseableHttpClient httpClient, User user,Date searchDate) throws Exception {
+	public synchronized void getReceiveExcel(CloseableHttpClient httpClient, User user, Date searchDate)
+			throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sellGrnQry/init.hlt
 		// get vendorTaxRegistration
 		String excelFileName = "Receiving_" + user.getRetailer() + "_" + user.getUserId() + "_"
@@ -183,7 +182,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("vendorTaxRegistration", vendorTaxRegistration));// 税号
 		receiveformParams.add(new BasicNameValuePair("transactionType", "01"));// 进货
-		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart",searchDateStr));// 交易日期
+		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateStart", searchDateStr));// 交易日期
 		receiveformParams.add(new BasicNameValuePair("grnModel.transactionDateEnd", searchDateStr)); // 交易日期
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("https://tesco.chinab2bi.com/tesco/sellGrnQry/exportDetail.hlt");
@@ -191,35 +190,41 @@ public class TescoDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost); // filename=20140108220149.zip
 		String zipFileNm = receiveRes.getFirstHeader("Content-Disposition").getValue();
 		zipFileNm = zipFileNm.substring(zipFileNm.indexOf("filename=") + 9);
-		String receiveFilePath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_INBOUND_PATH);
-		FileUtil.createFolder(receiveFilePath);
-		FileOutputStream receiveFos = new FileOutputStream(receiveFilePath + zipFileNm);
+		String tempPath = Utils.getProperty(Constants.TEMP_PATH);
+		FileUtil.createFolder(tempPath);
+		FileOutputStream receiveFos = new FileOutputStream(tempPath + zipFileNm);
 		receiveRes.getEntity().writeTo(receiveFos);
 		receiveFos.close();
 		receiveRes.close();
+
 		try {
-			FileUtil.unzip(receiveFilePath + zipFileNm, receiveFilePath, "");
+			FileUtil.unzip(tempPath + zipFileNm, tempPath, "");
+
+			// Update file name follow the naming conversion
+			String receiveFilePath = Utils.getProperty(user.getRetailer() + Constants.RECEIVING_INBOUND_PATH);
 			
-			//Update file name follow the naming conversion
 			String oldFileName = zipFileNm.substring(0, zipFileNm.lastIndexOf(".")) + ".xls";
+
 			File oldFile = new File(receiveFilePath+oldFileName);
 			
 			File newFile = new File(receiveFilePath+excelFileName);
 			oldFile.renameTo(newFile);
-			
+
 			log.info(user + "Tesco收货单Excel下载成功!");
 		} catch (ZipException e) {
 
-			String receiveFileExceptionPath = Utils
-					.getProperty(user.getRetailer() + Constants.RECEIVING_EXCEPTION_PATH);
-			FileUtil.moveFile(receiveFilePath, receiveFileExceptionPath, zipFileNm);
+			// String receiveFileExceptionPath = Utils
+			// .getProperty(user.getRetailer() +
+			// Constants.RECEIVING_EXCEPTION_PATH);
+			// FileUtil.moveFile(receiveFilePath, receiveFileExceptionPath,
+			// zipFileNm);
 
 			log.info(user + "Tesco收货单Excel下载失败!");
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 	}
 
-	public void getOrder(CloseableHttpClient httpClient, User user, HashMap<String, Object> contextMap,Date searchDate)
+	public void getOrder(CloseableHttpClient httpClient, User user, HashMap<String, Object> contextMap, Date searchDate)
 			throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sp/purOrder/sellPubOrderQryInit.hlt
 		// load search from
@@ -233,8 +238,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 		String parentVendor = parentVendorElement.attr("value");
 		contextMap.put("parentVender", parentVendor);
 		List<TescoOrderNotifyTO> notifyList = new ArrayList<TescoOrderNotifyTO>();
-
-		getNotifyList(httpClient, parentVendor, notifyList, user,searchDate);
+		getNotifyList(httpClient, parentVendor, notifyList, user, searchDate);
 		// get order detail
 		int count = 0;
 		for (TescoOrderNotifyTO notify : notifyList) {
@@ -258,16 +262,17 @@ public class TescoDataPullService implements RetailerDataPullService {
 	}
 
 	private void getNotifyList(CloseableHttpClient httpClient, String parentVendor,
-			List<TescoOrderNotifyTO> notifyList, User user,Date searchDate) throws Exception {
+			List<TescoOrderNotifyTO> notifyList, User user, Date searchDate) throws Exception {
 		// https://tesco.chinab2bi.com/tesco/sp/purOrder/sellPubOrderQry.hlt
 		log.info(user + "查询订单通知...");
 		int pageNo = 1;
 		int totalPages = 1;
+		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
 		do {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_TESCO));
 			List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-			searchformParams.add(new BasicNameValuePair("orderDateStart", DateUtil.toString(searchDate, "yyyy-MM-dd")));// 通知日期
-			searchformParams.add(new BasicNameValuePair("orderDateEnd", DateUtil.toString(searchDate, "yyyy-MM-dd"))); // 通知日期
+			searchformParams.add(new BasicNameValuePair("orderDateStart", searchDateStr));// 通知日期
+			searchformParams.add(new BasicNameValuePair("orderDateEnd", searchDateStr)); // 通知日期
 			searchformParams.add(new BasicNameValuePair("parentVendor", parentVendor));// parentVendor
 			searchformParams.add(new BasicNameValuePair("page.pageSize", "50"));// pageSize
 			searchformParams.add(new BasicNameValuePair("page.pageNo", String.valueOf(pageNo))); // pageSize
@@ -300,10 +305,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			}
 			pageNo++;
 		} while (pageNo <= totalPages);
-		log.info(user + "查询到从" + DateUtil.toString(searchDate, "yyyy-MM-dd") + "到"
-				+ DateUtil.toString(searchDate, "yyyy-MM-dd") + ",共有"
-				+ notifyList.size() + "条订单通知");
-
+		log.info(user + "查询到日期：" + searchDateStr + ",共有" + notifyList.size() + "条订单通知");
 	}
 
 	private void readOrder(BufferedReader br, User user,Date searchDate) throws Exception {
@@ -336,6 +338,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 				List<OrderTO> orderItems = new ArrayList<OrderTO>();
 				readOrderItem(br, orderItems, storeNm, orderNo, orderDate);
 				Utils.exportOrderInfoToTXT(user.getRetailer(), user.getUserId(), orderNo, searchDate, orderItems);
+
 				log.info(user + "成功读取订单,订单号:" + orderNo);
 				count++;
 			}

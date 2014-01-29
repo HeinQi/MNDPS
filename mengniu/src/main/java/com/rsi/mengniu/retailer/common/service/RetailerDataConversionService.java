@@ -38,21 +38,12 @@ public abstract class RetailerDataConversionService {
 
 	protected abstract Log getSummaryLog();
 
-	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
+	protected static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
 	protected abstract Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
 			Date endDate, File receivingFile) throws BaseException;
 
-	/**
-	 * Get Order Info
-	 * 
-	 * @param retailerID
-	 * @param orderNoSet
-	 * @return
-	 * @throws BaseException
-	 */
-	protected abstract Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet)
-			throws BaseException;
+	protected abstract Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException;
 
 	/**
 	 * Get Sales Info
@@ -195,6 +186,31 @@ public abstract class RetailerDataConversionService {
 
 		return receivingNoteMap;
 
+	}
+
+	/**
+	 * Get Order Info
+	 * 
+	 * @param retailerID
+	 * @param orderNoSet
+	 * @return
+	 * @throws BaseException
+	 */
+	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
+		File orderInboundFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH));
+
+		File[] orderList = orderInboundFolder.listFiles();
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+		for (int i = 0; i < orderList.length; i++) {
+
+			File orderFile = orderList[i];
+			orderMap.putAll(getOrderInfoFromFile(retailerID,orderFile));
+			getLog().info("订单文件名: " + orderFile.getName());
+
+		}
+
+		return orderMap;
 	}
 
 	/**

@@ -63,12 +63,12 @@ public class RenrenleDataConversionService extends
 		return null;
 	}
 
-	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	protected Map<String, OrderTO> getOrderInfo(String retailerID,
+//			Set<String> orderNoSet) throws BaseException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
@@ -295,6 +295,12 @@ public class RenrenleDataConversionService extends
 
 		
 
+	}
+
+	@Override
+	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

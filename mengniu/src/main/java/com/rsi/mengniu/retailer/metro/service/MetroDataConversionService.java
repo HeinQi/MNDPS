@@ -142,80 +142,80 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 		return receivingNoteByStoreMap;
 	}
 	
-	@Override
-	protected Map<String, OrderTO> getOrderInfo(String retailerID,
-			Set<String> orderNoSet) throws BaseException {
-		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
-		for (String orderNo : orderNoSet) {
-			// Get order info map
-			// Key: Order Number + Store ID + Item Code
-			Map<String, OrderTO> orderMap = null;
-			
-			// Get order info map
-			orderMap = getOrderInfo(orderNo);
-			log.info("读取订单信息. 订单号:" + orderNo);
-			
-			orderTOMap.putAll(orderMap);
+//	@Override
+//	protected Map<String, OrderTO> getOrderInfo(String retailerID,
+//			Set<String> orderNoSet) throws BaseException {
+//		Map<String, OrderTO> orderTOMap = new HashMap<String, OrderTO>();
+//		for (String orderNo : orderNoSet) {
+//			// Get order info map
+//			// Key: Order Number + Store ID + Item Code
+//			Map<String, OrderTO> orderMap = null;
+//			
+//			// Get order info map
+//			orderMap = getOrderInfo(orderNo);
+//			log.info("读取订单信息. 订单号:" + orderNo);
+//			
+//			orderTOMap.putAll(orderMap);
+//
+//			log.info("读取订单信息结束. 订单号:" + orderNo);
+//		}
+//
+//		return orderTOMap;
+//	}
 
-			log.info("读取订单信息结束. 订单号:" + orderNo);
-		}
-
-		return orderTOMap;
-	}
-
-	private Map<String, OrderTO> getOrderInfo(String orderNo)
-			throws BaseException {
-		String fileName = Utils.getProperty(Constants.RETAILER_METRO
-				+ Constants.ORDER_INBOUND_PATH)
-				+ "Order_"
-				+ Constants.RETAILER_METRO
-				+ "_"
-				+ orderNo
-				+ ".txt";
-		log.info(fileName);
-		File orderFile = new File(fileName);
-
-		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-
-		if (orderFile.exists()) {
-			BufferedReader reader = null;
-			try {
-				// Open the file
-				FileInputStream fileInput = new FileInputStream(orderFile);
-				InputStreamReader inputStrReader = new InputStreamReader(
-						fileInput, "UTF-8");
-				reader = new BufferedReader(inputStrReader);
-				reader.readLine();
-				// Read line by line
-				String orderLine = null;
-				while ((orderLine = reader.readLine()) != null) {
-					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getOrderNo()
-							+ orderTO.getStoreID()
-							+ orderTO.getItemID();
-					orderMap.put(key, orderTO);
-
-				}
-				// orderTOList.add(orderTO);
-
-			} catch (FileNotFoundException e) {
-				log.error(e);
-				throw new BaseException(e);
-			} catch (IOException e) {
-
-				log.error(e);
-				throw new BaseException(e);
-
-			} finally {
-
-				FileUtil.closeFileReader(reader);
-			}
-
-			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
-
-		}
-		return orderMap;
-	}
+//	private Map<String, OrderTO> getOrderInfo(String orderNo)
+//			throws BaseException {
+//		String fileName = Utils.getProperty(Constants.RETAILER_METRO
+//				+ Constants.ORDER_INBOUND_PATH)
+//				+ "Order_"
+//				+ Constants.RETAILER_METRO
+//				+ "_"
+//				+ orderNo
+//				+ ".txt";
+//		log.info(fileName);
+//		File orderFile = new File(fileName);
+//
+//		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+//
+//		if (orderFile.exists()) {
+//			BufferedReader reader = null;
+//			try {
+//				// Open the file
+//				FileInputStream fileInput = new FileInputStream(orderFile);
+//				InputStreamReader inputStrReader = new InputStreamReader(
+//						fileInput, "UTF-8");
+//				reader = new BufferedReader(inputStrReader);
+//				reader.readLine();
+//				// Read line by line
+//				String orderLine = null;
+//				while ((orderLine = reader.readLine()) != null) {
+//					OrderTO orderTO = new OrderTO(orderLine);
+//					String key = orderTO.getOrderNo()
+//							+ orderTO.getStoreID()
+//							+ orderTO.getItemID();
+//					orderMap.put(key, orderTO);
+//
+//				}
+//				// orderTOList.add(orderTO);
+//
+//			} catch (FileNotFoundException e) {
+//				log.error(e);
+//				throw new BaseException(e);
+//			} catch (IOException e) {
+//
+//				log.error(e);
+//				throw new BaseException(e);
+//
+//			} finally {
+//
+//				FileUtil.closeFileReader(reader);
+//			}
+//
+//			log.info("订单: " + orderNo + " 包含的详单数量为:" + orderMap.size());
+//
+//		}
+//		return orderMap;
+//	}
 
 	@Override
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(
@@ -256,5 +256,50 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 		}
 
 		return receivingByDateMap;
+	}
+	@Override
+	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
+		
+
+		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
+
+		if (orderFile.exists()) {
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				FileInputStream fileInput = new FileInputStream(orderFile);
+				InputStreamReader inputStrReader = new InputStreamReader(
+						fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
+				reader.readLine();
+				// Read line by line
+				String orderLine = null;
+				while ((orderLine = reader.readLine()) != null) {
+					OrderTO orderTO = new OrderTO(orderLine);
+					String key = orderTO.getOrderNo()
+							+ orderTO.getStoreID()
+							+ orderTO.getItemID();
+					orderMap.put(key, orderTO);
+
+				}
+				// orderTOList.add(orderTO);
+
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			log.info("订单文件: " + orderFile.getName() + " 包含的详单数量为:" + orderMap.size());
+
+		}
+		return orderMap;
 	}
 }

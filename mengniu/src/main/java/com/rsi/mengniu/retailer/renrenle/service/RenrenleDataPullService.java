@@ -282,6 +282,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			OrderTO orderTo = new OrderTO();
 			orderTo.setOrderNo(orderId);
 			orderTo.setOrderDate(searchDate);
+			orderTo.setStoreID(storeName.substring(0,4));
 			orderTo.setStoreName(storeName);
 			orderTo.setItemName(tds.get(0).text());
 			orderTo.setItemID(tds.get(1).text());

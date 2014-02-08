@@ -140,7 +140,7 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 						salesMap.put(salesDate, salesTOList);
 					}
 
-					log.debug("收货单详细条目: " + salesTO.toString());
+					log.debug("销售单详细条目: " + salesTO.toString());
 					salesTOList.add(salesTO);
 				}
 			}
@@ -183,7 +183,7 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 			List<OrderTO> orderList = orderMap.get(orderDateStr);
 			for (OrderTO orderTO : orderList) {
 				String outputLine = orderTO.getOrderNo() + "\t" + orderTO.getStoreID() + "\t" + orderTO.getStoreName()
-						+ "\t" + "" + "\t" + orderTO.getItemID() + "\t" + orderTO.getBarcode() + "\t"
+						+ "\t" + orderTO.getOrderDate() + "\t" + orderTO.getItemID() + "\t" + orderTO.getBarcode() + "\t"
 						+ orderTO.getItemName() + "\t" + orderTO.getQuantity() + "\t" + orderTO.getTotalPrice() + "\t"
 						+ "" + "\t" + "" + "\t" + orderTO.getUnitPrice();
 				try {
@@ -194,11 +194,23 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 					throw new BaseException(e);
 				}
 			}
+			FileUtil.closeFileWriter(writer);
 
 		}
 
 	}
 
+	protected void writerOrderOutputFileHeader(BufferedWriter writer) throws BaseException {
+		String mergedHeader = Utils.getProperty(Constants.RENRENLE_OUTPUT_ORDER_HEADER);
+		try {
+			writer.write(mergedHeader);
+			writer.newLine();
+		} catch (IOException e) {
+
+			throw new BaseException(e);
+		}
+	}
+	
 	private Map<String, List<OrderTO>> getOrderInfo(String retailerID, Date startDate, Date endDate)
 			throws BaseException {
 		Map orderMap = new HashMap();

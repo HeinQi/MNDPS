@@ -26,6 +26,9 @@ public final class Constants {
 	public static final String RECEIVING_HEADER = "receving.header";
 	public static final String SALES_HEADER = "sales.header";
 	public static final String OUTPUT_ORDER_HEADER = "output.order.header";
+	public static final String RENRENLE_OUTPUT_ORDER_HEADER = "renrenle.output.order.header";
+	
+	
 	
 	
 	public static final String INCORRECT_USER_HEADER = "incorrect.user.path";

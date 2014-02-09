@@ -69,6 +69,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			summaryLog.info(summaryBuffer);
 			return;
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_TESCO),
 				Utils.getEndDate(Constants.RETAILER_TESCO));
 		for (Date searchDate : dates) {
@@ -83,6 +84,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 				DataPullTaskPool.addFailedUser(user);
 			}
 		}
+		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
 		for (Date searchDate : dates) {
 
 			try {
@@ -99,10 +101,10 @@ public class TescoDataPullService implements RetailerDataPullService {
 				return;
 			}
 		}
-
+		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
 		for (Date searchDate : dates) {
 			try {
-				summaryBuffer.append("销售日期: " + searchDate + "\r\n");
+				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
 				getSales(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"), contextMap);
 				summaryBuffer.append("销售数据下载成功\r\n");
 			} catch (Exception e) {

@@ -74,7 +74,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 		for (Date searchDate : dates) {
 			try {
-				summaryBuffer.append("销售日期: " + searchDate + "\r\n");
+				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
 				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"), summaryBuffer);
 			} catch (Exception e) {
 				summaryBuffer.append("销售数据下载失败" + "\r\n");
@@ -87,7 +87,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
 		for (Date searchDate : dates) {
 			try {
-				summaryBuffer.append("订单日期: " + searchDate + "\r\n");
+				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
 				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
 				summaryBuffer.append("订单下载成功" + "\r\n");
 			} catch (Exception e) {

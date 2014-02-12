@@ -71,7 +71,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
 				Utils.getEndDate(Constants.RETAILER_RENRENLE));
-
+		
 		for (Date searchDate : dates) {
 			try {
 				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
@@ -88,7 +88,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		for (Date searchDate : dates) {
 			try {
 				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),summaryBuffer);
 				summaryBuffer.append("订单下载成功" + "\r\n");
 			} catch (Exception e) {
 				summaryBuffer.append("订单下载失败" + "\r\n");
@@ -168,6 +168,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		HttpEntity searchEntity = searchRes.getEntity();
 		String searchStr = new String(EntityUtils.toString(searchEntity).getBytes("ISO_8859_1"), "GBK");
 		searchRes.close();
+		if (!searchStr.contains("销售店号查询")) {
+			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			summaryBuffer.append("无权限下载销售单或下载失败" + "\r\n");
+			return;
+		}
 		Document searchDoc = Jsoup.parse(searchStr);
 		Element token = searchDoc.select("input[name=org.apache.struts.taglib.html.TOKEN]").first();
 		String tokenStr = token.attr("value");
@@ -200,9 +205,22 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		log.info(user + searchDate + "的销售数据下载成功");
 	}
 
-	public void getOrders(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+	public void getOrders(CloseableHttpClient httpClient, User user, String searchDate,StringBuffer summaryBuffer) throws Exception {
 		log.info(user + "开始下载" + searchDate + "的订单数据...");
-
+//http://www.renrenle.cn/scm/jump.do?prefix=/order&page=/orderAction.do?method=queryOrder&left=1&moduleID=202
+		HttpGet httpGet = new HttpGet(
+				"http://www.renrenle.cn/scm/jump.do?prefix=/order&page=/orderAction.do?method=queryOrder&left=1&moduleID=202");
+		CloseableHttpResponse searchRes = httpClient.execute(httpGet);
+		HttpEntity searchEntity = searchRes.getEntity();
+		String searchStr = new String(EntityUtils.toString(searchEntity).getBytes("ISO_8859_1"), "GBK");
+		searchRes.close();
+		if (!searchStr.contains("订单资料查询")) {
+			log.error(user + "页面加载失败，请登录网站检查订单数据查询功能是否正常!");
+			summaryBuffer.append("无权限下载订单或下载失败" + "\r\n");
+			return;
+		}
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
+		
 		int pageNo = 1;
 		int totalPages = 1;
 		List<String> orderIdList = new ArrayList<String>();

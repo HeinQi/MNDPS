@@ -359,8 +359,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 			orderTo.setOrderDate(orderDate);
 			String itemId = line.substring(1, 10);
 			line = line.substring(17);
-			String itemName = line.substring(0, line.indexOf(" "));
-			line = line.substring(line.indexOf(" ")).trim(); // 规格
+			String itemName = line.substring(0, line.indexOf("  "));
+			line = line.substring(line.indexOf("  ")).trim(); // 规格
 			line = line.substring(line.indexOf(" ")).trim();// 订购单位
 			line = line.substring(line.indexOf(" ")).trim();// 箱入数
 			line = line.substring(line.indexOf(" ")).trim();// 单件成本

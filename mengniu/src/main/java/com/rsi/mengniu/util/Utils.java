@@ -227,44 +227,35 @@ public class Utils {
 		if (!orderFile.exists()) {
 			try {
 				orderFile.createNewFile();
-				String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
-				FileOutputStream fileOutput = new FileOutputStream(orderFile);
-				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
-				writer.write(orderHeader);
-				writer.newLine();
 			} catch (IOException e) {
-
 				FileUtil.closeFileWriter(writer);
 				throw new BaseException(e);
-			}
-		} else {
-			try {
-
-				// TODO consider that re-run action
-				FileOutputStream fileOutput = new FileOutputStream(orderFile);
-				writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
-			} catch (IOException e) {
-
-				FileUtil.closeFileWriter(writer);
-				throw new BaseException();
 			}
 		}
 
 		try {
-
+			FileOutputStream fileOutput = new FileOutputStream(orderFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			
+			String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
+			writer.write(orderHeader);
+			writer.newLine();
+		} catch (IOException e) {
+			FileUtil.closeFileWriter(writer);
+			throw new BaseException();
+		}
+		
+		try {
 			for (int i = 0; i < orderList.size(); i++) {
 				OrderTO orderTO = orderList.get(i);
 				String orderRow = orderTO.toString();
 				writer.write(orderRow);
 				writer.newLine();
 			}
-
 		} catch (IOException e) {
 			throw new BaseException(e);
 		} finally {
-
 			FileUtil.closeFileWriter(writer);
-
 		}
 
 	}
@@ -567,15 +558,15 @@ public class Utils {
 				File file = fileList[i];
 				String fileName = file.getName();
 
-				if((fileName.indexOf(userID)!=-1) &&(fileName.indexOf(DateUtil.toStringYYYYMMDD(orderDate))!=-1)){
+				if ((fileName.indexOf(userID) != -1) && (fileName.indexOf(DateUtil.toStringYYYYMMDD(orderDate)) != -1)) {
 					return true;
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public static boolean isOrderFileExist(String retailerID, String userID, String orderID, Date orderDate) {
 		String folderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		String txtFileName = null;
@@ -666,8 +657,9 @@ public class Utils {
 			return false;
 		}
 	}
-	
-	public static void exportOrderInfoListToTXT(String retailerID,String userId,Date orderDate, List<OrderTO> orderList) throws BaseException {
+
+	public static void exportOrderInfoListToTXT(String retailerID, String userId, Date orderDate,
+			List<OrderTO> orderList) throws BaseException {
 		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
 		List<OrderTO> tempOrderList = null;
 		for (OrderTO orderTO : orderList) {
@@ -682,11 +674,12 @@ public class Utils {
 			tempOrderList.add(orderTO);
 		}
 		for (Entry<String, List<OrderTO>> entry : orderMap.entrySet()) {
-			exportOrderInfoToTXT(retailerID, userId, entry.getKey(),orderDate , entry.getValue());
+			exportOrderInfoToTXT(retailerID, userId, entry.getKey(), orderDate, entry.getValue());
 		}
 	}
+
 	public static RequestConfig getTimeoutConfig() {
-		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();//设置请求和传输超时时间
+		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();// 设置请求和传输超时时间
 	}
-	
+
 }

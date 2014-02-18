@@ -183,9 +183,9 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 			List<OrderTO> orderList = orderMap.get(orderDateStr);
 			for (OrderTO orderTO : orderList) {
 				String outputLine = orderTO.getOrderNo() + "\t" + orderTO.getStoreID() + "\t" + orderTO.getStoreName()
-						+ "\t" + orderTO.getOrderDate() + "\t" + orderTO.getItemID() + "\t" + orderTO.getBarcode() + "\t"
-						+ orderTO.getItemName() + "\t" + orderTO.getQuantity() + "\t" + orderTO.getTotalPrice() + "\t"
-						+ "" + "\t" + "" + "\t" + orderTO.getUnitPrice();
+						+ "\t" + orderTO.getOrderDate() + "\t" + orderTO.getItemID() + "\t" + orderTO.getBarcode()
+						+ "\t" + orderTO.getItemName() + "\t" + orderTO.getQuantity() + "\t" + orderTO.getTotalPrice()
+						+ "\t" + "" + "\t" + "" + "\t" + orderTO.getUnitPrice();
 				try {
 					writer.write(outputLine);
 					writer.newLine();
@@ -210,7 +210,7 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 			throw new BaseException(e);
 		}
 	}
-	
+
 	private Map<String, List<OrderTO>> getOrderInfo(String retailerID, Date startDate, Date endDate)
 			throws BaseException {
 		Map orderMap = new HashMap();
@@ -222,24 +222,28 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 			for (int i = 0; i < orderList.length; i++) {
 
 				File orderFile = orderList[i];
+				try {
+					String fileName = orderFile.getName();
+					getLog().info("订单文件名: " + orderFile.getName());
 
-				String fileName = orderFile.getName();
-				getLog().info("订单文件名: " + orderFile.getName());
+					String orderDateStr = fileName.substring(fileName.lastIndexOf("_") + 1, fileName.indexOf("."));
 
-				String orderDateStr = fileName.substring(fileName.lastIndexOf("_") + 1, fileName.indexOf("."));
+					Date orderDate = DateUtil.toDate(orderDateStr, "yyyyMMdd");
 
-				Date orderDate = DateUtil.toDate(orderDateStr, "yyyyMMdd");
+					orderDateStr = DateUtil.toString(orderDate);
 
-				orderDateStr = DateUtil.toString(orderDate);
+					if (DateUtil.isInDateRange(orderDate, startDate, endDate)) {
 
-				if (DateUtil.isInDateRange(orderDate, startDate, endDate)) {
+						// Get Receiving Info
+						Map<String, List> orderSingleMap = getOrderInfoFromFile(orderFile, orderDateStr);
 
-					// Get Receiving Info
-					Map<String, List> orderSingleMap = getOrderInfoFromFile(orderFile, orderDateStr);
+						Utils.putSubMapToMainMap(orderMap, orderSingleMap);
+					}
 
-					Utils.putSubMapToMainMap(orderMap, orderSingleMap);
+				} catch (Exception e) {
+					errorLog.error("读取文件失败。请检查文件是否正确。");
+					errorLog.error("文件名：" + orderFile.getName());
 				}
-
 			}
 		}
 
@@ -260,6 +264,7 @@ public class RenrenleDataConversionService extends RetailerDataConversionService
 			String orderLine = null;
 			List<OrderTO> orderTOList = new ArrayList<OrderTO>();
 			while ((orderLine = reader.readLine()) != null) {
+				this.getLog().info("订单内容： " + orderLine);
 				OrderTO orderTO = new OrderTO(orderLine);
 				orderTOList.add(orderTO);
 

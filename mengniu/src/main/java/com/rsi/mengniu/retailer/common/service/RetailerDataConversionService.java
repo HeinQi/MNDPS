@@ -43,7 +43,8 @@ public abstract class RetailerDataConversionService {
 	protected abstract Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
 			Date endDate, File receivingFile) throws BaseException;
 
-	protected abstract Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException;
+	protected abstract Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile)
+			throws BaseException;
 
 	/**
 	 * Get Sales Info
@@ -68,28 +69,39 @@ public abstract class RetailerDataConversionService {
 	 * @param endDate
 	 * @throws BaseException
 	 */
-	public void retailerDataProcessing() throws BaseException {
+	public void retailerDataProcessing() {
 		String retailerID = this.getRetailerID();
 		Date startDate = Utils.getStartDate(retailerID);
 		Date endDate = Utils.getEndDate(retailerID);
+		try {
 
-		getLog().info("开始处理数据");
+			getLog().info("开始处理数据");
 
-		getLog().info("开始处理收货单和订单数据");
+			getLog().info("开始处理收货单和订单数据");
 
-		getSummaryLog().info("订单合并情况：");
+			getSummaryLog().info("订单合并情况：");
 
-		processOrderData(retailerID, startDate, endDate);
+			processOrderData(retailerID, startDate, endDate);
 
-		getLog().info("收货单和订单数据处理结束");
+			getLog().info("收货单和订单数据处理结束");
+		} catch (Exception e) {
+			errorLog.error("零售商：" + retailerID + "订单处理失败。");
+			errorLog.error(e);
 
-		getLog().info("零售商：" + retailerID + " 开始处理销售单");
+		}
 
-		getSummaryLog().info("销售单合并情况：");
-		processSalesData(retailerID, startDate, endDate);
+		try {
+			getLog().info("零售商：" + retailerID + " 开始处理销售单");
 
-		getLog().info("零售商：" + retailerID + " 销售单处理结束");
+			getSummaryLog().info("销售单合并情况：");
+			processSalesData(retailerID, startDate, endDate);
 
+			getLog().info("零售商：" + retailerID + " 销售单处理结束");
+		} catch (Exception e) {
+			errorLog.error("零售商：" + retailerID + "销售单处理失败。");
+			errorLog.error(e);
+
+		}
 		getLog().info("数据处理结束");
 
 		getSummaryLog().info("零售商数据处理结束");
@@ -177,9 +189,14 @@ public abstract class RetailerDataConversionService {
 				getLog().info("收货单文件名: " + receivingFile.getName());
 
 				// Get Receiving Info
-				Map receivingNoteSingleMap = getReceivingInfoFromFile(retailerID, startDate, endDate, receivingFile);
+				try {
+					Map receivingNoteSingleMap = getReceivingInfoFromFile(retailerID, startDate, endDate, receivingFile);
 
-				Utils.putSubMapToMainMap(receivingNoteMap, receivingNoteSingleMap);
+					Utils.putSubMapToMainMap(receivingNoteMap, receivingNoteSingleMap);
+				} catch (Exception e) {
+					errorLog.error("读取文件失败。请检查文件是否正确。");
+					errorLog.error("文件名：" + receivingFile.getName());
+				}
 
 			}
 		}
@@ -205,8 +222,13 @@ public abstract class RetailerDataConversionService {
 		for (int i = 0; i < orderList.length; i++) {
 
 			File orderFile = orderList[i];
-			orderMap.putAll(getOrderInfoFromFile(retailerID,orderFile));
-			getLog().info("订单文件名: " + orderFile.getName());
+			try {
+				orderMap.putAll(getOrderInfoFromFile(retailerID, orderFile));
+				getLog().info("订单文件名: " + orderFile.getName());
+			} catch (Exception e) {
+				errorLog.error("读取文件失败。请检查文件是否正确。");
+				errorLog.error("文件名：" + orderFile.getName());
+			}
 
 		}
 
@@ -345,10 +367,11 @@ public abstract class RetailerDataConversionService {
 			String key = receivingNoteByStoreTO.getOrderNo() + storeName + receivingNoteByStoreTO.getItemID();
 			if (receivingNoteByStoreMap.containsKey(key)) {
 				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
-				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity().replaceAll(",", ""))
+				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity().replaceAll(
+						",", ""))
 						+ Double.parseDouble(existTO.getQuantity().replaceAll(",", ""))));
-				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getTotalPrice().replaceAll(",", ""))
-						+ Double.parseDouble(existTO.getTotalPrice().replaceAll(",", ""))));
+				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getTotalPrice()
+						.replaceAll(",", "")) + Double.parseDouble(existTO.getTotalPrice().replaceAll(",", ""))));
 				getLog().info(
 						"整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity() + " 原始总价: "
 								+ receivingNoteByStoreTO.getTotalPrice());
@@ -493,11 +516,16 @@ public abstract class RetailerDataConversionService {
 			for (int i = 0; i < salesList.length; i++) {
 
 				File salesFile = salesList[i];
-				getLog().info("收货单文件名: " + salesFile.getName());
-				Map salesSingleMap = getSalesInfoFromFile(retailerID, startDate, endDate, salesFile);
+				try {
+					getLog().info("收货单文件名: " + salesFile.getName());
+					Map salesSingleMap = getSalesInfoFromFile(retailerID, startDate, endDate, salesFile);
 
-				// receivingNoteMap.putAll(salesSingleMap);
-				Utils.putSubMapToMainMap(salesMap, salesSingleMap);
+					// receivingNoteMap.putAll(salesSingleMap);
+					Utils.putSubMapToMainMap(salesMap, salesSingleMap);
+				} catch (Exception e) {
+					errorLog.error("读取文件失败。请检查文件是否正确。");
+					errorLog.error("文件名：" + salesFile.getName());
+				}
 
 			}
 		}

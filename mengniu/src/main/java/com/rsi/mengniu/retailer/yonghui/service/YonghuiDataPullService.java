@@ -71,6 +71,14 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			summaryLog.info(summaryBuffer);
 			return;
 		}
+		
+		String venderIds ="";
+		try {
+			venderIds = getVenders(httpClient);
+		} catch (Exception e) {
+			errorLog.error(user, e);
+		}
+		//System.out.println(venderIds);
 		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
 		
 		for (Date searchDate : dates) {
@@ -104,7 +112,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		for (Date searchDate : dates) {
 			try {
 				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getSales(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"));
+				getSales(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),venderIds);
 				summaryBuffer.append("销售数据下载成功\r\n");
 			} catch (Exception e) {
 				summaryBuffer.append("销售数据下载失败" + "\r\n");
@@ -274,7 +282,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		log.info(user + "订单数据下载成功");
 	}
 
-	public void getSales(CloseableHttpClient httpClient, User user, String searchDate) throws Exception {
+	public void getSales(CloseableHttpClient httpClient, User user, String searchDate,String venderIds) throws Exception {
 		if (Utils.isSalesFileExist(user.getRetailer(), user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
 			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
 			return;			
@@ -287,6 +295,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		searchformParams.add(new BasicNameValuePair("sdate_max", searchDate));
 		searchformParams.add(new BasicNameValuePair("nosale", "false"));
 		searchformParams.add(new BasicNameValuePair("action", "getwithoutshop"));
+		searchformParams.add(new BasicNameValuePair("venderidarray", venderIds));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonReport");
 		searchPost.setConfig(Utils.getTimeoutConfig());
@@ -307,6 +316,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 				withShopformParams.add(new BasicNameValuePair("sdate_max", searchDate));
 				withShopformParams.add(new BasicNameValuePair("goodsid", goodsId));
 				withShopformParams.add(new BasicNameValuePair("action", "getwithshop"));
+				withShopformParams.add(new BasicNameValuePair("venderidarray", venderIds));
 				HttpEntity withShopFormEntity = new UrlEncodedFormEntity(withShopformParams, "UTF-8");
 				HttpPost withShopPost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonReport");
 				withShopPost.setConfig(Utils.getTimeoutConfig());
@@ -336,6 +346,26 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		}
 	}
 
+	
+	private String getVenders(CloseableHttpClient httpClient) throws Exception {
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
+		HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/DaemonShopList?sheetname=vender");
+		CloseableHttpResponse venderPageResponse = httpClient.execute(httpGet);
+		String venderPageStr = EntityUtils.toString(venderPageResponse.getEntity());
+		Document venderPage = Jsoup.parse(venderPageStr);
+		venderPageResponse.close();
+		String venderIds = "";
+		if (venderPageStr.contains("ddlSubVender") && venderPageStr != null) {
+			Elements venders = venderPage.select("option");
+			for (Element vender: venders) {
+				venderIds += vender.attr("value")+",";
+			}
+			venderIds = venderIds.substring(0, venderIds.length()-1);
+		}
+		return venderIds;
+		
+	}
+	
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
 	}

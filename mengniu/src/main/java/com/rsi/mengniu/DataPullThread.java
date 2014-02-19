@@ -19,7 +19,13 @@ public class DataPullThread implements Runnable {
 		User user = DataPullTaskPool.getTask();
 		while (user != null) {
 			log.info(user);
-			RetailerDataPullService dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer());
+			RetailerDataPullService dataPull = null;
+			if (Constants.RETAILER_HUALIAN.equals(user.getRetailer())) {
+				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer()+"."+user.getDistrict());
+			} else {
+				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer());
+			}
+			 
 			dataPull.dataPull(user);
 			user = DataPullTaskPool.getTask();
 		}

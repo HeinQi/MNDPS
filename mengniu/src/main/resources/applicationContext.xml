@@ -39,7 +39,14 @@
 	<bean id ="renrenle" class="com.rsi.mengniu.retailer.renrenle.service.RenrenleDataPullService">
 		<property name="ocr" ref="ocr"/>
 	</bean>
-	<bean id ="hualian" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+	<bean id ="hualian.zunyi" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+
+
+
+
+
+
+
 	
 	<bean id ="ocr" class="com.rsi.mengniu.util.OCR">
 	</bean>

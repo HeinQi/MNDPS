@@ -4,15 +4,7 @@ public class User {
 	String userId = "";
 	String password = "";
 	String retailer = "";
-	String district = "";
-
-	public String getDistrict() {
-		return district;
-	}
-
-	public void setDistrict(String district) {
-		this.district = district;
-	}
+	String url = "";
 
 	public String getUserId() {
 		return userId;
@@ -36,6 +28,14 @@ public class User {
 
 	public void setRetailer(String retailer) {
 		this.retailer = retailer;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public String toString() {

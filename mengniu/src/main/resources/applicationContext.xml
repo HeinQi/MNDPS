@@ -39,7 +39,7 @@
 	<bean id ="renrenle" class="com.rsi.mengniu.retailer.renrenle.service.RenrenleDataPullService">
 		<property name="ocr" ref="ocr"/>
 	</bean>
-	<bean id ="hualian.zunyi" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+	<bean id ="http://zunyi.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
 
 
 

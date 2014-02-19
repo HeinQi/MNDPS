@@ -51,6 +51,14 @@ public class Utils {
 	private static Properties properties;
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
+	public static void main(String[] args) throws BaseException {
+		User user = new User();
+		user.setUserId("Test");
+		user.setRetailer(Constants.RETAILER_CARREFOUR);
+		user.setUrl("tttt");
+		user.setPassword("Password");
+		recordIncorrectUser(user);
+	}
 
 	public void setProperties(Properties p) {
 		properties = p;
@@ -465,7 +473,7 @@ public class Utils {
 
 				HSSFRow row = sheet.getRow(i);
 				if (row.getCell(1).getStringCellValue().equals(user.getUserId())
-						&& row.getCell(3).getStringCellValue().equals(user.getDistrict())) {
+						&& row.getCell(3).getStringCellValue().equals(user.getUrl())) {
 					return;
 				}
 			}
@@ -473,7 +481,7 @@ public class Utils {
 			row.createCell(0).setCellValue(String.valueOf(lastRowNo + 1));
 			row.createCell(1).setCellValue(user.getUserId());
 			row.createCell(2).setCellValue(user.getPassword());
-			row.createCell(3).setCellValue(user.getDistrict());
+			row.createCell(3).setCellValue(user.getUrl());
 			row.createCell(4).setCellValue(DateUtil.toString(new Date()));
 
 			fileOut = new FileOutputStream(excelFile);

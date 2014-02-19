@@ -431,10 +431,10 @@ public class TescoDataPullService implements RetailerDataPullService {
 				SalesTO salesTo = new SalesTO();
 				salesTo.setSalesDate(searchDate);
 				salesTo.setItemID(tds.get(2).text());
-				salesTo.setItemName(tds.get(4).text());
-				salesTo.setStoreID(tds.get(6).text());
-				salesTo.setSalesQuantity(tds.get(8).text());
-				salesTo.setSalesAmount(tds.get(9).text());
+				salesTo.setItemName(tds.get(3).text());
+				salesTo.setStoreID(tds.get(5).text());
+				salesTo.setSalesQuantity(tds.get(7).text());
+				salesTo.setSalesAmount(tds.get(8).text());
 				salesList.add(salesTo);
 				log.info(user + "成功读取销售数据第" + salesList.size() + "条");
 			}

@@ -21,7 +21,7 @@ public class DataPullThread implements Runnable {
 			log.info(user);
 			RetailerDataPullService dataPull = null;
 			if (Constants.RETAILER_HUALIAN.equals(user.getRetailer())) {
-				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer()+"."+user.getDistrict());
+				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getUrl());
 			} else {
 				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer());
 			}

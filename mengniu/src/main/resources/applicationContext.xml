@@ -40,6 +40,47 @@
 		<property name="ocr" ref="ocr"/>
 	</bean>
 	<bean id ="http://zunyi.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+	
+	<!--
+	//http://60.165.173.225:81/
+	//酒泉市鼎盛糖酒副食品有限责任公司
+	//酒泉市海威商贸有限公司
+	//嘉峪关市西部天地商贸责任有限公司 
+	 -->
+	<bean id ="http://60.165.173.225:81/" class="com.rsi.mengniu.retailer.hualian.service.JQHualianDataPullService"></bean>
+	<!-- 
+	//221.199.11.90 
+	//宁夏惠尧商贸有限公司 
+	//青铜峡市乾坤商贸有限公司 
+	//石嘴山市三兴源商贸有限公司 
+	//吴忠志永商贸有限公司
+	 -->
+	
+	<bean id ="221.199.11.90" class="com.rsi.mengniu.retailer.hualian.service.NXHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://lanzhou.beijing-hualian.com/wwweb/index.asp
+//武威富协商贸有限公司
+//武威市凉州区天宁苑便民店
+//凉州区鸿浩商贸配送中心
+	
+	 -->
+	
+	<bean id ="http://lanzhou.beijing-hualian.com/wwweb/index.asp" class="com.rsi.mengniu.retailer.hualian.service.WWHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://qinghaihuayuan.beijing-hualian.com/index.asp
+	//宝鸡市鹏瑞商贸有限公司
+	//青海荣天祥商贸有限公司
+	 -->
+	
+	<bean id ="http://qinghaihuayuan.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.QHHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://lanzhou.beijing-hualian.com/lzweb/index.asp
+	//甘肃天成食品有限公司
+	 -->
+	<bean id ="http://lanzhou.beijing-hualian.com/lzweb/index.asp" class="com.rsi.mengniu.retailer.hualian.service.LZHualianDataPullService"></bean>
 
 
 

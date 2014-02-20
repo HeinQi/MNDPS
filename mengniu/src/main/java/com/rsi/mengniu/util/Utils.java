@@ -52,12 +52,8 @@ public class Utils {
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
 	public static void main(String[] args) throws BaseException {
-		User user = new User();
-		user.setUserId("Test");
-		user.setRetailer(Constants.RETAILER_CARREFOUR);
-		user.setUrl("tttt");
-		user.setPassword("Password");
-		recordIncorrectUser(user);
+		System.out.println("Sales_" + ("2".equals("") ? "" : ("2" + "_"))
+				+ ("".equals("") ? "" : ("3" + "_"))+ ".txt");
 	}
 
 	public void setProperties(Properties p) {
@@ -236,7 +232,7 @@ public class Utils {
 		try {
 			FileOutputStream fileOutput = new FileOutputStream(orderFile);
 			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
-			
+
 			String orderHeader = Utils.getProperty(Constants.ORDER_HEADER);
 			writer.write(orderHeader);
 			writer.newLine();
@@ -244,7 +240,7 @@ public class Utils {
 			FileUtil.closeFileWriter(writer);
 			throw new BaseException();
 		}
-		
+
 		try {
 			for (int i = 0; i < orderList.size(); i++) {
 				OrderTO orderTO = orderList.get(i);
@@ -426,6 +422,67 @@ public class Utils {
 
 		}
 
+	}
+
+	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, String agency,
+			String userID, Date slaesDate, List<SalesTO> salesList) throws BaseException {
+
+		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
+		FileUtil.createFolder(salesInboundFolderPath);
+
+		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_"
+				+ (districtName.equals("") ? "" : (districtName + "_")) + (agency.equals("") ? "" : (agency + "_"))
+				+ userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+
+		File salesFile = new File(salesFilePath);
+
+		BufferedWriter writer = null;
+
+		try {
+			salesFile.createNewFile();
+			String salesHeader = Utils.getProperty(Constants.SALES_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(salesFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(salesHeader);
+			writer.newLine();
+
+			for (int i = 0; i < salesList.size(); i++) {
+				SalesTO salesTO = (SalesTO) salesList.get(i);
+				String salesRow = salesTO.toString();
+				writer.write(salesRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			FileUtil.closeFileWriter(writer);
+
+		}
+
+	}
+
+	public static boolean isSalesFileExistForHualian(String retailerID, String districtName, String agency,
+			String userID, Date orderDate) {
+		String folderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
+		String txtFileName = null;
+		String excelFileName = null;
+		txtFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
+				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
+				+ ".txt";
+		excelFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
+				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
+				+ ".xls";
+		File txtFile = new File(folderPath + txtFileName);
+		File excelFile = new File(folderPath + excelFileName);
+
+		if (txtFile.exists() || excelFile.exists()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public static synchronized void recordIncorrectUser(User user) throws BaseException {

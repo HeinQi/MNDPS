@@ -56,23 +56,34 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
+		HttpGet salesHttpGet = new HttpGet("http://bhgs1.beijing-hualian.com/Account/Login.aspx");
+		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
+		HttpEntity formEntity = formResponse.getEntity();
+		Document doc = Jsoup.parse(EntityUtils.toString(formEntity));
+		Element vsElement = doc.select("#__VIEWSTATE").first();
+		Element evElement = doc.select("#__EVENTVALIDATION").first();
+		formResponse.close();
+		
+		
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		formParams.add(new BasicNameValuePair("__VIEWSTATE", vsElement.attr("value")));
+		formParams.add(new BasicNameValuePair("__EVENTVALIDATION", evElement.attr("value")));
 		formParams.add(new BasicNameValuePair("ctl00$MainContent$LoginUser$UserName", user.getUserId()));
 		formParams.add(new BasicNameValuePair("ctl00$MainContent$LoginUser$Password", user.getPassword())); // 错误的密码
+		formParams.add(new BasicNameValuePair("ctl00$MainContent$LoginUser$LoginButton", "登录")); // 错误的密码
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
 		HttpPost httppost = new HttpPost("http://bhgs1.beijing-hualian.com/Account/Login.aspx");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-
-		//String reponseLogin = new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK");
 		String responseLogin =EntityUtils.toString(loginResponse.getEntity());
 		loginResponse.close();
-		System.out.println(responseLogin);
-		if (responseLogin.contains("您的供应商编号或密码有误")) {
+		
+		if (responseLogin.contains("您的登录尝试不成功")) {
 			log.info(user + "错误的密码,退出!");
 			Utils.recordIncorrectUser(user);
 			return "Error";
 		}
+		/*
 		// forward
 		HttpGet httpGet = new HttpGet("http://lnjp.beijing-hualian.com/suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -83,6 +94,7 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 			return "Error";
 		}
 		response.close();
+		*/
 		log.info(user + "登录成功!");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		return "Success";
@@ -103,7 +115,7 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
 //			for (Element store : sElements) {
 //				String storeId = store.attr("value");
-				getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+				getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyy-MM-dd"));
 //			}
 			Utils.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(),searchDate, salesList);
 

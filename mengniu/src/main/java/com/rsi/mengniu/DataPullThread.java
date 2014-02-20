@@ -11,26 +11,32 @@ import com.rsi.mengniu.util.AppContextHelper;
 
 public class DataPullThread implements Runnable {
 	private static Log log = LogFactory.getLog(DataPullThread.class);
-	private final CountDownLatch mDoneSignal;  
+	private final CountDownLatch mDoneSignal;
+
 	DataPullThread(final CountDownLatch doneSignal) {
-		this.mDoneSignal= doneSignal;
+		this.mDoneSignal = doneSignal;
 	}
+
 	public void run() {
 		User user = DataPullTaskPool.getTask();
 		while (user != null) {
 			log.info(user);
 			RetailerDataPullService dataPull = null;
-			if (Constants.RETAILER_HUALIAN.equals(user.getRetailer())) {
-				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getUrl());
-			} else {
-				dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer());
+			try {
+				if (Constants.RETAILER_HUALIAN.equals(user.getRetailer())) {
+					dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getUrl());
+				} else {
+					dataPull = (RetailerDataPullService) AppContextHelper.getBean(user.getRetailer());
+				}
+
+				dataPull.dataPull(user);
+				user = DataPullTaskPool.getTask();
+			} catch (Exception e) {
+				user = null;
+				log.error(user, e);
 			}
-			 
-			dataPull.dataPull(user);
-			user = DataPullTaskPool.getTask();
 		}
 		mDoneSignal.countDown();
-		
 	}
 
 }

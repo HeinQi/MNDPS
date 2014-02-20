@@ -104,7 +104,7 @@ public class LNJPHualianDataPullService implements RetailerDataPullService {
 //				String storeId = store.attr("value");
 				getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
 //			}
-			Utils.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(),searchDate, salesList);
+			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user.getAgency(), user.getUserId(),searchDate, salesList);
 
 		}
 

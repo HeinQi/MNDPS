@@ -107,7 +107,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 				String storeId = store.text();
 				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
 			}
-			Utils.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(), searchDate, salesList);
+			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user.getAgency(), user.getUserId(),searchDate, salesList);
 
 		}
 

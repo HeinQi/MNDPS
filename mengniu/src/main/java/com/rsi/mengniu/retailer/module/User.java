@@ -5,6 +5,9 @@ public class User {
 	String password = "";
 	String retailer = "";
 	String url = "";
+	String district = ""; 
+	String agency = "";
+	String loginNm = "";
 
 	public String getUserId() {
 		return userId;
@@ -36,6 +39,30 @@ public class User {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getAgency() {
+		return agency;
+	}
+
+	public void setAgency(String agency) {
+		this.agency = agency;
+	}
+
+	public String getLoginNm() {
+		return loginNm;
+	}
+
+	public void setLoginNm(String loginNm) {
+		this.loginNm = loginNm;
 	}
 
 	public String toString() {

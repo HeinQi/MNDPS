@@ -55,17 +55,14 @@
 	//石嘴山市三兴源商贸有限公司 
 	//吴忠志永商贸有限公司
 	 -->
-	
 	<bean id ="221.199.11.90" class="com.rsi.mengniu.retailer.hualian.service.NXHualianDataPullService"></bean>
 	
 	<!-- 
 	//http://lanzhou.beijing-hualian.com/wwweb/index.asp
-//武威富协商贸有限公司
-//武威市凉州区天宁苑便民店
-//凉州区鸿浩商贸配送中心
-	
+	//武威富协商贸有限公司
+	//武威市凉州区天宁苑便民店
+	//凉州区鸿浩商贸配送中心
 	 -->
-	
 	<bean id ="http://lanzhou.beijing-hualian.com/wwweb/index.asp" class="com.rsi.mengniu.retailer.hualian.service.WWHualianDataPullService"></bean>
 	
 	<!-- 
@@ -73,7 +70,6 @@
 	//宝鸡市鹏瑞商贸有限公司
 	//青海荣天祥商贸有限公司
 	 -->
-	
 	<bean id ="http://qinghaihuayuan.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.QHHualianDataPullService"></bean>
 	
 	<!-- 
@@ -81,7 +77,44 @@
 	//甘肃天成食品有限公司
 	 -->
 	<bean id ="http://lanzhou.beijing-hualian.com/lzweb/index.asp" class="com.rsi.mengniu.retailer.hualian.service.LZHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://guiyang.beijing-hualian.com/
+   //贵阳蒙牛乳业贸易有限公司
+   //贵阳农汇食品营销有限公司
+	 -->
+	<bean id ="http://guiyang.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.GYHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://lnjp.beijing-hualian.com/
+	//辽宁瑞鑫物流有限公司
+	 -->
+	<bean id ="http://lnjp.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.LNJPHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://guangxi.beijing-hualian.com/
+	//广西南宁伊品蓝商贸有限公司
+	 -->
+	<bean id ="http://guangxi.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.GXHualianDataPullService"></bean>
+	
+	<!-- 
+	//http://gxfcg.beijing-hualian.com/
+	//北海市禾海天贸易有限公司
+	 -->
+	<bean id ="http://gxfcg.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.GXFCGHualianDataPullService"></bean>
 
+	<!-- 
+	//http://huizhou.beijing-hualian.com
+	//惠州市福楷贸易有限公司
+	//惠州市高姐丽英贸易有限公司
+	 -->
+	<bean id ="http://huizhou.beijing-hualian.com" class="com.rsi.mengniu.retailer.hualian.service.HZHualianDataPullService"></bean>
+
+	<!-- 
+	//http://bhgs1.beijing-hualian.com/Account/Login.aspx
+	//沈阳博思智业贸易有限公司	
+	 -->
+	<bean id ="http://bhgs1.beijing-hualian.com/Account/Login.aspx" class="com.rsi.mengniu.retailer.hualian.service.SYHualianDataPullService"></bean>
 
 
 

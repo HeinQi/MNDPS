@@ -36,6 +36,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import com.rsi.mengniu.Constants;
@@ -52,8 +53,7 @@ public class Utils {
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
 	public static void main(String[] args) throws BaseException {
-		System.out.println("Sales_" + ("2".equals("") ? "" : ("2" + "_"))
-				+ ("".equals("") ? "" : ("3" + "_"))+ ".txt");
+		System.out.println("Sales_" + ("2".equals("") ? "" : ("2" + "_")) + ("".equals("") ? "" : ("3" + "_")) + ".txt");
 	}
 
 	public void setProperties(Properties p) {
@@ -102,8 +102,7 @@ public class Utils {
 		return buffer.toString();
 	}
 
-	public static String HttpExecute(CloseableHttpClient httpClient, HttpUriRequest request, String expectStr)
-			throws Exception {
+	public static String HttpExecute(CloseableHttpClient httpClient, HttpUriRequest request, String expectStr) throws Exception {
 		CloseableHttpResponse response = httpClient.execute(request);
 		HttpEntity entity = response.getEntity();
 		String responseStr = EntityUtils.toString(entity);
@@ -210,13 +209,13 @@ public class Utils {
 	 * @param orderDate
 	 * @throws BaseException
 	 */
-	public static void exportOrderInfoToTXT(String retailerID, String userID, String orderID, Date orderDate,
-			List<OrderTO> orderList) throws BaseException {
+	public static void exportOrderInfoToTXT(String retailerID, String userID, String orderID, Date orderDate, List<OrderTO> orderList)
+			throws BaseException {
 
 		String orderFolderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		FileUtil.createFolder(orderFolderPath);
-		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
-				+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_" + orderID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
+				+ ".txt";
 
 		File orderFile = new File(orderFilePath);
 		BufferedWriter writer = null;
@@ -294,8 +293,8 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXT(String retailerID, String userID, Date receivingDate,
-			List<ReceivingNoteTO> receivingList) throws BaseException {
+	public static void exportReceivingInfoToTXT(String retailerID, String userID, Date receivingDate, List<ReceivingNoteTO> receivingList)
+			throws BaseException {
 
 		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
@@ -340,8 +339,8 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXTForRainbow(String retailerID, String userID, Date receivingDate,
-			List<ReceivingNoteTO> receivingList) throws BaseException {
+	public static void exportReceivingInfoToTXTForRainbow(String retailerID, String userID, Date receivingDate, List<ReceivingNoteTO> receivingList)
+			throws BaseException {
 
 		String receivingInboundFolderPath = getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
@@ -386,13 +385,11 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportSalesInfoToTXT(String retailerID, String userID, Date slaesDate, List<SalesTO> salesList)
-			throws BaseException {
+	public static void exportSalesInfoToTXT(String retailerID, String userID, Date slaesDate, List<SalesTO> salesList) throws BaseException {
 
 		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesInboundFolderPath);
-		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + userID + "_"
-				+ DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
 
 		File salesFile = new File(salesFilePath);
 
@@ -424,15 +421,14 @@ public class Utils {
 
 	}
 
-	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, String agency,
-			String userID, Date slaesDate, List<SalesTO> salesList) throws BaseException {
+	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, String agency, String userID, Date slaesDate,
+			List<SalesTO> salesList) throws BaseException {
 
 		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesInboundFolderPath);
 
-		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_"
-				+ (districtName.equals("") ? "" : (districtName + "_")) + (agency.equals("") ? "" : (agency + "_"))
-				+ userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
+				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
 
 		File salesFile = new File(salesFilePath);
 
@@ -464,17 +460,14 @@ public class Utils {
 
 	}
 
-	public static boolean isSalesFileExistForHualian(String retailerID, String districtName, String agency,
-			String userID, Date orderDate) {
+	public static boolean isSalesFileExistForHualian(String retailerID, String districtName, String agency, String userID, Date orderDate) {
 		String folderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		String txtFileName = null;
 		String excelFileName = null;
-		txtFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
-				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
-				+ ".txt";
+		txtFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_")) + (agency.equals("") ? "" : (agency + "_"))
+				+ userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
 		excelFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
-				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
-				+ ".xls";
+				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
 		File txtFile = new File(folderPath + txtFileName);
 		File excelFile = new File(folderPath + excelFileName);
 
@@ -529,8 +522,7 @@ public class Utils {
 			for (int i = 1; i <= lastRowNo; i++) {
 
 				HSSFRow row = sheet.getRow(i);
-				if (row.getCell(1).getStringCellValue().equals(user.getUserId())
-						&& row.getCell(3).getStringCellValue().equals(user.getUrl())) {
+				if (row.getCell(1).getStringCellValue().equals(user.getUserId()) && row.getCell(3).getStringCellValue().equals(user.getUrl())) {
 					return;
 				}
 			}
@@ -568,12 +560,11 @@ public class Utils {
 	 * @param failedReceivingList
 	 * @throws BaseException
 	 */
-	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate,
-			List<ReceivingNoteTO> failedReceivingList) throws BaseException {
+	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList)
+			throws BaseException {
 		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
-		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_"
-				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_" + DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
 
 		File receivingFile = new File(receivingFilePath);
 
@@ -629,10 +620,8 @@ public class Utils {
 		String txtFileName = null;
 		String excelFileName = null;
 		if (orderID != null && !orderID.equals("")) {
-			txtFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
-					+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
-			excelFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
-					+ DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+			txtFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+			excelFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
 		} else {
 			txtFileName = "Order_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
 			excelFileName = "Order_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
@@ -715,8 +704,7 @@ public class Utils {
 		}
 	}
 
-	public static void exportOrderInfoListToTXT(String retailerID, String userId, Date orderDate,
-			List<OrderTO> orderList) throws BaseException {
+	public static void exportOrderInfoListToTXT(String retailerID, String userId, Date orderDate, List<OrderTO> orderList) throws BaseException {
 		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
 		List<OrderTO> tempOrderList = null;
 		for (OrderTO orderTO : orderList) {
@@ -738,9 +726,19 @@ public class Utils {
 	public static RequestConfig getTimeoutConfig() {
 		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();// 设置请求和传输超时时间
 	}
-	
+
 	public static String getUrlRoot(String url) {
-		return url.substring(0,url.lastIndexOf("/")+1);
+		return url.substring(0, url.lastIndexOf("/") + 1);
+	}
+
+	public static List<HashMap<String, String>> json2List(String json) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			return objectMapper.readValue(json, List.class);
+		} catch (IOException e) {
+			errorLog.error("Json Parse Error!", e);
+		}
+		return null;
 	}
 
 }

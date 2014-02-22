@@ -28,9 +28,9 @@ import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.Utils;
 
-//https://tesco.chinab2bi.com/security/login.hlt
-public class HualianDataPullService implements RetailerDataPullService {
-	private static Log log = LogFactory.getLog(HualianDataPullService.class);
+//http://haerbin.beijing-hualian.com/
+public class HRBHualianDataPullService implements RetailerDataPullService {
+	private static Log log = LogFactory.getLog(HRBHualianDataPullService.class);
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -60,7 +60,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 		formParams.add(new BasicNameValuePair("UsernameGet", user.getUserId()));
 		formParams.add(new BasicNameValuePair("PasswordGet", user.getPassword())); // 错误的密码
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(user.getUrl()+"checksuppllogin.asp");
+		HttpPost httppost = new HttpPost("http://haerbin.beijing-hualian.com/checksuppllogin.asp");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
@@ -72,7 +72,7 @@ public class HualianDataPullService implements RetailerDataPullService {
 			return "Error";
 		}
 		// forward
-		HttpGet httpGet = new HttpGet(user.getUrl()+"suppl_select.asp");
+		HttpGet httpGet = new HttpGet("http://haerbin.beijing-hualian.com/suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
@@ -88,11 +88,11 @@ public class HualianDataPullService implements RetailerDataPullService {
 
 	public void getSales(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
-		HttpGet salesHttpGet = new HttpGet(user.getUrl()+"suppl_select.asp?action=sale");
+		HttpGet salesHttpGet = new HttpGet("http://haerbin.beijing-hualian.com/suppl_select.asp?action=sale");
 		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
 		HttpEntity formEntity = formResponse.getEntity();
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
-		Element storeElement = doc.select("#store").first();
+		Element storeElement = doc.select("#store_no").first();
 		formResponse.close();
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		Elements sElements = storeElement.select("option[value]");
@@ -115,13 +115,13 @@ public class HualianDataPullService implements RetailerDataPullService {
 			throws Exception {
 
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		formParams.add(new BasicNameValuePair("store", storeId));
+		formParams.add(new BasicNameValuePair("store_no", storeId));
 		formParams.add(new BasicNameValuePair("begindate", searchDate));
 		formParams.add(new BasicNameValuePair("enddate", searchDate));
 		log.info(user + "下载店号为[" + storeId + "],日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(user.getUrl()+"suppl_select.asp?action=salesel");
+		HttpPost httppost = new HttpPost("http://haerbin.beijing-hualian.com/suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
@@ -130,11 +130,11 @@ public class HualianDataPullService implements RetailerDataPullService {
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
-			sales.setStoreID(tds.get(0).text());
-			sales.setItemID(tds.get(1).text());
-			sales.setItemName(tds.get(2).text());
-			sales.setSalesQuantity(tds.get(3).text());
-			sales.setSalesAmount(tds.get(4).text());
+			sales.setStoreID(storeId);
+			sales.setItemID(tds.get(0).text());
+			sales.setItemName(tds.get(1).text());
+			sales.setSalesQuantity(tds.get(2).text());
+			sales.setSalesAmount(tds.get(3).text());
 			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);
 		}

@@ -89,7 +89,7 @@
 	//http://lnjp.beijing-hualian.com/
 	//辽宁瑞鑫物流有限公司
 	 -->
-	<bean id ="http://lnjp.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.LNJPHualianDataPullService"></bean>
+	<bean id ="http://lnjp.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
 	
 	<!-- 
 	//http://guangxi.beijing-hualian.com/
@@ -114,7 +114,26 @@
 	//http://bhgs1.beijing-hualian.com/Account/Login.aspx
 	//沈阳博思智业贸易有限公司	
 	 -->
-	<bean id ="http://bhgs1.beijing-hualian.com/Account/Login.aspx" class="com.rsi.mengniu.retailer.hualian.service.SYHualianDataPullService"></bean>
+	<bean id ="http://bhgs1.beijing-hualian.com/Account/Login.aspx?ReturnUrl=%2f" class="com.rsi.mengniu.retailer.hualian.service.SYHualianDataPullService"></bean>
+	
+	<!-- 
+	http://wuzhou.beijing-hualian.com/
+	梧州市高锋华商贸有限公司
+	梧州市钰达食品贸易有限公司
+	 -->
+	<bean id ="http://wuzhou.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+	<!-- 
+	 -->
+	<bean id ="http://anshun.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	<!-- 
+	 -->
+	<bean id ="http://shandong.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	<!-- 
+	http://haerbin.beijing-hualian.com/
+	哈尔滨蒙牛商贸有限公司
+	黑龙江蒙牛乳业销售有限公司
+	 -->
+	<bean id ="http://haerbin.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HRBHualianDataPullService"></bean>
 
 
 

@@ -30,11 +30,12 @@ import com.rsi.mengniu.util.Utils;
 //建平地区
 //http://lnjp.beijing-hualian.com/
 //辽宁瑞鑫物流有限公司
-public class LNJPHualianDataPullService implements RetailerDataPullService {
-	private static Log log = LogFactory.getLog(LNJPHualianDataPullService.class);
+public class NoStoreHualianDataPullService implements RetailerDataPullService {
+	private static Log log = LogFactory.getLog(NoStoreHualianDataPullService.class);
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+		System.out.println(Utils.getUrlRoot(user.getUrl()));
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
@@ -61,7 +62,7 @@ public class LNJPHualianDataPullService implements RetailerDataPullService {
 		formParams.add(new BasicNameValuePair("UsernameGet", user.getUserId()));
 		formParams.add(new BasicNameValuePair("PasswordGet", user.getPassword())); // 错误的密码
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://lnjp.beijing-hualian.com/checksuppllogin.asp");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"checksuppllogin.asp");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
@@ -73,7 +74,7 @@ public class LNJPHualianDataPullService implements RetailerDataPullService {
 			return "Error";
 		}
 		// forward
-		HttpGet httpGet = new HttpGet("http://lnjp.beijing-hualian.com/suppl_select.asp");
+		HttpGet httpGet = new HttpGet(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
@@ -121,7 +122,7 @@ public class LNJPHualianDataPullService implements RetailerDataPullService {
 		log.info(user + "下载日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://lnjp.beijing-hualian.com/suppl_select.asp?action=salesel");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
@@ -130,11 +131,19 @@ public class LNJPHualianDataPullService implements RetailerDataPullService {
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
+			if (user.getUrl().contains("anshun.beijing-hualian.com")) {
+				sales.setStoreID("");
+				sales.setItemID(tds.get(0).text());
+				sales.setItemName(tds.get(1).text());
+				sales.setSalesQuantity(tds.get(2).text());
+				sales.setSalesAmount(tds.get(3).text());				
+			} else {
 			sales.setStoreID(tds.get(0).text());
 			sales.setItemID(tds.get(1).text());
 			sales.setItemName(tds.get(2).text());
 			sales.setSalesQuantity(tds.get(3).text());
 			sales.setSalesAmount(tds.get(4).text());
+			}
 			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);
 		}

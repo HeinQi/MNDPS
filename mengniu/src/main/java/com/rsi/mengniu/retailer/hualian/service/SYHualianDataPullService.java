@@ -83,18 +83,18 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 			Utils.recordIncorrectUser(user);
 			return "Error";
 		}
-		/*
-		// forward
-		HttpGet httpGet = new HttpGet("http://lnjp.beijing-hualian.com/suppl_select.asp");
-		CloseableHttpResponse response = httpClient.execute(httpGet);
-		HttpEntity entity = response.getEntity();
-		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
-		if (!loginStr.contains("查询系统")) {
-			log.info(user + "系统出错,退出!");
-			return "Error";
-		}
-		response.close();
-		*/
+		
+//		// forward
+//		HttpGet httpGet = new HttpGet("http://bhgs1.beijing-hualian.com/default.aspx");
+//		CloseableHttpResponse response = httpClient.execute(httpGet);
+//		HttpEntity entity = response.getEntity();
+//		String loginStr = EntityUtils.toString(entity);
+//		if (!loginStr.contains("销售查询")) {
+//			log.info(user + "系统出错,退出!");
+//			return "Error";
+//		}
+//		response.close();
+		
 		log.info(user + "登录成功!");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		return "Success";
@@ -117,7 +117,7 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 //				String storeId = store.attr("value");
 				getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyy-MM-dd"));
 //			}
-			Utils.exportSalesInfoToTXT(Constants.RETAILER_HUALIAN, user.getUserId(),searchDate, salesList);
+			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user.getAgency(), user.getUserId(),searchDate, salesList);
 
 		}
 
@@ -127,28 +127,46 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 	// /suppl_select.asp?action=salesel
 	private void getSalesByStore(CloseableHttpClient httpClient, User user,List<SalesTO> salesList, String searchDate)
 			throws Exception {
-
+		HttpGet salesHttpGet = new HttpGet("http://bhgs1.beijing-hualian.com/Info/xscx.aspx");
+		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
+		HttpEntity formEntity = formResponse.getEntity();
+		Document searchDoc = Jsoup.parse(EntityUtils.toString(formEntity));
+		Element vsElement = searchDoc.select("#__VIEWSTATE").first();
+		Element evElement = searchDoc.select("#__EVENTVALIDATION").first();
+		formResponse.close();
+		
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		formParams.add(new BasicNameValuePair("begindate", searchDate));
-		formParams.add(new BasicNameValuePair("enddate", searchDate));
+		formParams.add(new BasicNameValuePair("ctl00$MainContent$ScriptManager1","ctl00$MainContent$UpdatePanel1|ctl00$MainContent$btnCx"));
+		formParams.add(new BasicNameValuePair("__VIEWSTATE", vsElement.attr("value")));
+		formParams.add(new BasicNameValuePair("__EVENTVALIDATION", evElement.attr("value")));
+		formParams.add(new BasicNameValuePair("__ASYNCPOST", "true"));
+		formParams.add(new BasicNameValuePair("ctl00$MainContent$ddlCity", "所有地区"));
+		formParams.add(new BasicNameValuePair("ctl00$MainContent$tbxSdate", searchDate));
+		formParams.add(new BasicNameValuePair("ctl00$MainContent$tbxEdate", searchDate));
+		formParams.add(new BasicNameValuePair("ctl00$MainContent$btnCx", "开始查询"));
 		log.info(user + "下载日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://lnjp.beijing-hualian.com/suppl_select.asp?action=salesel");
+		HttpPost httppost = new HttpPost("http://bhgs1.beijing-hualian.com/Info/xscx.aspx");
+		httppost.addHeader("Accept-Language", "zh-CN");
+		httppost.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
-		Element dataTable = doc.select("table").first();
+		HttpEntity searchEntity = loginResponse.getEntity();
+		Document doc = Jsoup.parse(EntityUtils.toString(searchEntity));
+		
+		Element dataTable = doc.select("#MainContent_GridView1").first();
 		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
 			sales.setStoreID(tds.get(0).text());
-			sales.setItemID(tds.get(1).text());
-			sales.setItemName(tds.get(2).text());
-			sales.setSalesQuantity(tds.get(3).text());
-			sales.setSalesAmount(tds.get(4).text());
-			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
+			sales.setItemID(tds.get(2).text());
+			sales.setItemName(tds.get(3).text());
+			sales.setSalesQuantity(tds.get(4).text());
+			sales.setSalesAmount(tds.get(5).text());
+			sales.setSalesDate(searchDate);
 			salesList.add(sales);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));

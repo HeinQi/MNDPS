@@ -738,5 +738,9 @@ public class Utils {
 	public static RequestConfig getTimeoutConfig() {
 		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();// 设置请求和传输超时时间
 	}
+	
+	public static String getUrlRoot(String url) {
+		return url.substring(0,url.lastIndexOf("/")+1);
+	}
 
 }

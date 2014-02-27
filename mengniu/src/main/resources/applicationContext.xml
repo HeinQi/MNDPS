@@ -134,9 +134,28 @@
 	黑龙江蒙牛乳业销售有限公司
 	 -->
 	<bean id ="http://haerbin.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HRBHualianDataPullService"></bean>
+	
+	<!-- 
+	郑州金凌商贸有限公司
+	郑州市蒙牛贸易有限公司
+	 -->
+	<bean id ="http://henan.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.ConfigStoreHualianDataPullService"></bean>
+	
+	<!-- 
+	长春鸿雁科技有限公司（低温、冰淇淋）
+	长春蒙牛乳品销售有限公司
+	 -->
+	<bean id ="http://changchun.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+	<!-- 
+	武汉蒙牛乳业有限公司
+	 -->
+	<bean id ="http://wuhan.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
 
-
-
+	<!--  
+	http://baoding.beijing-hualian.com/	津冀	华林伟业
+	-->
+	<bean id ="http://baoding.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
 
 
 

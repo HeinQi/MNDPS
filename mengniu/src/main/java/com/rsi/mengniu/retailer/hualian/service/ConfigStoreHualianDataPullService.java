@@ -27,11 +27,10 @@ import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.Utils;
-//建平地区
-//http://lnjp.beijing-hualian.com/
-//辽宁瑞鑫物流有限公司
-public class NoStoreHualianDataPullService implements RetailerDataPullService {
-	private static Log log = LogFactory.getLog(NoStoreHualianDataPullService.class);
+
+//从配置文件中读取要获取数据的门店号
+public class ConfigStoreHualianDataPullService implements RetailerDataPullService {
+	private static Log log = LogFactory.getLog(ConfigStoreHualianDataPullService.class);
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -89,36 +88,30 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 
 	public void getSales(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
-//		HttpGet salesHttpGet = new HttpGet("http://lnjp.beijing-hualian.com/suppl_select.asp?action=sale");
-//		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
-//		HttpEntity formEntity = formResponse.getEntity();
-//		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
-//		Element storeElement = doc.select("#store").first();
-//		formResponse.close();
-//		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
-//		Elements sElements = storeElement.select("option[value]");
+		String[] sotres = null;
+		if (user.getUrl().contains("henan.beijing-hualian.com")) {
+			sotres = getConfigStoreList("hualian.henan.storeNo");
+		}
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
-//			for (Element store : sElements) {
-//				String storeId = store.attr("value");
-				getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
-//			}
+			for (String storeId : sotres) {
+				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+			}
 			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user.getAgency(), user.getUserId(),searchDate, salesList);
-
 		}
-
 		log.info(user + "销售数据下载成功");
 	}
 
 	// /suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user,List<SalesTO> salesList, String searchDate)
+	private void getSalesByStore(CloseableHttpClient httpClient, User user, String storeId, List<SalesTO> salesList, String searchDate)
 			throws Exception {
 
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		formParams.add(new BasicNameValuePair("store_no", storeId));
 		formParams.add(new BasicNameValuePair("begindate", searchDate));
 		formParams.add(new BasicNameValuePair("enddate", searchDate));
-		log.info(user + "下载日期为 " + searchDate + " 的销售数据");
+		log.info(user + "下载店号为[" + storeId + "],日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
 		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp?action=salesel");
@@ -130,23 +123,20 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
-			if (user.getUrl().contains("anshun.beijing-hualian.com")) {
-				sales.setStoreID("");
-				sales.setItemID(tds.get(0).text());
-				sales.setItemName(tds.get(1).text());
-				sales.setSalesQuantity(tds.get(2).text());
-				sales.setSalesAmount(tds.get(3).text());				
-			} else {
-			sales.setStoreID(tds.get(0).text());
-			sales.setItemID(tds.get(1).text());
-			sales.setItemName(tds.get(2).text());
-			sales.setSalesQuantity(tds.get(3).text());
-			sales.setSalesAmount(tds.get(4).text());
-			}
+			sales.setStoreID(storeId);
+			sales.setItemID(tds.get(0).text());
+			sales.setItemName(tds.get(1).text());
+			sales.setSalesQuantity(tds.get(2).text());
+			sales.setSalesAmount(tds.get(3).text());
 			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
+	}
+	
+	private String[] getConfigStoreList(String key) {
+		String storeStr = Utils.getProperty(key);
+		return storeStr.split(",");
 	}
 
 }

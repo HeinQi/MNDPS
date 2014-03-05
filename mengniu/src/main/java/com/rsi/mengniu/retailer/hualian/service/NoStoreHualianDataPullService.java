@@ -130,7 +130,7 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
-			if (user.getUrl().contains("anshun.beijing-hualian.com")) {
+			if (user.getUrl().contains("anshun.beijing-hualian.com")||user.getUrl().contains("gzxy.beijing-hualian.com")||user.getUrl().contains("kaili.beijing-hualian.com") ) {
 				sales.setStoreID("");
 				sales.setItemID(tds.get(0).text());
 				sales.setItemName(tds.get(1).text());

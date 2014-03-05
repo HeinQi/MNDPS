@@ -67,6 +67,7 @@ public class DataPullTaskPool {
 				user.setDistrict(getCellValueAsStr(row.getCell(4)));
 				user.setAgency(getCellValueAsStr(row.getCell(5)));
 				user.setLoginNm(getCellValueAsStr(row.getCell(6)));
+				user.setStoreNo(getCellValueAsStr(row.getCell(7)));
 			}
 			log.debug(user);
 			userList.add(user);

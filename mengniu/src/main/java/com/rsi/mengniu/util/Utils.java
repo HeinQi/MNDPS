@@ -53,7 +53,6 @@ public class Utils {
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 
 	public static void main(String[] args) throws BaseException {
-		System.out.println("Sales_" + ("2".equals("") ? "" : ("2" + "_")) + ("".equals("") ? "" : ("3" + "_")) + ".txt");
 	}
 
 	public void setProperties(Properties p) {
@@ -728,7 +727,14 @@ public class Utils {
 	}
 
 	public static String getUrlRoot(String url) {
-		return url.substring(0, url.lastIndexOf("/") + 1);
+		if (!url.startsWith("http")) {
+			url = "http://"+url;
+		}
+		if (url.matches("http://(.*?)/(.*?)")) {
+			return url.substring(0, url.lastIndexOf("/") + 1);
+		} else {
+			return url+"/";
+		}
 	}
 
 	public static List<HashMap<String, String>> json2List(String json) {

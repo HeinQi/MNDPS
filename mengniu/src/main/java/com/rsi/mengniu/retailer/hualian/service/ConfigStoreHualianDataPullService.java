@@ -88,10 +88,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 
 	public void getSales(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
-		String[] sotres = null;
-		if (user.getUrl().contains("henan.beijing-hualian.com")) {
-			sotres = getConfigStoreList("hualian.henan.storeNo");
-		}
+		String[] sotres = user.getStoreNo().split(",");
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
@@ -109,6 +106,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("store_no", storeId));
+		formParams.add(new BasicNameValuePair("storeno", storeId));
 		formParams.add(new BasicNameValuePair("begindate", searchDate));
 		formParams.add(new BasicNameValuePair("enddate", searchDate));
 		log.info(user + "下载店号为[" + storeId + "],日期为 " + searchDate + " 的销售数据");
@@ -123,20 +121,23 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
+			if (user.getUrl().contains("anhui.beijing-hualian.com")) {
+				sales.setStoreID(tds.get(0).text());
+				sales.setItemID(tds.get(1).text());
+				sales.setItemName(tds.get(2).text());
+				sales.setSalesQuantity(tds.get(3).text());
+				sales.setSalesAmount(tds.get(4).text());
+			} else {
 			sales.setStoreID(storeId);
 			sales.setItemID(tds.get(0).text());
 			sales.setItemName(tds.get(1).text());
 			sales.setSalesQuantity(tds.get(2).text());
 			sales.setSalesAmount(tds.get(3).text());
+			}
 			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
-	}
-	
-	private String[] getConfigStoreList(String key) {
-		String storeStr = Utils.getProperty(key);
-		return storeStr.split(",");
 	}
 
 }

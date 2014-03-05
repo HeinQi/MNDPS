@@ -156,6 +156,42 @@
 	http://baoding.beijing-hualian.com/	津冀	华林伟业
 	-->
 	<bean id ="http://baoding.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+	<!-- 
+	合肥市蒙牛乳业销售有限公司
+	 -->
+	<bean id ="http://anhui.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.ConfigStoreHualianDataPullService"></bean>
+	
+	<!-- 
+	南京蒙牛乳业销售有限公司
+	 -->
+	<bean id ="http://218.94.70.10/zongchao/" class="com.rsi.mengniu.retailer.hualian.service.NXHualianDataPullService"></bean>
+	<!-- 
+	连云港得福实业有限公司
+	 -->
+	<bean id ="http://218.94.70.10/lyg/" class="com.rsi.mengniu.retailer.hualian.service.NXHualianDataPullService"></bean>
+	
+	<!-- 
+	苏州市尧鹏营销有限公司
+	 -->
+	<bean id ="http://suzhou.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+	<!-- 
+	江州区昭君食品贸易商行
+	 -->
+	<bean id ="http://cz.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+	<!-- 
+	贵港市百佳商贸有限公司
+	 -->
+	<bean id ="http://gxgg.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.HualianDataPullService"></bean>
+	
+	<!-- 
+	兴义市哗坤商贸有限公司
+	 -->
+	<bean id ="http://gzxy.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	<!-- 
+	 -->
+	<bean id ="http://kaili.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
 
 
 

@@ -33,11 +33,18 @@ import com.rsi.mengniu.util.Utils;
 //青铜峡市乾坤商贸有限公司 
 //石嘴山市三兴源商贸有限公司 
 //吴忠志永商贸有限公司
+//http://218.94.70.10/
+//南京蒙牛乳业销售有限公司
 public class NXHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(NXHualianDataPullService.class);
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+//		String urlRoot = Utils.getUrlRoot(user.getUrl());
+//		if (urlRoot.contains("218.94.70.10")) {
+//			urlRoot=urlRoot+"zongchao/";
+//		}
+//		user.setUrl(urlRoot);
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
@@ -64,7 +71,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 		formParams.add(new BasicNameValuePair("UsernameGet", user.getUserId()));
 		formParams.add(new BasicNameValuePair("PasswordGet", user.getPassword())); // 错误的密码
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://221.199.11.90/checksuppllogin.asp");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"checksuppllogin.asp");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
@@ -76,7 +83,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 			return "Error";
 		}
 		// forward
-		HttpGet httpGet = new HttpGet("http://221.199.11.90/suppl_select.asp");
+		HttpGet httpGet = new HttpGet(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
@@ -92,7 +99,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 
 	public void getSales(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
-		HttpGet salesHttpGet = new HttpGet("http://221.199.11.90/suppl_select.asp?action=sale");
+		HttpGet salesHttpGet = new HttpGet(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp?action=sale");
 		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
 		HttpEntity formEntity = formResponse.getEntity();
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
@@ -125,7 +132,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 		log.info(user + "下载店号为[" + storeId + "],日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost("http://221.199.11.90/suppl_select.asp?action=salesel");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));

@@ -8,6 +8,7 @@ public class User {
 	String district = ""; 
 	String agency = "";
 	String loginNm = "";
+	String storeNo = "";
 
 	public String getUserId() {
 		return userId;
@@ -67,6 +68,15 @@ public class User {
 
 	public String toString() {
 		return "UserId[" + userId + "],Password[" + password + "],Retailer[" + retailer + "]";
+	}
+
+	
+	public String getStoreNo() {
+		return storeNo;
+	}
+
+	public void setStoreNo(String storeNo) {
+		this.storeNo = storeNo;
 	}
 
 	public boolean equals(Object obj) {

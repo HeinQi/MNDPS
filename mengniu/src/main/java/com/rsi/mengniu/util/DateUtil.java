@@ -24,7 +24,7 @@ public class DateUtil {
 			Date receivingDate = dateFormat.parse(dateStr);
 			return receivingDate;
 		} catch (ParseException e) {
-			System.out.println(dateStr);
+			errorLog.error(dateStr);
 			throw new BaseException(e);
 		}
 

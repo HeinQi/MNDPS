@@ -22,6 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -54,6 +55,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user + "网站登录出错,请检查!");
 			errorLog.error(user, e);
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		try {
@@ -62,6 +64,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
 			errorLog.error(user, e);
+			DataPullTaskPool.addFailedUser(user);
 		}
 	}
 

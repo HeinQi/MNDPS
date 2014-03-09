@@ -66,6 +66,8 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			errorLog.error(user,e);
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
 			summaryLog.info(summaryBuffer);
+			DataPullTaskPool.addFailedUser(user);
+			
 			return;
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
@@ -246,7 +248,12 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		Document doc = Jsoup.parse(responseStr);
 		Element mailboxForm = doc.select("form[name=mailboxForm]").first();
 		Element table = mailboxForm.select("table").first();
+		
 		String recordStr = table.select("tr[align=right]").select("td").get(0).text();
+		if(recordStr==null || recordStr.equals("")){
+			log.info(user + "订单日期" + searchDate + "记录为 0");
+			return;
+		}
 		recordStr = recordStr.substring(recordStr.indexOf("共") + 1, recordStr.indexOf("记"));
 		recordStr = recordStr.replaceAll(",", "");
 		int record = Integer.parseInt(recordStr);

@@ -22,6 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
+import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -46,6 +47,7 @@ public class JQHualianDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		try {
@@ -54,6 +56,7 @@ public class JQHualianDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
 			errorLog.error(user,e);
+			DataPullTaskPool.addFailedUser(user);
 		}
 	}
 
@@ -132,6 +135,7 @@ public class JQHualianDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
 		Element dataTable = doc.select("table").first();
+		log.info(user +" 订单页面内容" + dataTable.toString());
 		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");

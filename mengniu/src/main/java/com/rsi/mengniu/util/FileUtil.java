@@ -276,7 +276,7 @@ public class FileUtil {
 	 * @throws BaseException
 	 */
 	public static void moveFiles(List<String> sourceFileNameList, String sourcePath, String destPath)
-			throws BaseException {
+			 {
 
 		for (String sourceFileName : sourceFileNameList) {
 			moveFile(sourcePath, destPath, sourceFileName);

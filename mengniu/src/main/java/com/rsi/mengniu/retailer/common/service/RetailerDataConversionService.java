@@ -176,7 +176,7 @@ public abstract class RetailerDataConversionService {
 	 * @throws BaseException
 	 */
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfo(String retailerID, Date startDate, Date endDate)
-			throws BaseException {
+			 {
 		Map receivingNoteMap = new HashMap();
 
 		File receivingInboundFolder = new File(Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH));
@@ -213,7 +213,7 @@ public abstract class RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) throws BaseException {
+	protected Map<String, OrderTO> getOrderInfo(String retailerID, Set<String> orderNoSet) {
 		File orderInboundFolder = new File(Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH));
 
 		File[] orderList = orderInboundFolder.listFiles();
@@ -243,8 +243,8 @@ public abstract class RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
-			Map<String, List<ReceivingNoteTO>> receivingNoteMap) throws BaseException {
+	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate (
+			Map<String, List<ReceivingNoteTO>> receivingNoteMap)throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = new HashMap<String, List<ReceivingNoteTO>>();
 		for (List<ReceivingNoteTO> receivingNoteList : receivingNoteMap.values()) {
 
@@ -506,7 +506,7 @@ public abstract class RetailerDataConversionService {
 	}
 
 	private Map<String, List<SalesTO>> getSalesData(String retailerID, Date startDate, Date endDate)
-			throws BaseException {
+			 {
 		Map salesMap = new HashMap();
 
 		File salesInboundFolder = new File(Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH));

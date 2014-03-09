@@ -67,6 +67,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 
 		} catch (Exception e) {
 			log.error(user + Utils.getTrace(e));
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		List<Date> dateList = null;

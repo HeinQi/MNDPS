@@ -67,6 +67,7 @@ public class TescoDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("登录失败!\r\n");
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			summaryLog.info(summaryBuffer);
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");

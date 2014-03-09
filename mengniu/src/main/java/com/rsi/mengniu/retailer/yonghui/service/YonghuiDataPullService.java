@@ -69,6 +69,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("登录失败!\r\n");
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
 			summaryLog.info(summaryBuffer);
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		

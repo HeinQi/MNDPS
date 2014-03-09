@@ -56,6 +56,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			summaryLog.info(summaryBuffer);
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
+			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");

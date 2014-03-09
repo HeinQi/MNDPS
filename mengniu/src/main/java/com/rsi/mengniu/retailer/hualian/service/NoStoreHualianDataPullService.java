@@ -30,6 +30,7 @@ import com.rsi.mengniu.util.Utils;
 //建平地区
 //http://lnjp.beijing-hualian.com/
 //辽宁瑞鑫物流有限公司
+
 public class NoStoreHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(NoStoreHualianDataPullService.class);
 
@@ -42,16 +43,16 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 				return;
 			}
 		} catch (Exception e) {
-			log.error(user+"网站登录出错,请检查!");
-			errorLog.error(user,e);
+			log.error(user + "网站登录出错,请检查!");
+			errorLog.error(user, e);
 			return;
 		}
 		try {
 			getSales(httpClient, user);
-			httpClient.close();			
+			httpClient.close();
 		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-			errorLog.error(user,e);
+			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user, e);
 		}
 	}
 
@@ -61,7 +62,7 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 		formParams.add(new BasicNameValuePair("UsernameGet", user.getUserId()));
 		formParams.add(new BasicNameValuePair("PasswordGet", user.getPassword())); // 错误的密码
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"checksuppllogin.asp");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl()) + "checksuppllogin.asp");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
@@ -73,7 +74,7 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 			return "Error";
 		}
 		// forward
-		HttpGet httpGet = new HttpGet(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp");
+		HttpGet httpGet = new HttpGet(Utils.getUrlRoot(user.getUrl()) + "suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
@@ -89,22 +90,22 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 
 	public void getSales(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始下载销售数据...");
-//		HttpGet salesHttpGet = new HttpGet("http://lnjp.beijing-hualian.com/suppl_select.asp?action=sale");
-//		CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
-//		HttpEntity formEntity = formResponse.getEntity();
-//		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
-//		Element storeElement = doc.select("#store").first();
-//		formResponse.close();
-//		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
-//		Elements sElements = storeElement.select("option[value]");
+		// HttpGet salesHttpGet = new HttpGet("http://lnjp.beijing-hualian.com/suppl_select.asp?action=sale");
+		// CloseableHttpResponse formResponse = httpClient.execute(salesHttpGet);
+		// HttpEntity formEntity = formResponse.getEntity();
+		// Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
+		// Element storeElement = doc.select("#store").first();
+		// formResponse.close();
+		// Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
+		// Elements sElements = storeElement.select("option[value]");
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
-//			for (Element store : sElements) {
-//				String storeId = store.attr("value");
-				getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
-//			}
-			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user.getAgency(), user.getUserId(),searchDate, salesList);
+			// for (Element store : sElements) {
+			// String storeId = store.attr("value");
+			getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+			// }
+			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN, "", user.getAgency(), user.getUserId(), searchDate, salesList);
 
 		}
 
@@ -112,8 +113,7 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 	}
 
 	// /suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user,List<SalesTO> salesList, String searchDate)
-			throws Exception {
+	private void getSalesByStore(CloseableHttpClient httpClient, User user, List<SalesTO> salesList, String searchDate) throws Exception {
 
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("begindate", searchDate));
@@ -121,7 +121,7 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 		log.info(user + "下载日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp?action=salesel");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl()) + "suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
@@ -130,18 +130,25 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
 			SalesTO sales = new SalesTO();
-			if (user.getUrl().contains("anshun.beijing-hualian.com")||user.getUrl().contains("gzxy.beijing-hualian.com")||user.getUrl().contains("kaili.beijing-hualian.com") ) {
+			if (user.getUrl().contains("anshun.beijing-hualian.com") || user.getUrl().contains("gzxy.beijing-hualian.com")
+					|| user.getUrl().contains("kaili.beijing-hualian.com")) {
 				sales.setStoreID("");
 				sales.setItemID(tds.get(0).text());
 				sales.setItemName(tds.get(1).text());
 				sales.setSalesQuantity(tds.get(2).text());
-				sales.setSalesAmount(tds.get(3).text());				
+				sales.setSalesAmount(tds.get(3).text());
+			} else if (user.getUrl().contains("shandong.beijing-hualian.com") )  {
+				sales.setStoreID(tds.get(0).text().substring(3, 6)); //#99033山东日照中心店
+				sales.setItemID(tds.get(1).text());
+				sales.setItemName(tds.get(2).text());
+				sales.setSalesQuantity(tds.get(3).text());
+				sales.setSalesAmount(tds.get(4).text());				
 			} else {
-			sales.setStoreID(tds.get(0).text());
-			sales.setItemID(tds.get(1).text());
-			sales.setItemName(tds.get(2).text());
-			sales.setSalesQuantity(tds.get(3).text());
-			sales.setSalesAmount(tds.get(4).text());
+				sales.setStoreID(tds.get(0).text());
+				sales.setItemID(tds.get(1).text());
+				sales.setItemName(tds.get(2).text());
+				sales.setSalesQuantity(tds.get(3).text());
+				sales.setSalesAmount(tds.get(4).text());
 			}
 			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);

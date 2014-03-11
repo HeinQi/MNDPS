@@ -42,7 +42,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 	private OCR ocr;
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_YONGHUI),
 				Utils.getEndDate(Constants.RETAILER_YONGHUI));
 		StringBuffer summaryBuffer = new StringBuffer();
@@ -209,7 +209,6 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		receiveformParams.add(new BasicNameValuePair("sheetname", "receipt"));
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		HttpPost receivePost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonSearchSheet");
-		receivePost.setConfig(Utils.getTimeoutConfig());
 		receivePost.setEntity(receiveFormEntity);
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
 		String responseStr = EntityUtils.toString(receiveRes.getEntity());
@@ -226,7 +225,6 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			String sheetId = eSheetId.text();
 			HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/DaemonViewSheet?sheet=receipt&sheetid="
 					+ sheetId);
-			httpGet.setConfig(Utils.getTimeoutConfig());
 			CloseableHttpResponse detailResponse = httpClient.execute(httpGet);
 			String detailStr = EntityUtils.toString(detailResponse.getEntity());
 			Document xmlDetailDoc = Jsoup.parse(detailStr, "", Parser.xmlParser());
@@ -276,7 +274,6 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		String url = "http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=" + searchDateStr + "&orderdate_max="
 				+ searchDateStr + "&operation=eptOrderSheet";
 		HttpGet httpGet = new HttpGet(url);
-		httpGet.setConfig(Utils.getTimeoutConfig());
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		response.getEntity().writeTo(orderFos);
 		response.close();
@@ -299,7 +296,6 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		searchformParams.add(new BasicNameValuePair("venderidarray", venderIds));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonReport");
-		searchPost.setConfig(Utils.getTimeoutConfig());
 		searchPost.setEntity(searchFormEntity);
 		String responseStr = Utils.HttpExecute(httpClient, searchPost, "sale_cost");
 		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
@@ -320,7 +316,6 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 				withShopformParams.add(new BasicNameValuePair("venderidarray", venderIds));
 				HttpEntity withShopFormEntity = new UrlEncodedFormEntity(withShopformParams, "UTF-8");
 				HttpPost withShopPost = new HttpPost("http://vss.yonghui.cn:9999/vss/DaemonReport");
-				withShopPost.setConfig(Utils.getTimeoutConfig());
 				withShopPost.setEntity(withShopFormEntity);
 				String withShopStr = Utils.HttpExecute(httpClient, withShopPost, "sale_cost");
 				Document xmlDetailDoc = Jsoup.parse(withShopStr, "", Parser.xmlParser());

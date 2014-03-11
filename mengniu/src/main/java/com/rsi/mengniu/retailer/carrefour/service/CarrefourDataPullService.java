@@ -41,7 +41,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 	private OCR ocr;
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		StringBuffer summaryBuffer = new StringBuffer();
 		summaryBuffer.append("运行时间: "+new Date()+"\r\n");
 		summaryBuffer.append("零售商: "+user.getRetailer()+"\r\n");
@@ -196,6 +196,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 			downloadformParams.add(new BasicNameValuePair("filenamedownload", "excelpath"));
 			HttpEntity downloadFormEntity = new UrlEncodedFormEntity(downloadformParams, "UTF-8");
 			HttpPost downloadPost = new HttpPost("http://supplierweb.carrefour.com.cn/download.jsp");
+			
 			downloadPost.setEntity(downloadFormEntity);
 			CloseableHttpResponse downloadRes = httpClient.execute(downloadPost);
 			downloadRes.getEntity().writeTo(receiveFos);
@@ -223,6 +224,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		summaryBuffer.append("订单日期: "+searchDate+"\r\n");
 		// forward to PowerE2E Platform
 		HttpGet httpGet = new HttpGet("https://supplierweb.carrefour.com.cn/callSSO.jsp");
+		
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		if (!EntityUtils.toString(entity).contains("PowerE2E Platform")) {
@@ -241,6 +243,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		searchformParams.add(new BasicNameValuePair("receivedDateTo", searchDate));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/openInbox.htm?");
+
 		searchPost.setEntity(searchFormEntity);
 		CloseableHttpResponse searchRes = httpClient.execute(searchPost);
 		String responseStr = EntityUtils.toString(searchRes.getEntity());
@@ -275,6 +278,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		for (String msgId : msgIdList) {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 			HttpGet httpOrderGet = new HttpGet("https://platform.powere2e.com/platform/mailbox/performDocAction.htm?actionId=1&guid=" + msgId);
+
 			CloseableHttpResponse orderRes = httpClient.execute(httpOrderGet);
 			String orderDetail = EntityUtils.toString(orderRes.getEntity());
 			orderRes.close();
@@ -324,6 +328,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		searchformParams.add(new BasicNameValuePair("receivedDateTo", searchDate));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/navigateInbox.htm?gotoPage=" + page);
+
 		searchPost.setEntity(searchFormEntity);
 		CloseableHttpResponse searchRes = httpClient.execute(searchPost);
 		String responseStr = EntityUtils.toString(searchRes.getEntity());

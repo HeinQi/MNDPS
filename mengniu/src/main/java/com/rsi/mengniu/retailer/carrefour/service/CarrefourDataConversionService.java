@@ -76,12 +76,14 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 
 							switch (j) {
 							case 2:
-								receivingNoteTO.setStoreID(sourceCellValue);
+								//Get store ID by receiving store number
+								String storeID = Utils.getCarrefourStoreIDByReceivingStoreID(sourceCellValue);
+								receivingNoteTO.setStoreID(storeID);
 
 								continue;
 							case 3:
 
-								sourceCellValue = sourceCellValue.substring(sourceCellValue.indexOf("-") + 1);
+								//sourceCellValue = sourceCellValue.substring(sourceCellValue.indexOf("-") + 1);
 								receivingNoteTO.setStoreName(sourceCellValue);
 
 								continue;
@@ -238,7 +240,9 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
-					String key = orderTO.getOrderNo() + orderTO.getStoreName().substring(3) + orderTO.getItemID();
+					String orderStoreName = orderTO.getStoreName();
+					String storeID = Utils.getCarrefourStoreIDByOrderStoreName(orderStoreName);
+					String key = orderTO.getOrderNo() + storeID + orderTO.getItemID();
 					orderMap.put(key, orderTO);
 
 				}
@@ -261,6 +265,42 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 
 		}
 		return orderMap;
+	}
+	
+	/**
+	 * Parse the receiving list of one day to map The key is:
+	 * Order Number + Store Name + Item ID
+	 * 
+	 * @param receivingNoteList
+	 * @return
+	 * @throws BaseException
+	 */
+	public Map<String, ReceivingNoteTO> generateReceivingMapForComparison(List<ReceivingNoteTO> receivingNoteList)
+			throws BaseException {
+		Map<String, ReceivingNoteTO> receivingNoteByStoreMap = new HashMap<String, ReceivingNoteTO>();
+
+		for (int i = 0; i < receivingNoteList.size(); i++) {
+			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
+			String receivingStoreID = receivingNoteByStoreTO.getStoreID();
+			String key = receivingNoteByStoreTO.getOrderNo() + receivingStoreID + receivingNoteByStoreTO.getItemID();
+			if (receivingNoteByStoreMap.containsKey(key)) {
+				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
+				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity().replaceAll(
+						",", ""))
+						+ Double.parseDouble(existTO.getQuantity().replaceAll(",", ""))));
+				existTO.setTotalPrice(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getTotalPrice()
+						.replaceAll(",", "")) + Double.parseDouble(existTO.getTotalPrice().replaceAll(",", ""))));
+				getLog().info(
+						"整合收货单: 原始数量: " + receivingNoteByStoreTO.getQuantity() + " 原始总价: "
+								+ receivingNoteByStoreTO.getTotalPrice());
+
+				getLog().info("整合收货单: 整合后数量: " + existTO.getQuantity() + " 整合后总价: " + existTO.getTotalPrice());
+			} else {
+				receivingNoteByStoreMap.put(key, receivingNoteByStoreTO);
+			}
+
+		}
+		return receivingNoteByStoreMap;
 	}
 
 }

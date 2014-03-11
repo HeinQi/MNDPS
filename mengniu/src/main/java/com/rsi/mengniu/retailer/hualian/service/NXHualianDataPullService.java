@@ -40,7 +40,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(NXHualianDataPullService.class);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 //		String urlRoot = Utils.getUrlRoot(user.getUrl());
 //		if (urlRoot.contains("218.94.70.10")) {
 //			urlRoot=urlRoot+"zongchao/";

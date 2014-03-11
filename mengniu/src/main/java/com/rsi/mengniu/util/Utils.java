@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,7 +55,9 @@ public class Utils {
 	private static Properties properties;
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 	private static Log log = LogFactory.getLog(Utils.class);
-	private static Map<String, String> storeMap = new HashMap<String, String>();
+	private static Map<String, String> rainbowStoreMap = new HashMap<String, String>();
+	private static Map<String, String> carrefourOrderStoreMap= new HashMap<String, String>();
+	private static Map<String, String> carrefourReceivingStoreMap= new HashMap<String, String>();
 	
 	public static void main(String[] args) throws BaseException {
 	}
@@ -70,7 +73,7 @@ public class Utils {
 	
 	public static  CloseableHttpClient createHttpClient() {
 		RequestConfig globalConfig = RequestConfig.custom()
-		        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+		        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY).setConnectionRequestTimeout(30000).setConnectTimeout(30000)
 		        .build();
 		CloseableHttpClient httpClient = HttpClients.custom()
 		        .setDefaultRequestConfig(globalConfig)
@@ -159,14 +162,14 @@ public class Utils {
 		return sourceStr;
 	}
 
-	public static String getRaimbowStoreIDByName(String storeName) throws BaseException {
-		Map<String, String> storeMapping = getRainbowStoreMapping();
-		String storeID = storeMapping.get(storeName);
+	public static String getRainbowStoreIDByName(String storeName) throws BaseException {
+		Map<String, String> rainbowStoreMapping = getRainbowStoreMapping();
+		String storeID = rainbowStoreMapping.get(storeName);
 		return storeID == null ? "" : storeID;
 	}
 
 	public static Map<String, String> getRainbowStoreMapping() throws BaseException {
-		if(storeMap.size()!=0) return storeMap;
+		if(rainbowStoreMap.size()!=0) return rainbowStoreMap;
 		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Rainbow_store_mapping.xls");
 		Workbook sourceWorkbook;
 		try {
@@ -198,9 +201,98 @@ public class Utils {
 			String storeID = sourceCellValue;
 			String storeName = sourceRow.getCell(1).getStringCellValue();
 
-			storeMap.put(storeName, storeID);
+			rainbowStoreMap.put(storeName, storeID);
 		}
-		return storeMap;
+		return rainbowStoreMap;
+	}
+	
+
+	public static String getCarrefourStoreIDByOrderStoreName(String orderStoreName) throws BaseException {
+		Map<String, String> carrefourStoreMapping = getCarrefourOrderStoreMapping();
+		String storeID = carrefourStoreMapping.get(orderStoreName);
+		return storeID == null ? "" : storeID;
+	}
+
+	public static Map<String, String> getCarrefourOrderStoreMapping() throws BaseException {
+		if(carrefourOrderStoreMap.size()!=0) return carrefourOrderStoreMap;
+		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Carrefour_store_mapping.xls");
+		Workbook sourceWorkbook;
+		try {
+			sourceWorkbook = new HSSFWorkbook(sourceExcel);
+		} catch (IOException e) {
+			throw new BaseException(e);
+		}
+
+		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+		log.info("Total Rows of Store Mapping: " + sourceSheet.getPhysicalNumberOfRows());
+		
+		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+			Row sourceRow = sourceSheet.getRow(i);
+			if (sourceRow == null) {
+				continue;
+			}
+			Cell sourceCell = sourceRow.getCell(1);
+			int cellType = sourceCell.getCellType();
+			String sourceCellValue;
+			
+			if (cellType == Cell.CELL_TYPE_NUMERIC) {
+				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
+			} else {
+
+				sourceCellValue = sourceCell.getStringCellValue();
+			}
+
+
+			String storeID = sourceCellValue;
+			String storeName = sourceRow.getCell(0).getStringCellValue();
+
+			carrefourOrderStoreMap.put(storeName, storeID);
+		}
+		return carrefourOrderStoreMap;
+	}
+	
+
+	public static String getCarrefourStoreIDByReceivingStoreID(String receivingStoreID) throws BaseException {
+		Map<String, String> carrefourStoreMapping = getCarrefourReceivingStoreMapping();
+		String storeID = carrefourStoreMapping.get(receivingStoreID);
+		return storeID == null ? "" : storeID;
+	}
+	public static Map<String, String> getCarrefourReceivingStoreMapping() throws BaseException {
+		if(carrefourReceivingStoreMap.size()!=0) return carrefourReceivingStoreMap;
+		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Carrefour_store_mapping.xls");
+		Workbook sourceWorkbook;
+		try {
+			sourceWorkbook = new HSSFWorkbook(sourceExcel);
+		} catch (IOException e) {
+			throw new BaseException(e);
+		}
+
+		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+		log.info("Total Rows of Store Mapping: " + sourceSheet.getPhysicalNumberOfRows());
+		
+		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+			Row sourceRow = sourceSheet.getRow(i);
+			if (sourceRow == null) {
+				continue;
+			}
+			Cell sourceCell = sourceRow.getCell(1);
+			int cellType = sourceCell.getCellType();
+			String sourceCellValue;
+			
+			if (cellType == Cell.CELL_TYPE_NUMERIC) {
+				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
+			} else {
+
+				sourceCellValue = sourceCell.getStringCellValue();
+			}
+
+
+			String storeID = sourceCellValue;
+			String receivingStoreID = sourceRow.getCell(2).getStringCellValue();
+
+			carrefourReceivingStoreMap.put(receivingStoreID, storeID);
+		}
+		return carrefourReceivingStoreMap;
 	}
 
 	public static void putSubMapToMainMap(Map<String, List> mainMap, Map<String, List> subMap) {
@@ -739,9 +831,9 @@ public class Utils {
 		}
 	}
 
-	public static RequestConfig getTimeoutConfig() {
-		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();// 设置请求和传输超时时间
-	}
+//	public static RequestConfig getTimeoutConfig() {
+//		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();// 设置请求和传输超时时间
+//	}
 
 	public static String getUrlRoot(String url) {
 		if (!url.startsWith("http")) {

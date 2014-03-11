@@ -36,7 +36,7 @@ public class GYHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(GYHualianDataPullService.class);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others

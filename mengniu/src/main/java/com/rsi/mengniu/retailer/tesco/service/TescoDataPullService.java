@@ -21,7 +21,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -46,7 +45,8 @@ public class TescoDataPullService implements RetailerDataPullService {
 	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_TESCO);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		//CloseableHttpClient httpClient = Utils.createHttpClient();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		HashMap<String, Object> contextMap = new HashMap<String, Object>();
 		StringBuffer summaryBuffer = new StringBuffer();
 		summaryBuffer.append("运行时间: " + new Date() + "\r\n");

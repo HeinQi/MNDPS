@@ -37,7 +37,7 @@ public class JQHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(JQHualianDataPullService.class);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others

@@ -37,7 +37,7 @@ public class HZHualianDataPullService implements RetailerDataPullService {
 		private static Log log = LogFactory.getLog(HZHualianDataPullService.class);
 
 		public void dataPull(User user) {
-			CloseableHttpClient httpClient = HttpClients.createDefault();
+			CloseableHttpClient httpClient = Utils.createHttpClient();
 			HashMap<String, Object> contextMap = new HashMap<String, Object>();
 			List<String> storeList = null;
 			try {

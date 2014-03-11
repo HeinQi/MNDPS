@@ -40,7 +40,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 	private OCR ocr;
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		StringBuffer summaryBuffer = new StringBuffer();
 		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
 		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");

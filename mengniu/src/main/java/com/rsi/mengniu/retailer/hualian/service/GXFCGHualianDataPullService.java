@@ -36,7 +36,7 @@ public class GXFCGHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(GXFCGHualianDataPullService.class);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		HashMap<String, Object> contextMap = new HashMap<String, Object>();
 		List<String> districtList = null;
 		try {

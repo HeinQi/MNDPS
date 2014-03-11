@@ -47,7 +47,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RAINBOW);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = Utils.createHttpClient();
 		StringBuffer summaryBuffer = new StringBuffer();
 
 		summaryBuffer.append("\r\n");
@@ -275,7 +275,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 			receivingDate = receivingDate.substring(receivingDate.indexOf(":") + 1);
 			orderNo = orderNo.substring(orderNo.indexOf(":") + 1);
 
-			String storeID = Utils.getRaimbowStoreIDByName(storeName);
+			String storeID = Utils.getRainbowStoreIDByName(storeName);
 
 			Elements receivingDetailTableElements = receivingDetailDoc.select("#table152").first().select("tr:gt(0)");
 			receivingDetailTableElements.remove(receivingDetailTableElements.size() - 1);

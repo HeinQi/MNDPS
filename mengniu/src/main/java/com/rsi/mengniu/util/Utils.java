@@ -24,10 +24,12 @@ import javax.imageio.ImageIO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -51,7 +53,9 @@ import com.rsi.mengniu.retailer.module.User;
 public class Utils {
 	private static Properties properties;
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
-
+	private static Log log = LogFactory.getLog(Utils.class);
+	private static Map<String, String> storeMap = new HashMap<String, String>();
+	
 	public static void main(String[] args) throws BaseException {
 	}
 
@@ -61,6 +65,17 @@ public class Utils {
 
 	public static String getProperty(String key) {
 		return properties.getProperty(key);
+	}
+	
+	
+	public static  CloseableHttpClient createHttpClient() {
+		RequestConfig globalConfig = RequestConfig.custom()
+		        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+		        .build();
+		CloseableHttpClient httpClient = HttpClients.custom()
+		        .setDefaultRequestConfig(globalConfig)
+		        .build();
+		return httpClient;
 	}
 
 	public static Date getStartDate(String retailerId) {
@@ -145,15 +160,14 @@ public class Utils {
 	}
 
 	public static String getRaimbowStoreIDByName(String storeName) throws BaseException {
-		String storeID = getRainbowStoreMapping().get(storeName);
+		Map<String, String> storeMapping = getRainbowStoreMapping();
+		String storeID = storeMapping.get(storeName);
 		return storeID == null ? "" : storeID;
 	}
 
 	public static Map<String, String> getRainbowStoreMapping() throws BaseException {
-
-		Map<String, String> storeMap = new HashMap<String, String>();
+		if(storeMap.size()!=0) return storeMap;
 		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Rainbow_store_mapping.xls");
-
 		Workbook sourceWorkbook;
 		try {
 			sourceWorkbook = new HSSFWorkbook(sourceExcel);
@@ -162,7 +176,8 @@ public class Utils {
 		}
 
 		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-
+		log.info("Total Rows of Store Mapping: " + sourceSheet.getPhysicalNumberOfRows());
+		
 		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 			Row sourceRow = sourceSheet.getRow(i);
 			if (sourceRow == null) {
@@ -171,12 +186,14 @@ public class Utils {
 			Cell sourceCell = sourceRow.getCell(0);
 			int cellType = sourceCell.getCellType();
 			String sourceCellValue;
+			
 			if (cellType == Cell.CELL_TYPE_NUMERIC) {
 				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
 			} else {
 
 				sourceCellValue = sourceCell.getStringCellValue();
 			}
+
 
 			String storeID = sourceCellValue;
 			String storeName = sourceRow.getCell(1).getStringCellValue();

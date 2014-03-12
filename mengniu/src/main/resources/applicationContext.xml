@@ -194,6 +194,10 @@
 	凯里市蒙凯贸易有限公司
 	--> 
 	<bean id ="http://kaili.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	<!-- 
+	北京嘉万成糖烟酒商贸有限公司
+	 -->
+	<bean id ="http://bj.beijing-hualian.com/index_cs.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
 
 	
 

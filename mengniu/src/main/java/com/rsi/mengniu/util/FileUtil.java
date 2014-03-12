@@ -19,6 +19,9 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -28,6 +31,7 @@ import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
+import com.rsi.mengniu.retailer.module.User;
 
 public class FileUtil {
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
@@ -275,8 +279,7 @@ public class FileUtil {
 	 * @param destPath
 	 * @throws BaseException
 	 */
-	public static void moveFiles(List<String> sourceFileNameList, String sourcePath, String destPath)
-			 {
+	public static void moveFiles(List<String> sourceFileNameList, String sourcePath, String destPath) {
 
 		for (String sourceFileName : sourceFileNameList) {
 			moveFile(sourcePath, destPath, sourceFileName);
@@ -370,7 +373,7 @@ public class FileUtil {
 			String distFileFullPath = fileName.substring(0, fileName.lastIndexOf(".")) + ".xls";
 			File distFile = new File(distFileFullPath);
 
-			distFile.deleteOnExit();
+			distFile.delete();
 
 			throw new ZipException("压缩文件不合法,可能被损坏.");
 		} // 将文件抽出到解压目录(解压)
@@ -407,5 +410,72 @@ public class FileUtil {
 		}
 		System.out.println(j);
 	}
+
+	/**
+	 * Init Excel File
+	 * 
+	 * @param fileFullPath
+	 * @throws BaseException
+	 */
+	public static void initExcelXLS(String filePath,String fileName) throws BaseException {
+		FileUtil.createFolder(filePath);
+		String fileFullPath = filePath + fileName;
+		File excelFile = new File(fileFullPath);
+		if (!excelFile.exists()) {
+			// init Excel File
+			HSSFWorkbook workbook = new HSSFWorkbook();
+			HSSFSheet sheet = workbook.createSheet("Sheet1");
+
+			FileOutputStream fileOut = null;
+			try {
+				fileOut = new FileOutputStream(excelFile);
+				workbook.write(fileOut);
+				fileOut.close();
+			} catch (IOException e) {
+				throw new BaseException(e);
+			} finally {
+				try {
+					if (fileOut != null) {
+						fileOut.close();
+					}
+				} catch (IOException e) {
+					throw new BaseException(e);
+				}
+			}
+		}
+	}
+
+	public static void initExcelHeader(String fileFullPath, String[] fieldName) throws BaseException {
+		File excelFile = new File(fileFullPath);
+		FileOutputStream fileOut = null;
+		
+		try {
+			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(fileFullPath));
+			HSSFSheet sheet = workbook.getSheetAt(0);
+			HSSFRow header = sheet.createRow(0);
+			for(int i = 0; i < fieldName.length;i++){
+				header.createCell(i).setCellValue(fieldName[i]);
+			}
+			
+				fileOut = new FileOutputStream(excelFile);
+				workbook.write(fileOut);
+				fileOut.close();
+			
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+			try {
+				if (fileOut != null) {
+					fileOut.close();
+				}
+			} catch (IOException e) {
+				throw new BaseException(e);
+			}
+		}
+	}
+	
+
+	
+	
 
 }

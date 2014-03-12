@@ -9,11 +9,13 @@ public class SalesTO extends BaseTO {
 	private String storeID = "";
 	private String salesQuantity = "";
 	private String salesAmount = "";
+	private String userID = "";
 
 	public String toString() {
 		return this.itemID + "\t" + this.itemName + "\t" + this.salesDate
 				+ "\t" + this.storeID + "\t" + this.salesQuantity + "\t"
-				+ this.salesAmount;
+						+ this.salesAmount;
+		//+ "\t"						+ this.userID;
 	}
 
 	public SalesTO() {
@@ -29,6 +31,7 @@ public class SalesTO extends BaseTO {
 		this.setStoreID(orderFieldArray[3]);
 		this.setSalesQuantity(orderFieldArray[4]);
 		this.setSalesAmount(orderFieldArray[5]);
+		//this.setUserID(orderFieldArray[6]);
 	}
 
 	public String getItemID() {
@@ -77,6 +80,15 @@ public class SalesTO extends BaseTO {
 
 	public void setSalesAmount(String salesAmount) {
 		this.salesAmount = salesAmount;
+	}
+
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
 	}
 
 }

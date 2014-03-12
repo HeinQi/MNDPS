@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
+import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.Utils;
 
 public class MengniuPulling {
@@ -65,7 +66,7 @@ public class MengniuPulling {
 				RetailerDataConversionService dataConversion = (RetailerDataConversionService) appContext.getBean(retailerId + ".data.conversion");
 				dataConversion.retailerDataProcessing();
 			}
-
+AccountLogUtil.writeAccountLogToFile();
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
 		}

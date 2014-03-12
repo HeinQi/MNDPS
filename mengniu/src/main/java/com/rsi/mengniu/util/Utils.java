@@ -588,7 +588,7 @@ public class Utils {
 
 	public static synchronized void recordIncorrectUser(User user) throws BaseException {
 
-		String filePath = getProperty(Constants.INCORRECT_USER_HEADER);
+		String filePath = getProperty(Constants.INCORRECT_USER_PATH);
 		FileUtil.createFolder(filePath);
 		String fileFullPath = filePath + user.getRetailer() + ".xls";
 		File excelFile = new File(fileFullPath);
@@ -670,6 +670,50 @@ public class Utils {
 	 */
 	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList)
 			throws BaseException {
+		String receivingExceptionFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
+		FileUtil.createFolder(receivingExceptionFolderPath);
+		String receivingExceptionFilePath = receivingExceptionFolderPath + "Receiving_" + retailerID + "_" + DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+
+		File receivingFile = new File(receivingExceptionFilePath);
+
+		BufferedWriter writer = null;
+
+		try {
+			receivingFile.createNewFile();
+			String receivingHeader = Utils.getProperty(Constants.RECEIVING_HEADER);
+
+			FileOutputStream fileOutput = new FileOutputStream(receivingFile);
+			writer = new BufferedWriter(new OutputStreamWriter(fileOutput, "UTF-8"));
+			writer.write(receivingHeader);
+			writer.newLine();
+
+			for (int i = 0; i < failedReceivingList.size(); i++) {
+				ReceivingNoteTO receivingNoteTO = failedReceivingList.get(i);
+				String receivingRow = receivingNoteTO.toString();
+				writer.write(receivingRow);
+				writer.newLine();
+			}
+
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+
+			FileUtil.closeFileWriter(writer);
+
+		}
+
+	}
+	
+	/**
+	 * Export the fialed receiving data to exception folder
+	 * 
+	 * @param retailerID
+	 * @param receivingDate
+	 * @param failedReceivingList
+	 * @throws BaseException
+	 */
+	public static void exportFailedReceivingToTXTForCarrefour(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList)
+			throws BaseException {
 		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
 		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_" + DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
@@ -689,7 +733,12 @@ public class Utils {
 
 			for (int i = 0; i < failedReceivingList.size(); i++) {
 				ReceivingNoteTO receivingNoteTO = failedReceivingList.get(i);
-				String receivingRow = receivingNoteTO.toString();
+				if(receivingNoteTO.getStoreID()==null||receivingNoteTO.getStoreID().equals("")){
+					receivingNoteTO.setRemarks("找不到门店ID与名称的对应关系");
+				} else {
+					receivingNoteTO.setRemarks("找不到收货单对应的订单信息");
+				}
+				String receivingRow = receivingNoteTO.toStringForCarrefourException();
 				writer.write(receivingRow);
 				writer.newLine();
 			}

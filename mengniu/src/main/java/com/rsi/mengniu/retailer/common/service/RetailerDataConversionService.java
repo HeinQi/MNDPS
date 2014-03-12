@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,9 +24,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
+import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
@@ -73,6 +76,10 @@ public abstract class RetailerDataConversionService {
 		String retailerID = this.getRetailerID();
 		Date startDate = Utils.getStartDate(retailerID);
 		Date endDate = Utils.getEndDate(retailerID);
+
+		// Delete Exception File
+		deleteExceptionFile(retailerID, startDate, endDate);
+
 		try {
 
 			getLog().info("开始处理数据");
@@ -106,6 +113,41 @@ public abstract class RetailerDataConversionService {
 
 		getSummaryLog().info("零售商数据处理结束");
 		getSummaryLog().info(Constants.SUMMARY_SEPERATOR_LINE + "\n");
+
+	}
+
+	private void deleteExceptionFile(String retailerID, Date startDate, Date endDate) {
+		getLog().info("开始清理Exception文件");
+		List<Date> dates = DateUtil.getDateArrayByRange(startDate, endDate);
+		for (Date processDate : dates) {
+			String receivingExceptionFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
+			FileUtil.createFolder(receivingExceptionFolderPath);
+			String fileName = "Receiving_" + retailerID + "_"
+					+ DateUtil.toStringYYYYMMDD(processDate) + ".txt";
+			String receivingExceptionFilePath = receivingExceptionFolderPath + fileName;
+
+			File receivingFile = new File(receivingExceptionFilePath);
+
+			if(receivingFile.exists()){
+				receivingFile.delete();
+			}
+			
+			getLog().info("收货单异常文件： " + fileName + "清理完毕");
+			
+			
+			String outputOrderExceptionFolderPath = Utils.getProperty(retailerID + Constants.OUTPUT_ORDER_EXCEPTION_PATH);
+
+			String outputOrderExceptionFileName = outputOrderExceptionFolderPath + retailerID + "_order_"
+					+ DateUtil.toStringYYYYMMDD(processDate) + ".txt";
+			String outputOrderExceptionFileFullPath = outputOrderExceptionFolderPath + outputOrderExceptionFileName;
+
+			File outputOrderExceptionFile = new File(outputOrderExceptionFileFullPath);
+			if(outputOrderExceptionFile.exists()){
+				outputOrderExceptionFile.delete();
+			}
+			getLog().info("订单异常文件： " + fileName + "清理完毕");
+			
+		}
 
 	}
 
@@ -175,8 +217,7 @@ public abstract class RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	protected Map<String, List<ReceivingNoteTO>> getReceivingInfo(String retailerID, Date startDate, Date endDate)
-			 {
+	protected Map<String, List<ReceivingNoteTO>> getReceivingInfo(String retailerID, Date startDate, Date endDate) {
 		Map receivingNoteMap = new HashMap();
 
 		File receivingInboundFolder = new File(Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH));
@@ -243,8 +284,8 @@ public abstract class RetailerDataConversionService {
 	 * @return
 	 * @throws BaseException
 	 */
-	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate (
-			Map<String, List<ReceivingNoteTO>> receivingNoteMap)throws BaseException {
+	protected Map<String, List<ReceivingNoteTO>> generateReceivingMapByDate(
+			Map<String, List<ReceivingNoteTO>> receivingNoteMap) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingByDateMap = new HashMap<String, List<ReceivingNoteTO>>();
 		for (List<ReceivingNoteTO> receivingNoteList : receivingNoteMap.values()) {
 
@@ -399,6 +440,8 @@ public abstract class RetailerDataConversionService {
 		Object[] receivingKeyList = receivingNoteByStoreMap.keySet().toArray();
 		Arrays.sort(receivingKeyList);
 
+		Map<String,Set<String>> mergedOrderMap = new HashMap<String, Set<String>>();
+		
 		List<ReceivingNoteTO> failedReceivingList = new ArrayList<ReceivingNoteTO>();
 		int failedCount = 0;
 		int successCount = 0;
@@ -421,8 +464,9 @@ public abstract class RetailerDataConversionService {
 				 * 下载过程中已经下过的订单信息不能再下，  所有账号下载下来的文件按照日期合并
 				 * ，每个date一个文件,文件名为Carrefour_order_YYYYMMDD,Unicode txt
 				 */
-
-				String mergedLine = orderTO.getOrderNo()
+				String orderNo = orderTO.getOrderNo();
+				
+				String mergedLine = orderNo
 						+ "\t"
 						+ receivingNoteTO.getStoreID()
 						+ "\t"
@@ -445,15 +489,20 @@ public abstract class RetailerDataConversionService {
 						+ receivingNoteTO.getTotalPrice()
 						+ "\t"
 						+ ((orderTO.getUnitPrice().equals("")) ? receivingNoteTO.getUnitPrice() : orderTO
-								.getUnitPrice());
+								.getUnitPrice())
+						+ "\t"
+						+ receivingNoteTO.getUserID();
 				stringBuffer.append(mergedLine + "\r\n");
-				// try {
-				// writer.write(mergedLine);
-				// writer.newLine();
-				// } catch (IOException e) {
-				// FileUtil.closeFileWriter(writer);
-				// throw new BaseException(e);
-				// }
+
+				//生成合并成功的数据，为Account Log准备数据
+				Set<String> orderNoSet = new HashSet<String>();
+				String mergedOrderKey = retailerID+"--"+receivingNoteTO.getUserID() +"--"+ receivingNoteTO.getReceivingDate();
+				if(mergedOrderMap.containsKey(mergedOrderKey)){
+					orderNoSet = mergedOrderMap.get(mergedOrderKey);
+				}
+				orderNoSet.add(orderNo);
+				mergedOrderMap.put(mergedOrderKey, orderNoSet);
+				
 				successCount++;
 			} else {
 				getLog().info("警告! 查不到收货单对应的订单信息. 收货单信息为: " + receivingNoteTO.toString());
@@ -461,10 +510,9 @@ public abstract class RetailerDataConversionService {
 				failedCount++;
 			}
 		}
-
-		if (failedCount != 0) {
-			Utils.exportFailedReceivingToTXT(retailerID, receivingDate, failedReceivingList);
-		}
+		AccountLogUtil.updateProcessedOrderInfo(mergedOrderMap);
+		
+		exportFailedReceiving(retailerID, receivingDate, failedReceivingList, failedCount);
 
 		getSummaryLog().info("订单合并成功数量：" + successCount);
 		getLog().info("订单合并成功数量：" + successCount);
@@ -472,6 +520,22 @@ public abstract class RetailerDataConversionService {
 		getSummaryLog().info("订单合并失败数量：" + failedCount);
 
 		return stringBuffer;
+	}
+
+	/**
+	 * Export the failed receiving data to file
+	 * 
+	 * @param retailerID
+	 * @param receivingDate
+	 * @param failedReceivingList
+	 * @param failedCount
+	 * @throws BaseException
+	 */
+	public void exportFailedReceiving(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList,
+			int failedCount) throws BaseException {
+		if (failedCount != 0) {
+			Utils.exportFailedReceivingToTXT(retailerID, receivingDate, failedReceivingList);
+		}
 	}
 
 	/**
@@ -495,6 +559,9 @@ public abstract class RetailerDataConversionService {
 			String processDateStr = entry.getKey();
 			List<SalesTO> salesList = entry.getValue();
 			convertSalesData(retailerID, processDateStr, salesList);
+			
+			//统计销售合并数据
+			AccountLogUtil.recordSalesProcessedAmount(retailerID,processDateStr,salesList);
 		}
 		// Archive
 		String sourceFilePath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
@@ -505,8 +572,7 @@ public abstract class RetailerDataConversionService {
 		FileUtil.moveFiles(FileUtil.getAllFile(sourceFilePath), sourceFilePath, destPath);
 	}
 
-	private Map<String, List<SalesTO>> getSalesData(String retailerID, Date startDate, Date endDate)
-			 {
+	private Map<String, List<SalesTO>> getSalesData(String retailerID, Date startDate, Date endDate) {
 		Map salesMap = new HashMap();
 
 		File salesInboundFolder = new File(Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH));

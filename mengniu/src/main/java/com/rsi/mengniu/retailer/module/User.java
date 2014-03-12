@@ -1,6 +1,10 @@
 package com.rsi.mengniu.retailer.module;
 
-public class User {
+public class User extends BaseTO{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -765618785271367907L;
 	String userId = "";
 	String password = "";
 	String retailer = "";

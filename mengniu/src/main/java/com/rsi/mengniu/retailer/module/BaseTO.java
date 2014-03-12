@@ -5,6 +5,11 @@ import java.util.Date;
 
 public class BaseTO implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7475482599034761098L;
+	
 	private String createBy;
 	private Date createDate;
 	private String updateBy;

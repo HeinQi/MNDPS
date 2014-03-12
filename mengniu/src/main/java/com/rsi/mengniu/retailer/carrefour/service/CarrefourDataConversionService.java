@@ -46,6 +46,9 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
 			Date endDate, File receivingFile) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
+		String fileName = receivingFile.getName();
+		String[] splitStr = fileName.split("_");
+		String userID = splitStr[2];
 		try {
 			InputStream sourceExcel = new FileInputStream(receivingFile);
 
@@ -65,6 +68,7 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 					if (DateUtil.isInDateRange(receivingDate, startDate, endDate)) {
 
 						ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
+						receivingNoteTO.setUserID(userID);
 						String orderNo = null;
 						List<ReceivingNoteTO> receivingNoteTOList = null;
 
@@ -79,7 +83,7 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 								//Get store ID by receiving store number
 								String storeID = Utils.getCarrefourStoreIDByReceivingStoreID(sourceCellValue);
 								receivingNoteTO.setStoreID(storeID);
-
+								receivingNoteTO.setReceivingStoreNo(sourceCellValue);
 								continue;
 							case 3:
 
@@ -227,7 +231,9 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 	@Override
 	protected Map<String, OrderTO> getOrderInfoFromFile(String retailerID, File orderFile) throws BaseException {
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
-
+		String fileName = orderFile.getName();
+		String[] splitStr = fileName.split("_");
+		String userID = splitStr[2];
 		if (orderFile.exists()) {
 			BufferedReader reader = null;
 			try {
@@ -240,6 +246,7 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
+					orderTO.setUserID(userID);
 					String orderStoreName = orderTO.getStoreName();
 					String storeID = Utils.getCarrefourStoreIDByOrderStoreName(orderStoreName);
 					String key = orderTO.getOrderNo() + storeID + orderTO.getItemID();
@@ -281,8 +288,8 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 
 		for (int i = 0; i < receivingNoteList.size(); i++) {
 			ReceivingNoteTO receivingNoteByStoreTO = receivingNoteList.get(i);
-			String receivingStoreID = receivingNoteByStoreTO.getStoreID();
-			String key = receivingNoteByStoreTO.getOrderNo() + receivingStoreID + receivingNoteByStoreTO.getItemID();
+			String storeID = receivingNoteByStoreTO.getStoreID();
+			String key = receivingNoteByStoreTO.getOrderNo() + storeID + receivingNoteByStoreTO.getItemID();
 			if (receivingNoteByStoreMap.containsKey(key)) {
 				ReceivingNoteTO existTO = receivingNoteByStoreMap.get(key);
 				existTO.setQuantity(String.valueOf(Double.parseDouble(receivingNoteByStoreTO.getQuantity().replaceAll(
@@ -303,4 +310,18 @@ public class CarrefourDataConversionService extends RetailerDataConversionServic
 		return receivingNoteByStoreMap;
 	}
 
+	/**
+	 * Export the failed receiving data to file
+	 * @param retailerID
+	 * @param receivingDate
+	 * @param failedReceivingList
+	 * @param failedCount
+	 * @throws BaseException
+	 */
+	public void exportFailedReceiving(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList,
+			int failedCount) throws BaseException {
+		if (failedCount != 0) {
+			Utils.exportFailedReceivingToTXTForCarrefour(retailerID, receivingDate, failedReceivingList);
+		}
+	}
 }

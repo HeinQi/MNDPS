@@ -30,8 +30,11 @@ public final class Constants {
 	
 	
 	
-	
-	public static final String INCORRECT_USER_HEADER = "incorrect.user.path";
+
+	public static final String INCORRECT_USER_PATH = "incorrect.user.path";
+	public static final String ACCOUNT_LOG_PATH = "account.log.path";
+	public static final String ACCOUNT_LOG_FILENAME = "account.log.filename";
+	public static final String ACCOUNT_LOG_FIELDNAME = "account.log.fieldname";
 	
 
 	public static final String DOC_RECEIVING = "DOC_RECEIVING";

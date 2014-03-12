@@ -14,6 +14,7 @@ public class OrderTO extends BaseTO {
 	private String quantity="";// 8
 	private String unitPrice="";// 9
 	private String totalPrice="";// 10
+	private String userID="";// 11
 
 
 	public String getOrderNo() {
@@ -95,6 +96,16 @@ public class OrderTO extends BaseTO {
 	public void setTotalPrice(String totalPrice) {
 		this.totalPrice = totalPrice;
 	}
+	
+	
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
 
 	public OrderTO() {
 		super();
@@ -105,6 +116,7 @@ public class OrderTO extends BaseTO {
 				+ "\t" + this.storeName + "\t" + this.itemID + "\t"
 				+ this.itemName + "\t" + this.barcode + "\t" + this.quantity
 				+ "\t" + this.unitPrice + "\t" + this.totalPrice;
+		//+ "\t"				+ this.userID;
 	}
 
 	/*
@@ -127,6 +139,7 @@ public class OrderTO extends BaseTO {
 		this.setQuantity(orderFieldArray[7]);
 		this.setUnitPrice(orderFieldArray[8]);
 		this.setTotalPrice(orderFieldArray[9]);
+		//this.setUserID(orderFieldArray[10]);
 
 	}
 

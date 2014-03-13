@@ -211,7 +211,7 @@ public class RainbowDataPullService implements RetailerDataPullService {
 			totalPageNumberStr = totalPageNumberStr.substring(totalPageNumberStr.indexOf("(") + 1,
 					totalPageNumberStr.indexOf(")"));
 			int totalPageNumber = Integer.valueOf(totalPageNumberStr);
-			for (int i = 2; i <= totalPageNumber; i++) {
+			for (int i = 1; i <= totalPageNumber; i++) {
 				Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 
 				HttpGet summaryPageGet = new HttpGet("http://vd.rainbow.cn:8080/object/getAdvReportData.jsp"

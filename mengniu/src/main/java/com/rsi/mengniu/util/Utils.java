@@ -14,9 +14,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -56,9 +58,9 @@ public class Utils {
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 	private static Log log = LogFactory.getLog(Utils.class);
 	private static Map<String, String> rainbowStoreMap = new HashMap<String, String>();
-	private static Map<String, String> carrefourOrderStoreMap= new HashMap<String, String>();
-	private static Map<String, String> carrefourReceivingStoreMap= new HashMap<String, String>();
-	
+	private static Map<String, String> carrefourOrderStoreMap = new HashMap<String, String>();
+	private static Map<String, String> carrefourReceivingStoreMap = new HashMap<String, String>();
+
 	public static void main(String[] args) throws BaseException {
 	}
 
@@ -69,15 +71,11 @@ public class Utils {
 	public static String getProperty(String key) {
 		return properties.getProperty(key);
 	}
-	
-	
-	public static  CloseableHttpClient createHttpClient() {
-		RequestConfig globalConfig = RequestConfig.custom()
-		        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY).setConnectionRequestTimeout(30000).setConnectTimeout(30000)
-		        .build();
-		CloseableHttpClient httpClient = HttpClients.custom()
-		        .setDefaultRequestConfig(globalConfig)
-		        .build();
+
+	public static CloseableHttpClient createHttpClient() {
+		RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+				.setConnectionRequestTimeout(30000).setConnectTimeout(30000).build();
+		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
 		return httpClient;
 	}
 
@@ -119,7 +117,8 @@ public class Utils {
 		return buffer.toString();
 	}
 
-	public static String HttpExecute(CloseableHttpClient httpClient, HttpUriRequest request, String expectStr) throws Exception {
+	public static String HttpExecute(CloseableHttpClient httpClient, HttpUriRequest request, String expectStr)
+			throws Exception {
 		CloseableHttpResponse response = httpClient.execute(request);
 		HttpEntity entity = response.getEntity();
 		String responseStr = EntityUtils.toString(entity);
@@ -169,7 +168,8 @@ public class Utils {
 	}
 
 	public static Map<String, String> getRainbowStoreMapping() throws BaseException {
-		if(rainbowStoreMap.size()!=0) return rainbowStoreMap;
+		if (rainbowStoreMap.size() != 0)
+			return rainbowStoreMap;
 		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Rainbow_store_mapping.xls");
 		Workbook sourceWorkbook;
 		try {
@@ -180,7 +180,7 @@ public class Utils {
 
 		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
 		log.info("Total Rows of Store Mapping: " + sourceSheet.getPhysicalNumberOfRows());
-		
+
 		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 			Row sourceRow = sourceSheet.getRow(i);
 			if (sourceRow == null) {
@@ -189,14 +189,13 @@ public class Utils {
 			Cell sourceCell = sourceRow.getCell(0);
 			int cellType = sourceCell.getCellType();
 			String sourceCellValue;
-			
+
 			if (cellType == Cell.CELL_TYPE_NUMERIC) {
 				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
 			} else {
 
 				sourceCellValue = sourceCell.getStringCellValue();
 			}
-
 
 			String storeID = sourceCellValue;
 			String storeName = sourceRow.getCell(1).getStringCellValue();
@@ -205,7 +204,6 @@ public class Utils {
 		}
 		return rainbowStoreMap;
 	}
-	
 
 	public static String getCarrefourStoreIDByOrderStoreName(String orderStoreName) throws BaseException {
 		Map<String, String> carrefourStoreMapping = getCarrefourOrderStoreMapping();
@@ -214,7 +212,8 @@ public class Utils {
 	}
 
 	public static Map<String, String> getCarrefourOrderStoreMapping() throws BaseException {
-		if(carrefourOrderStoreMap.size()!=0) return carrefourOrderStoreMap;
+		if (carrefourOrderStoreMap.size() != 0)
+			return carrefourOrderStoreMap;
 		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Carrefour_store_mapping.xls");
 		Workbook sourceWorkbook;
 		try {
@@ -225,7 +224,7 @@ public class Utils {
 
 		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
 		log.info("Total Rows of Store Mapping: " + sourceSheet.getPhysicalNumberOfRows());
-		
+
 		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 			Row sourceRow = sourceSheet.getRow(i);
 			if (sourceRow == null) {
@@ -234,14 +233,13 @@ public class Utils {
 			Cell sourceCell = sourceRow.getCell(1);
 			int cellType = sourceCell.getCellType();
 			String sourceCellValue;
-			
+
 			if (cellType == Cell.CELL_TYPE_NUMERIC) {
 				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
 			} else {
 
 				sourceCellValue = sourceCell.getStringCellValue();
 			}
-
 
 			String storeID = sourceCellValue;
 			String storeName = sourceRow.getCell(0).getStringCellValue();
@@ -250,15 +248,16 @@ public class Utils {
 		}
 		return carrefourOrderStoreMap;
 	}
-	
 
 	public static String getCarrefourStoreIDByReceivingStoreID(String receivingStoreID) throws BaseException {
 		Map<String, String> carrefourStoreMapping = getCarrefourReceivingStoreMapping();
 		String storeID = carrefourStoreMapping.get(receivingStoreID);
 		return storeID == null ? "" : storeID;
 	}
+
 	public static Map<String, String> getCarrefourReceivingStoreMapping() throws BaseException {
-		if(carrefourReceivingStoreMap.size()!=0) return carrefourReceivingStoreMap;
+		if (carrefourReceivingStoreMap.size() != 0)
+			return carrefourReceivingStoreMap;
 		InputStream sourceExcel = DataPullTaskPool.class.getResourceAsStream("/data/Carrefour_store_mapping.xls");
 		Workbook sourceWorkbook;
 		try {
@@ -269,7 +268,7 @@ public class Utils {
 
 		Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
 		log.info("Total Rows of Store Mapping: " + sourceSheet.getPhysicalNumberOfRows());
-		
+
 		for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
 			Row sourceRow = sourceSheet.getRow(i);
 			if (sourceRow == null) {
@@ -278,14 +277,13 @@ public class Utils {
 			Cell sourceCell = sourceRow.getCell(1);
 			int cellType = sourceCell.getCellType();
 			String sourceCellValue;
-			
+
 			if (cellType == Cell.CELL_TYPE_NUMERIC) {
 				sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
 			} else {
 
 				sourceCellValue = sourceCell.getStringCellValue();
 			}
-
 
 			String storeID = sourceCellValue;
 			String receivingStoreID = sourceRow.getCell(2).getStringCellValue();
@@ -317,13 +315,13 @@ public class Utils {
 	 * @param orderDate
 	 * @throws BaseException
 	 */
-	public static void exportOrderInfoToTXT(String retailerID, String userID, String orderID, Date orderDate, List<OrderTO> orderList)
-			throws BaseException {
+	public static void exportOrderInfoToTXT(String retailerID, String userID, String orderID, Date orderDate,
+			List<OrderTO> orderList) throws BaseException {
 
 		String orderFolderPath = Utils.getProperty(retailerID + Constants.ORDER_INBOUND_PATH);
 		FileUtil.createFolder(orderFolderPath);
-		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_" + orderID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
-				+ ".txt";
+		String orderFilePath = orderFolderPath + "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
+				+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
 
 		File orderFile = new File(orderFilePath);
 		BufferedWriter writer = null;
@@ -401,8 +399,8 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXT(String retailerID, String userID, Date receivingDate, List<ReceivingNoteTO> receivingList)
-			throws BaseException {
+	public static void exportReceivingInfoToTXT(String retailerID, String userID, Date receivingDate,
+			List<ReceivingNoteTO> receivingList) throws BaseException {
 
 		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
@@ -447,8 +445,8 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportReceivingInfoToTXTForRainbow(String retailerID, String userID, Date receivingDate, List<ReceivingNoteTO> receivingList)
-			throws BaseException {
+	public static void exportReceivingInfoToTXTForRainbow(String retailerID, String userID, Date receivingDate,
+			List<ReceivingNoteTO> receivingList) throws BaseException {
 
 		String receivingInboundFolderPath = getProperty(retailerID + Constants.RECEIVING_INBOUND_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
@@ -493,11 +491,13 @@ public class Utils {
 	 * @param receivingList
 	 * @throws BaseException
 	 */
-	public static void exportSalesInfoToTXT(String retailerID, String userID, Date slaesDate, List<SalesTO> salesList) throws BaseException {
+	public static void exportSalesInfoToTXT(String retailerID, String userID, Date slaesDate, List<SalesTO> salesList)
+			throws BaseException {
 
 		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesInboundFolderPath);
-		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + userID + "_"
+				+ DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
 
 		File salesFile = new File(salesFilePath);
 
@@ -529,14 +529,15 @@ public class Utils {
 
 	}
 
-	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, String agency, String userID, Date slaesDate,
-			List<SalesTO> salesList) throws BaseException {
+	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, String agency,
+			String userID, Date slaesDate, List<SalesTO> salesList) throws BaseException {
 
 		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesInboundFolderPath);
 
-		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
-				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_"
+				+ (districtName.equals("") ? "" : (districtName + "_")) + (agency.equals("") ? "" : (agency + "_"))
+				+ userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
 
 		File salesFile = new File(salesFilePath);
 
@@ -568,14 +569,17 @@ public class Utils {
 
 	}
 
-	public static boolean isSalesFileExistForHualian(String retailerID, String districtName, String agency, String userID, Date orderDate) {
+	public static boolean isSalesFileExistForHualian(String retailerID, String districtName, String agency,
+			String userID, Date orderDate) {
 		String folderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		String txtFileName = null;
 		String excelFileName = null;
-		txtFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_")) + (agency.equals("") ? "" : (agency + "_"))
-				+ userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+		txtFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
+				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
+				+ ".txt";
 		excelFileName = "Sales_" + retailerID + "_" + (districtName.equals("") ? "" : (districtName + "_"))
-				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+				+ (agency.equals("") ? "" : (agency + "_")) + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate)
+				+ ".xls";
 		File txtFile = new File(folderPath + txtFileName);
 		File excelFile = new File(folderPath + excelFileName);
 
@@ -630,7 +634,8 @@ public class Utils {
 			for (int i = 1; i <= lastRowNo; i++) {
 
 				HSSFRow row = sheet.getRow(i);
-				if (row.getCell(1).getStringCellValue().equals(user.getUserId()) && row.getCell(3).getStringCellValue().equals(user.getUrl())) {
+				if (row.getCell(1).getStringCellValue().equals(user.getUserId())
+						&& row.getCell(3).getStringCellValue().equals(user.getUrl())) {
 					return;
 				}
 			}
@@ -668,11 +673,12 @@ public class Utils {
 	 * @param failedReceivingList
 	 * @throws BaseException
 	 */
-	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList)
-			throws BaseException {
+	public static void exportFailedReceivingToTXT(String retailerID, Date receivingDate,
+			List<ReceivingNoteTO> failedReceivingList) throws BaseException {
 		String receivingExceptionFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
 		FileUtil.createFolder(receivingExceptionFolderPath);
-		String receivingExceptionFilePath = receivingExceptionFolderPath + "Receiving_" + retailerID + "_" + DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+		String receivingExceptionFilePath = receivingExceptionFolderPath + "Receiving_" + retailerID + "_"
+				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
 
 		File receivingFile = new File(receivingExceptionFilePath);
 
@@ -703,7 +709,7 @@ public class Utils {
 		}
 
 	}
-	
+
 	/**
 	 * Export the fialed receiving data to exception folder
 	 * 
@@ -712,11 +718,12 @@ public class Utils {
 	 * @param failedReceivingList
 	 * @throws BaseException
 	 */
-	public static void exportFailedReceivingToTXTForCarrefour(String retailerID, Date receivingDate, List<ReceivingNoteTO> failedReceivingList)
-			throws BaseException {
+	public static void exportFailedReceivingToTXTForCarrefour(String retailerID, Date receivingDate,
+			List<ReceivingNoteTO> failedReceivingList) throws BaseException {
 		String receivingInboundFolderPath = Utils.getProperty(retailerID + Constants.RECEIVING_EXCEPTION_PATH);
 		FileUtil.createFolder(receivingInboundFolderPath);
-		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_" + DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
+		String receivingFilePath = receivingInboundFolderPath + "Receiving_" + retailerID + "_"
+				+ DateUtil.toStringYYYYMMDD(receivingDate) + ".txt";
 
 		File receivingFile = new File(receivingFilePath);
 
@@ -733,8 +740,8 @@ public class Utils {
 
 			for (int i = 0; i < failedReceivingList.size(); i++) {
 				ReceivingNoteTO receivingNoteTO = failedReceivingList.get(i);
-				if(receivingNoteTO.getStoreID()==null||receivingNoteTO.getStoreID().equals("")){
-					receivingNoteTO.setRemarks("找不到门店ID与名称的对应关系");
+				if (receivingNoteTO.getStoreID() == null || receivingNoteTO.getStoreID().equals("")) {
+					receivingNoteTO.setRemarks("找不到门店ID与名称的mapping配置");
 				} else {
 					receivingNoteTO.setRemarks("找不到收货单对应的订单信息");
 				}
@@ -777,8 +784,10 @@ public class Utils {
 		String txtFileName = null;
 		String excelFileName = null;
 		if (orderID != null && !orderID.equals("")) {
-			txtFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
-			excelFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
+			txtFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
+					+ DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
+			excelFileName = "Order_" + retailerID + "_" + userID + "_" + orderID + "_"
+					+ DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
 		} else {
 			txtFileName = "Order_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".txt";
 			excelFileName = "Order_" + retailerID + "_" + userID + "_" + DateUtil.toStringYYYYMMDD(orderDate) + ".xls";
@@ -861,7 +870,8 @@ public class Utils {
 		}
 	}
 
-	public static void exportOrderInfoListToTXT(String retailerID, String userId, Date orderDate, List<OrderTO> orderList) throws BaseException {
+	public static void exportOrderInfoListToTXT(String retailerID, String userId, Date orderDate,
+			List<OrderTO> orderList) throws BaseException {
 		Map<String, List<OrderTO>> orderMap = new HashMap<String, List<OrderTO>>();
 		List<OrderTO> tempOrderList = null;
 		for (OrderTO orderTO : orderList) {
@@ -880,18 +890,20 @@ public class Utils {
 		}
 	}
 
-//	public static RequestConfig getTimeoutConfig() {
-//		return RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();// 设置请求和传输超时时间
-//	}
+	// public static RequestConfig getTimeoutConfig() {
+	// return
+	// RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();//
+	// 设置请求和传输超时时间
+	// }
 
 	public static String getUrlRoot(String url) {
 		if (!url.startsWith("http")) {
-			url = "http://"+url;
+			url = "http://" + url;
 		}
 		if (url.matches("http://(.*?)/(.*?)")) {
 			return url.substring(0, url.lastIndexOf("/") + 1);
 		} else {
-			return url+"/";
+			return url + "/";
 		}
 	}
 
@@ -905,4 +917,116 @@ public class Utils {
 		return null;
 	}
 
+	public static List<ReceivingNoteTO> getReceivingNoteTOListFromFileForTesco(File receivingFile) throws BaseException {
+		List<ReceivingNoteTO> allReceivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+
+		try {
+			if (receivingFile.exists()) {
+
+				String fileName = receivingFile.getName();
+				String[] splitStr = fileName.split("_");
+				String userID = splitStr[2];
+				InputStream sourceExcel = new FileInputStream(receivingFile);
+				Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+				String orderNo = null;
+				String storeID = null;
+				String storeName = null;
+				String receivingDateStr = null;
+				Date receivingDate = null;
+				if (sourceWorkbook.getNumberOfSheets() != 0) {
+					Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+					for (int i = 1; i < (sourceSheet.getPhysicalNumberOfRows() - 1); i++) {
+						Row sourceRow = sourceSheet.getRow(i);
+						if (sourceRow == null) {
+							continue;
+						}
+
+						if (sourceRow.getCell(11).getStringCellValue() != null
+								&& !sourceRow.getCell(11).getStringCellValue().equals("")) {
+
+							receivingDateStr = sourceRow.getCell(11).getStringCellValue();
+							receivingDate = DateUtil.toDate(receivingDateStr);
+						}
+						// If receivingDate is in the date range
+
+						ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO();
+						receivingNoteTO.setUserID(userID);
+						for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+							Cell sourceCell = sourceRow.getCell(j);
+							String sourceCellValue = null;
+
+							int cellType = sourceCell.getCellType();
+							if (cellType == Cell.CELL_TYPE_NUMERIC) {
+								sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
+							} else {
+
+								sourceCellValue = sourceCell.getStringCellValue();
+							}
+							switch (j) {
+							case 3:
+								if (sourceCellValue != null && !sourceCellValue.equals("")) {
+									storeID = sourceCellValue.substring(0, sourceCellValue.indexOf("."));
+								}
+								receivingNoteTO.setStoreID(storeID);
+								continue;
+							case 4:
+
+								if (sourceCellValue != null && !sourceCellValue.equals("")) {
+									storeName = sourceCellValue;
+								}
+								receivingNoteTO.setStoreName(storeName);
+								continue;
+							case 5:
+
+								if (sourceCellValue != null && !sourceCellValue.equals("")) {
+									sourceCellValue = Utils.trimPrefixZero(sourceCellValue);
+									orderNo = sourceCellValue;
+								}
+								receivingNoteTO.setOrderNo(orderNo);
+								continue;
+							case 11:
+								receivingNoteTO.setReceivingDate(receivingDateStr);
+								continue;
+							case 14:
+								receivingNoteTO.setItemID(sourceCellValue);
+								continue;
+							case 15:
+								receivingNoteTO.setItemName(sourceCellValue);
+								continue;
+							case 16:
+								receivingNoteTO.setQuantity(sourceCellValue);
+								continue;
+							case 17:
+								receivingNoteTO.setUnitPrice(sourceCellValue);
+								continue;
+							case 18:
+								receivingNoteTO.setTotalPrice(sourceCellValue);
+								continue;
+							}
+
+						}
+
+						allReceivingNoteTOList.add(receivingNoteTO);
+					}
+				}
+			}
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
+		}
+		return allReceivingNoteTOList;
+	}
+
+	public static int getConlidatedOrderNoAmount(List<ReceivingNoteTO> receivingNoteList) {
+		int orderDownloadAmount;
+		Set<String> orderNoSet = new HashSet<String>();
+		for (ReceivingNoteTO receivingNoteTO : receivingNoteList) {
+			orderNoSet.add(receivingNoteTO.getOrderNo());
+		}
+		orderDownloadAmount = orderNoSet.size();
+		return orderDownloadAmount;
+	}
 }

@@ -489,9 +489,9 @@ public abstract class RetailerDataConversionService {
 						+ receivingNoteTO.getTotalPrice()
 						+ "\t"
 						+ ((orderTO.getUnitPrice().equals("")) ? receivingNoteTO.getUnitPrice() : orderTO
-								.getUnitPrice())
-						+ "\t"
-						+ receivingNoteTO.getUserID();
+								.getUnitPrice());
+//						+ "\t"
+//						+ receivingNoteTO.getUserID();
 				stringBuffer.append(mergedLine + "\r\n");
 
 				//生成合并成功的数据，为Account Log准备数据

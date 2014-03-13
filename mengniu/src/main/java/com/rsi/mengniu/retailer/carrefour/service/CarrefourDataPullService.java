@@ -1,7 +1,6 @@
 package com.rsi.mengniu.retailer.carrefour.service;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,9 +26,8 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
-import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.common.service.RetailerDataPullServiceImpl;
 import com.rsi.mengniu.retailer.module.AccountLogTO;
-import com.rsi.mengniu.retailer.module.CountTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.AccountLogUtil;
@@ -39,99 +37,11 @@ import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
 //http://supplierweb.carrefour.com.cn/
-public class CarrefourDataPullService implements RetailerDataPullService {
+public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 	private static Log log = LogFactory.getLog(CarrefourDataPullService.class);
 	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_CARREFOUR);
 	private OCR ocr;
 
-	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
-		StringBuffer summaryBuffer = new StringBuffer();
-		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
-		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
-		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
-		String loginResult = null;
-		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),"");
-		int loginCount = 0; // 如果验证码出错重新login,最多15次
-		try {
-			do {
-				loginResult = login(httpClient, user);
-				loginCount++;
-			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
-			// Invalid Password and others
-			if (!"Success".equals(loginResult)) {
-				summaryBuffer.append("登录失败!\r\n");
-				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-				summaryLog.info(summaryBuffer);
-				AccountLogUtil.loginFailed(accountLogLoginTO);
-				return;
-			}
-			AccountLogUtil.loginSuccess(accountLogLoginTO);
-		} catch (Exception e) {
-			summaryBuffer.append("登录失败!\r\n");
-			log.error(user + "网站登录出错,请检查!");
-			errorLog.error(user, e);
-			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-			summaryLog.info(summaryBuffer);
-			DataPullTaskPool.addFailedUser(user);
-
-			return;
-		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING + "\r\n");
-
-		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_CARREFOUR),
-				Utils.getEndDate(Constants.RETAILER_CARREFOUR));
-
-		try {
-
-			// receive
-			String fileFullPath = getReceiveExcel(httpClient, user, summaryBuffer);
-			Map<String, Set<String>> receivingMapByDate = AccountLogUtil.getReceivingAmountFromFileForCarrefour(
-					fileFullPath, Utils.getStartDate(Constants.RETAILER_CARREFOUR),
-					Utils.getEndDate(Constants.RETAILER_CARREFOUR));
-
-			for (String processDateStr : receivingMapByDate.keySet()) {
-				AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),processDateStr);
-				accountLogTO.setReceivingDownloadAmount(receivingMapByDate.get(processDateStr).size());
-				AccountLogUtil.recordReceivingDownloadAmount(accountLogTO);
-			}
-		} catch (Exception e) {
-			summaryBuffer.append("收货单下载失败" + "\r\n");
-			log.error(user + "页面加载失败，请登录网站检查收货单功能是否正常！");
-			errorLog.error(user, e);
-			DataPullTaskPool.addFailedUser(user);
-			// log.error(user + Utils.getTrace(e));
-		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
-
-		for (Date searchDate : dates) {
-			CountTO orderCount = new CountTO();
-			AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),DateUtil.toString(searchDate));
-			try {
-				// order
-				int orderAmount = getOrder(httpClient, user, summaryBuffer, orderCount,
-						DateUtil.toString(searchDate, "dd-MM-yyyy"));
-				// 设置订单下载数量
-				accountLogTO.setOrderDownloadAmount(orderAmount);
-				AccountLogUtil.recordOrderDownloadAmount(accountLogTO);
-			} catch (Exception e) {
-				summaryBuffer.append("订单下载出错" + "\r\n");
-				summaryBuffer.append("成功数量: " + orderCount.getCounttotalNo() + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查订单功能是否正常！");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
-			}
-		}
-
-		try {
-			httpClient.close();
-		} catch (IOException e) {
-			errorLog.error(user, e);
-		}
-
-		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-		summaryLog.info(summaryBuffer);
-	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
@@ -179,6 +89,33 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		log.info(user + "登录成功!");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 		return "Success";
+	}
+	
+	public void getReceiveData(CloseableHttpClient httpClient, User user, List<Date> dates, StringBuffer summaryBuffer) {
+		try {
+
+			// receive
+			String fileFullPath = getReceiveExcel(httpClient, user, summaryBuffer);
+
+			// 计算Receiving下载成功的数量
+			Map<String, Set<String>> receivingMapByDate = AccountLogUtil.getReceivingAmountFromFileForCarrefour(
+					fileFullPath, Utils.getStartDate(Constants.RETAILER_CARREFOUR),
+					Utils.getEndDate(Constants.RETAILER_CARREFOUR));
+
+			for (String processDateStr : receivingMapByDate.keySet()) {
+				AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
+						processDateStr);
+				accountLogTO.setReceivingDownloadAmount(receivingMapByDate.get(processDateStr).size());
+				AccountLogUtil.recordReceivingDownloadAmount(accountLogTO);
+			}
+		} catch (Exception e) {
+			summaryBuffer.append("收货单下载失败" + "\r\n");
+			getLog().error(user + "页面加载失败，请登录网站检查收货单功能是否正常！");
+			errorLog.error(user, e);
+			DataPullTaskPool.addFailedUser(user);
+			// getLog().error(user + Utils.getTrace(e));
+		}
+
 	}
 
 	public String getReceiveExcel(CloseableHttpClient httpClient, User user, StringBuffer summaryBuffer)
@@ -241,17 +178,19 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 	}
 
-	public int getOrder(CloseableHttpClient httpClient, User user, StringBuffer summaryBuffer, CountTO orderCount,
-			String searchDate) throws Exception {
+	@Override
+	public int getOrder(CloseableHttpClient httpClient, User user, Date processDate,StringBuffer summaryBuffer
+			) throws Exception {
+		String processDateStr = DateUtil.toString(processDate, "dd-MM-yyyy");
 		Set<String> orderNoSet = new HashSet<String>();
 		if (Utils.isOrderFileExistForCarrefour(Constants.RETAILER_CARREFOUR, user.getUserId(),
-				DateUtil.toDate(searchDate, "dd-MM-yyyy"))) {
-			log.info(user + "订单日期: " + searchDate + "的订单已存在,不再下载");
+				processDate)) {
+			log.info(user + "订单日期: " + processDate + "的订单已存在,不再下载");
 			return 0;
 		}
 
 		log.info(user + "跳转到订单查询页面...");
-		summaryBuffer.append("订单日期: " + searchDate + "\r\n");
+		summaryBuffer.append("订单日期: " + processDate + "\r\n");
 		// forward to PowerE2E Platform
 		HttpGet httpGet = new HttpGet("https://supplierweb.carrefour.com.cn/callSSO.jsp");
 
@@ -269,8 +208,8 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 		// https://platform.powere2e.com/platform/mailbox/openInbox.htm?
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-		searchformParams.add(new BasicNameValuePair("receivedDateFrom", searchDate)); // "01-12-2013"
-		searchformParams.add(new BasicNameValuePair("receivedDateTo", searchDate));
+		searchformParams.add(new BasicNameValuePair("receivedDateFrom", processDateStr)); // "01-12-2013"
+		searchformParams.add(new BasicNameValuePair("receivedDateTo", processDateStr));
 		HttpEntity searchFormEntity = new UrlEncodedFormEntity(searchformParams, "UTF-8");
 		HttpPost searchPost = new HttpPost("https://platform.powere2e.com/platform/mailbox/openInbox.htm?");
 
@@ -284,14 +223,14 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 		String recordStr = table.select("tr[align=right]").select("td").get(0).text();
 		if (recordStr == null || recordStr.equals("")) {
-			log.info(user + "订单日期" + searchDate + "记录为 0");
+			log.info(user + "订单日期" + processDate + "记录为 0");
 			return 0;
 		}
 		recordStr = recordStr.substring(recordStr.indexOf("共") + 1, recordStr.indexOf("记"));
 		recordStr = recordStr.replaceAll(",", "");
 		int record = Integer.parseInt(recordStr);
 		int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
-		log.info(user + "查询到日期: " + searchDate + ",共有" + record + "笔订单");
+		log.info(user + "查询到日期: " + processDate + ",共有" + record + "笔订单");
 		Elements msgIds = doc.select("input[name=msgId]");
 		List<String> msgIdList = new ArrayList<String>();
 		for (Element msgId : msgIds) {
@@ -300,7 +239,7 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 		// 取得每页的MsgId
 		while (page > 1) {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
-			getMsgIdByPage(page, msgIdList, httpClient, searchDate);
+			getMsgIdByPage(page, msgIdList, httpClient, processDateStr);
 			page--;
 		}
 		int count = 0;
@@ -343,15 +282,15 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 			}
 			count++;
-			orderCount.increaseOne();
+//			orderCount.increaseOne();
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
 		}
 		// FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
 		Utils.exportOrderInfoListToTXT(Constants.RETAILER_CARREFOUR, user.getUserId(),
-				DateUtil.toDate(searchDate, "dd-MM-yyyy"), orderItems);
+				processDate, orderItems);
 		log.info(user + "订单数据下载成功!");
 		summaryBuffer.append("订单下载成功" + "\r\n");
-		summaryBuffer.append("数量: " + orderCount.getCounttotalNo() + "\r\n");
+		summaryBuffer.append("数量: " + orderNoSet.size() + "\r\n");
 
 		return orderNoSet.size();
 	}
@@ -387,5 +326,34 @@ public class CarrefourDataPullService implements RetailerDataPullService {
 
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
+	}
+
+	@Override
+	protected Log getLog() {
+	
+		return log;
+	}
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
+	
+	@Override
+	protected String getRetailerID() {
+
+		return Constants.RETAILER_CARREFOUR;
+	}
+
+	@Override
+	protected int getReceive(CloseableHttpClient httpClient, User user, Date processDate, StringBuffer summaryBuffer) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	protected int getSales(CloseableHttpClient httpClient, User user, Date processDate, StringBuffer summaryBuffer) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

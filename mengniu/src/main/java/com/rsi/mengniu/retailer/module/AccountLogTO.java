@@ -123,7 +123,7 @@ public class AccountLogTO extends BaseTO {
 		this.userID = userID;
 		this.password = password;
 		this.processDateStr = processDateStr;
-		this.successInd = "Y";
+//		this.successInd = "Y";
 	}
 	
 	

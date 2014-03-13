@@ -81,9 +81,19 @@ public class AccountLogUtil {
 	 */
 	public static void writeAccountLogToFile() throws BaseException {
 		if (accountLogMap.size() != 0) {
+			updateSuccessInd();
 			writeAccountLogToExcel();
 
 		}
+	}
+
+	private static void updateSuccessInd() {
+		for(AccountLogTO accountLogTO: accountLogMap.values()){
+			if(accountLogTO.getLoginInd()!=null && !accountLogTO.getLoginInd().equals("N")){
+			accountLogTO.setSuccessInd("Y");
+			}
+		}
+		
 	}
 
 	private static void writeAccountLogToExcel() throws BaseException {

@@ -133,6 +133,7 @@ public class ReceivingNoteTO extends BaseTO {
 
 		this.setOrderNo(receivingFieldArray[0]);
 		this.setReceivingDate(receivingFieldArray[1]);
+		this.setStoreID(receivingFieldArray[2]);
 		this.setReceivingStoreNo(receivingFieldArray[2]);
 		this.setStoreName(receivingFieldArray[3]);
 		this.setItemID(receivingFieldArray[4]);

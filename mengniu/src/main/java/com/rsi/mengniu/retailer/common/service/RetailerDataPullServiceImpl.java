@@ -53,6 +53,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			getSummaryLog().info(summaryBuffer);
 			DataPullTaskPool.addFailedUser(user);
+//			AccountLogUtil.loginFailed(accountLogLoginTO);
 
 			return;
 		}

@@ -1,6 +1,7 @@
 package com.rsi.mengniu.util;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,6 +25,9 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
+
+import nl.fountain.xelem.lex.ExcelReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +48,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.util.StringUtils;
+import org.xml.sax.SAXException;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
@@ -1020,8 +1026,269 @@ public class Utils {
 		return allReceivingNoteTOList;
 	}
 
-	public static int getConlidatedOrderNoAmount(List<ReceivingNoteTO> receivingNoteList) {
-		int orderDownloadAmount;
+	public static List<ReceivingNoteTO> getReceivingNoteTOListFromFileForRainbow(File receivingFile)
+			throws BaseException {
+		List<ReceivingNoteTO> receivingNoteList = new ArrayList<ReceivingNoteTO>();
+		if (receivingFile.exists()) {
+			String fileName = receivingFile.getName();
+			String[] splitStr = fileName.split("_");
+			String userID = splitStr[2];
+
+			BufferedReader reader = null;
+			try {
+				// Open the file
+				FileInputStream fileInput = new FileInputStream(receivingFile);
+				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
+				reader = new BufferedReader(inputStrReader);
+				reader.readLine();
+				// Read line by line
+				String receivingLine = null;
+				while ((receivingLine = reader.readLine()) != null) {
+					RainbowReceivingTO receivingNoteTO = new RainbowReceivingTO(receivingLine);
+					receivingNoteTO.setUserID(userID);
+					receivingNoteList.add(receivingNoteTO);
+				}
+
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+
+				log.error(e);
+				throw new BaseException(e);
+
+			} finally {
+
+				FileUtil.closeFileReader(reader);
+			}
+
+			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:" + receivingNoteList.size());
+
+		}
+		return receivingNoteList;
+	}
+
+	public static List<SalesTO> getSalesTOListFromFileForRainbow(File salesFile) throws BaseException {
+		List<SalesTO> salesTOList = new ArrayList<SalesTO>();
+
+		if (salesFile.exists()) {
+			String fileName = salesFile.getName();
+			String[] splitStr = fileName.split("_");
+			String userID = splitStr[2];
+			try {
+				InputStream sourceExcel = new FileInputStream(salesFile);
+
+				Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+				if (sourceWorkbook.getNumberOfSheets() != 0) {
+					Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+					for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+						Row sourceRow = sourceSheet.getRow(i);
+						if (sourceRow == null) {
+							continue;
+						}
+
+						String salesDateStr = sourceRow.getCell(8).getStringCellValue();
+
+						SalesTO salesTO = new SalesTO();
+
+						salesTO.setItemID(sourceRow.getCell(1).getStringCellValue());
+						salesTO.setItemName(sourceRow.getCell(2).getStringCellValue());
+						salesTO.setStoreID(sourceRow.getCell(5).getStringCellValue());
+						salesTO.setSalesDate(salesDateStr);
+						salesTO.setSalesQuantity(sourceRow.getCell(6).getStringCellValue());
+						salesTO.setSalesAmount(sourceRow.getCell(7).getStringCellValue());
+						salesTO.setUserID(userID);
+						salesTOList.add(salesTO);
+
+					}
+				}
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+				log.error(e);
+				throw new BaseException(e);
+			}
+		}
+		return salesTOList;
+	}
+
+	public static List<SalesTO> getSalesTOListFromFileForRenrenle(File salesFile) throws BaseException {
+
+		List<SalesTO> salesTOList = new ArrayList<SalesTO>();
+
+		if (salesFile.exists()) {
+			String fileName = salesFile.getName();
+			String[] splitStr = fileName.split("_");
+			String userID = splitStr[2];
+			String salesDate = fileName.substring(fileName.lastIndexOf("_") + 1, fileName.indexOf("."));
+			salesDate = DateUtil.toString(DateUtil.toDate(salesDate, "yyyyMMdd"));
+
+			try {
+				InputStream sourceExcel = new FileInputStream(salesFile);
+
+				Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+
+				if (sourceWorkbook.getNumberOfSheets() != 0) {
+					Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+					for (int i = 3; i < sourceSheet.getPhysicalNumberOfRows() - 1; i++) {
+						Row sourceRow = sourceSheet.getRow(i);
+						if (sourceRow == null) {
+							continue;
+						}
+						SalesTO salesTO = new SalesTO();
+						salesTO.setSalesDate(salesDate);
+						salesTO.setUserID(userID);
+
+						for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+
+							Cell sourceCell = sourceRow.getCell(j);
+
+							String sourceCellValue;
+							if (sourceCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+								sourceCellValue = Double.valueOf(sourceCell.getNumericCellValue()).toString();
+							} else {
+
+								sourceCellValue = sourceCell.getStringCellValue();
+							}
+
+							switch (j) {
+							case 0:
+								salesTO.setStoreID(sourceCellValue);
+
+								continue;
+							case 2:
+								salesTO.setItemName(sourceCellValue);
+
+								continue;
+							case 3:
+								salesTO.setItemID(sourceCellValue);
+
+								continue;
+							case 6:
+								salesTO.setSalesQuantity(sourceCellValue);
+
+								continue;
+							case 7:
+								salesTO.setSalesAmount(sourceCellValue);
+
+								continue;
+
+							}
+
+						}
+
+						salesTOList.add(salesTO);
+					}
+				}
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				throw new BaseException(e);
+			} catch (IOException e) {
+				log.error(e);
+				throw new BaseException(e);
+			}
+		}
+		return salesTOList;
+	}
+
+	public static List<OrderTO> getOrderTOListFromFileForYonghui(File orderFile) {
+
+		List<OrderTO> orderTOList = new ArrayList<OrderTO>();
+		if (orderFile.exists()) {
+			String fileName = orderFile.getName();
+			String[] splitStr = fileName.split("_");
+			String userID = splitStr[2];
+			ExcelReader excelReader = null;
+			try {
+				excelReader = new ExcelReader();
+			} catch (ParserConfigurationException e) {
+				// TODO Auto-generated catch block
+				errorLog.error(e);
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				errorLog.error(e);
+			}
+			nl.fountain.xelem.excel.Workbook wb = null;
+			try {
+				wb = excelReader.getWorkbook(orderFile.getPath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				errorLog.error(e);
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				errorLog.error(e);
+			}
+
+			nl.fountain.xelem.excel.Worksheet sourceSheet = wb.getWorksheetAt(0);
+			for (int i = 2; i <= sourceSheet.lastRow; i++) {
+				nl.fountain.xelem.excel.Row sourceRow = sourceSheet.getRowAt(i);
+				if (sourceRow == null) {
+					continue;
+				}
+
+				OrderTO orderTO = new OrderTO();
+				String orderNo = null;
+
+				for (int j = 1; j <= sourceRow.maxCellIndex(); j++) {
+
+					nl.fountain.xelem.excel.Cell sourceCell = sourceRow.getCellAt(j);
+
+					switch (j) {
+					case 2:
+						orderNo = sourceCell.getData$();
+						orderTO.setOrderNo(orderNo);
+
+						continue;
+					case 5:
+						String storeID = sourceCell.getData$();
+						orderTO.setStoreID(storeID);
+
+						continue;
+					case 6:
+
+						String storeName = sourceCell.getData$();
+						orderTO.setStoreName(storeName);
+						continue;
+					case 7:
+						String orderDate = sourceCell.getData$();
+						orderTO.setOrderDate(orderDate);
+
+						continue;
+					case 9:
+						String itemCode = sourceCell.getData$();
+						orderTO.setItemID(itemCode);
+
+						continue;
+					case 10:
+						String barcode = sourceCell.getData$();
+						orderTO.setBarcode(barcode);
+
+						continue;
+					case 11:
+
+						String itemName = sourceCell.getData$();
+						orderTO.setItemName(itemName);
+
+						continue;
+					case 13:
+						String quantity = sourceCell.getData$();
+						orderTO.setQuantity(quantity);
+
+						continue;
+					}
+
+				}
+				orderTO.setUserID(userID);
+				orderTOList.add(orderTO);
+
+			}
+		}
+		return orderTOList;
+	}
+
+	public static int getConlidatedOrderNoAmountByReceivingNoteTO(List<ReceivingNoteTO> receivingNoteList) {
+		int orderDownloadAmount = 0;
 		Set<String> orderNoSet = new HashSet<String>();
 		for (ReceivingNoteTO receivingNoteTO : receivingNoteList) {
 			orderNoSet.add(receivingNoteTO.getOrderNo());
@@ -1029,4 +1296,15 @@ public class Utils {
 		orderDownloadAmount = orderNoSet.size();
 		return orderDownloadAmount;
 	}
+
+	public static int getConlidatedOrderNoAmountByOrderTO(List<OrderTO> orderTOList) {
+		int orderDownloadAmount = 0;
+		Set<String> orderNoSet = new HashSet<String>();
+		for (OrderTO orderTO : orderTOList) {
+			orderNoSet.add(orderTO.getOrderNo());
+		}
+		orderDownloadAmount = orderNoSet.size();
+		return orderDownloadAmount;
+	}
+
 }

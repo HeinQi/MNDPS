@@ -128,7 +128,7 @@ public class TescoDataPullService extends RetailerDataPullServiceImpl {
 //		summaryLog.info(summaryBuffer);
 //	}
 
-	public String login(CloseableHttpClient httpClient, User user) throws Exception {
+	protected String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("j_username", user.getUserId()));
@@ -220,7 +220,7 @@ public class TescoDataPullService extends RetailerDataPullServiceImpl {
 
 			// Get consolidated download order amount
 			List<ReceivingNoteTO> receivingNoteList = Utils.getReceivingNoteTOListFromFileForTesco(newFile);
-			orderDownloadAmount = Utils.getConlidatedOrderNoAmount(receivingNoteList);
+			orderDownloadAmount = Utils.getConlidatedOrderNoAmountByReceivingNoteTO(receivingNoteList);
 			log.info(user + "Tesco收货单Excel下载成功!");
 		} catch (ZipException e) {
 

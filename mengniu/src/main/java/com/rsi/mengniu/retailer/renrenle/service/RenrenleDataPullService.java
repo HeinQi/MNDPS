@@ -1,5 +1,6 @@
 package com.rsi.mengniu.retailer.renrenle.service;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.OrderTO;
+import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
@@ -151,11 +153,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate, StringBuffer summaryBuffer)
+	public int getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate, StringBuffer summaryBuffer)
 			throws Exception {
 		if (Utils.isSalesFileExist(Constants.RETAILER_RENRENLE, user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
 			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
-			return;
+			return 0;
 		}
 		
 		log.info(user + "开始下载" + searchDate + "的销售数据...");
@@ -172,7 +174,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		if (!searchStr.contains("销售店号查询")) {
 			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
 			summaryBuffer.append("无权限下载销售单或下载失败" + "\r\n");
-			return;
+			return 0;
 		}
 		Document searchDoc = Jsoup.parse(searchStr);
 		Element token = searchDoc.select("input[name=org.apache.struts.taglib.html.TOKEN]").first();
@@ -204,9 +206,14 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		summaryBuffer.append("销售单下载成功" + "\r\n");
 		summaryBuffer.append("文件: " + receiveFileNm + "\r\n");
 		log.info(user + searchDate + "的销售数据下载成功");
+		
+		List<SalesTO> salesTOList = Utils.getSalesTOListFromFileForRenrenle(new File(salesFilePath + receiveFileNm));
+		
+		return salesTOList.size();
+		
 	}
 
-	public void getOrders(CloseableHttpClient httpClient, User user, String searchDate,StringBuffer summaryBuffer) throws Exception {
+	public int getOrders(CloseableHttpClient httpClient, User user, String searchDate,StringBuffer summaryBuffer) throws Exception {
 		log.info(user + "开始下载" + searchDate + "的订单数据...");
 //http://www.renrenle.cn/scm/jump.do?prefix=/order&page=/orderAction.do?method=queryOrder&left=1&moduleID=202
 		HttpGet httpGet = new HttpGet(
@@ -218,7 +225,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		if (!searchStr.contains("订单资料查询")) {
 			log.error(user + "页面加载失败，请登录网站检查订单数据查询功能是否正常!");
 			summaryBuffer.append("无权限下载订单或下载失败" + "\r\n");
-			return;
+			return 0;
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		
@@ -245,7 +252,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			if (!responseStr.contains("泰斯玛供应链关系管理系统")) {
 				log.error(user + "订单查询失败,请登录网站检查");
 				DataPullTaskPool.addFailedUser(user);
-				return;
+				return 0;
 			}
 			String totalPageStr = responseStr.substring(responseStr.indexOf("</B>/<B>") + 8);
 			totalPageStr = totalPageStr.substring(0, totalPageStr.indexOf("</B>"));
@@ -275,6 +282,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			log.info(user + "成功获取第" + (i + 1) + "条订单,订单号为" + orderId);
 		}
 		log.info(user + searchDate + "的订单数据下载成功");
+		
+		return orderIdList.size();
 	}
 
 	private void getOrderDetail(CloseableHttpClient httpClient, User user, String orderId, String searchDate,

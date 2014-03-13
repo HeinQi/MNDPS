@@ -440,6 +440,8 @@ public abstract class RetailerDataConversionService {
 		Object[] receivingKeyList = receivingNoteByStoreMap.keySet().toArray();
 		Arrays.sort(receivingKeyList);
 
+		
+		
 		Map<String,Set<String>> mergedOrderMap = new HashMap<String, Set<String>>();
 		
 		List<ReceivingNoteTO> failedReceivingList = new ArrayList<ReceivingNoteTO>();

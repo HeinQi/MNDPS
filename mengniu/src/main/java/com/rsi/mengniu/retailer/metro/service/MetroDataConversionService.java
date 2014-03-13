@@ -52,6 +52,9 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
 
 		if (receivingFile.exists()) {
+			String fileName = receivingFile.getName();
+			String[] splitStr = fileName.split("_");
+			String userID = splitStr[2];
 			BufferedReader reader = null;
 			try {
 				// Open the file
@@ -65,6 +68,7 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 				while ((receivingLine = reader.readLine()) != null) {
 					ReceivingNoteTO receivingNoteTO = new ReceivingNoteTO(
 							receivingLine);
+					receivingNoteTO.setUserID(userID);
 					String orderNo = receivingNoteTO.getOrderNo();
 
 					List<ReceivingNoteTO> receivingNoteTOList = null;
@@ -264,6 +268,9 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 		Map<String, OrderTO> orderMap = new HashMap<String, OrderTO>();
 
 		if (orderFile.exists()) {
+			String fileName = orderFile.getName();
+			String[] splitStr = fileName.split("_");
+			String userID = splitStr[2];
 			BufferedReader reader = null;
 			try {
 				// Open the file
@@ -276,6 +283,9 @@ public class MetroDataConversionService extends RetailerDataConversionService {
 				String orderLine = null;
 				while ((orderLine = reader.readLine()) != null) {
 					OrderTO orderTO = new OrderTO(orderLine);
+					
+					orderTO.setUserID(userID);
+					
 					String key = orderTO.getOrderNo()
 							+ orderTO.getStoreID()
 							+ orderTO.getItemID();

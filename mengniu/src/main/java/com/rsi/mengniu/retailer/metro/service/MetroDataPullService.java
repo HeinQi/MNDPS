@@ -24,9 +24,11 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
@@ -38,51 +40,57 @@ public class MetroDataPullService implements RetailerDataPullService {
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = Utils.createHttpClient();
 		StringBuffer summaryBuffer = new StringBuffer();
-		summaryBuffer.append("运行时间: "+new Date()+"\r\n");
-		summaryBuffer.append("零售商: "+user.getRetailer()+"\r\n");
-		summaryBuffer.append("用户: "+user.getUserId()+"\r\n");
+		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
+		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
+		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
+		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
+		
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
 				summaryBuffer.append("登录失败!\r\n");
-				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 				summaryLog.info(summaryBuffer);
+				AccountLogUtil.loginFailed(accountLogLoginTO);
 				return;
 			}
+
+			AccountLogUtil.loginSuccess(accountLogLoginTO);
 		} catch (Exception e) {
 			summaryBuffer.append("登录失败!\r\n");
-			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			summaryLog.info(summaryBuffer);
-			log.error(user+"网站登录出错,请检查!");
-			errorLog.error(user,e);
+			log.error(user + "网站登录出错,请检查!");
+			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
+//			AccountLogUtil.loginFailed(accountLogLoginTO);
 			return;
 		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
+		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING + "\r\n");
 		try {
 			// receive
-			getReceive(httpClient, user,summaryBuffer);			
+			getReceive(httpClient, user, summaryBuffer);
 		} catch (Exception e) {
-			summaryBuffer.append("收货单下载失败"+"\r\n");
-			log.error(user+"页面加载失败，请登录网站检查收货单查询功能是否正常!");
-			errorLog.error(user,e);	
+			summaryBuffer.append("收货单下载失败" + "\r\n");
+			log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
+			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
 		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
+		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
 		try {
 			// order
-			getOrder(httpClient,user,summaryBuffer);
-			httpClient.close();		
+			getOrder(httpClient, user, summaryBuffer);
+			httpClient.close();
 		} catch (Exception e) {
-			summaryBuffer.append("订单下载失败"+"\r\n");
-			log.error(user+"页面加载失败，请登录网站检查订单查询功能是否正常!");
-			errorLog.error(user,e);
+			summaryBuffer.append("订单下载失败" + "\r\n");
+			log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
+			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
 		}
-		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
+		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 		summaryLog.info(summaryBuffer);
-		
+
 	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
@@ -99,7 +107,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		// forward
-		HttpGet httpGet = new HttpGet("https://portal.metro-link.com" + loginResponse.getFirstHeader("location").getValue());
+		HttpGet httpGet = new HttpGet("https://portal.metro-link.com"
+				+ loginResponse.getFirstHeader("location").getValue());
 		httpGet.addHeader("Accept-Language", "zh-CN");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		String responseStr = EntityUtils.toString(response.getEntity());
@@ -109,7 +118,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			log.info(user + "登录失败,请检查登录名和密码!");
 			Utils.recordIncorrectUser(user);
 			return "InvalidPassword";
-		}		
+		}
 		if (!responseStr.contains("Login Successful")) {
 			log.info(user + "网站登录失败,请检查网站,退出");
 			return "Error";
@@ -119,17 +128,18 @@ public class MetroDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getReceive(CloseableHttpClient httpClient, User user,StringBuffer summaryBuffer) throws Exception {
+	public void getReceive(CloseableHttpClient httpClient, User user, StringBuffer summaryBuffer) throws Exception {
 		String receiveFileNm = "Receiving_" + Constants.RETAILER_METRO + "_" + user.getUserId() + "_"
 				+ DateUtil.toStringYYYYMMDD(new Date()) + ".txt";
 		if (Utils.isReceivingFileExist(Constants.RETAILER_METRO, receiveFileNm)) {
-			log.info(user+"收货单已存在,不再下载");
+			log.info(user + "收货单已存在,不再下载");
 			return;
 		}
-		log.info(user+"下载收货单...");
+		log.info(user + "下载收货单...");
 
 		/*
-		 * sap-ext-sid:8bYti*zClHwZHwXfrCHo6A--qvel*Z7akaxIul*bBSNpTA-- sap-wd-cltwndid:WID1389278326411 sap-wd-norefresh:X
+		 * sap-ext-sid:8bYti*zClHwZHwXfrCHo6A--qvel*Z7akaxIul*bBSNpTA--
+		 * sap-wd-cltwndid:WID1389278326411 sap-wd-norefresh:X
 		 * sap-wd-secure-id:kWy9KBHx7eFt5TZYysnpjw==
 		 */
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
@@ -143,7 +153,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		// /irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fevery_user!2fgeneral!2fdefaultAjaxframeworkContent!2fcom.sap.portal.contentarea?ExecuteLocally=true&CurrentWindowId=WID1389359093558&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&windowId=WID1389359093558&NavMode=0&PrevNavTarget=navurl%3A%2F%2Ff0a962e1bd92af95fc8eba4691680ae4
 		HttpPost receivePost = new HttpPost(url2);
 		receivePost.addHeader("Accept-Language", "zh-CN");
-		receivePost.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		receivePost
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 
 		receivePost.setEntity(receiveFormEntity);
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
@@ -166,7 +178,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String sap_epcm_guid = doc1.select("input[name=sap-epcm-guid]").first().attr("value");// sap-epcm-guid"
 		String restart = doc1.select("input[name=com.sap.portal.reserved.wd.pb.restart]").first().attr("value");// com.sap.portal.reserved.wd.pb.restart"
 		String dynamicParameter = doc1.select("input[name=DynamicParameter]").first().attr("value"); // DynamicParameter"
-		String supportInitialNavNodesFilter = doc1.select("input[name=supportInitialNavNodesFilter]").first().attr("value");// supportInitialNavNodesFilter"
+		String supportInitialNavNodesFilter = doc1.select("input[name=supportInitialNavNodesFilter]").first()
+				.attr("value");// supportInitialNavNodesFilter"
 		String navigationTarget = doc1.select("input[name=NavigationTarget]").first().attr("value"); // NavigationTarget"
 		String navMode = doc1.select("input[name=NavMode]").first().attr("value");// NavMode"
 		String executeLocally = doc1.select("input[name=ExecuteLocally]").first().attr("value"); // ExecuteLocally"
@@ -175,7 +188,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String prevNavTarget = doc1.select("input[name=PrevNavTarget]").first().attr("value"); // PrevNavTarget"
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		
+
 		List<NameValuePair> receiveformParams3 = new ArrayList<NameValuePair>();
 		receiveformParams3.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		receiveformParams3.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -205,7 +218,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 		HttpPost receivePost3 = new HttpPost(url3);
 		receivePost3.addHeader("Accept-Language", "zh-CN");
 		receivePost3
-				.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 
 		receivePost3.setEntity(receiveFormEntity3);
 		CloseableHttpResponse receiveRes3 = httpClient.execute(receivePost3);
@@ -216,7 +230,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String sap_wd_secure_id = doc3.select("input[name=sap-wd-secure-id]").first().attr("value");// sap-wd-secure-id
 		String sap_wd_norefresh = doc3.select("input[name=sap-wd-norefresh]").first().attr("value");// sap-wd-norefresh
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		
+
 		// From Date
 		List<NameValuePair> receiveformParams4 = new ArrayList<NameValuePair>();
 		receiveformParams4.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
@@ -224,14 +238,15 @@ public class MetroDataPullService implements RetailerDataPullService {
 		receiveformParams4.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		receiveformParams4.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
 		String sapEventQueue = "InputField_ValidateIdaaaa.GoodsRecView.inputReceivingDateFromValue"
-				+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_METRO),"yyyy-M-d")
+				+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_METRO), "yyyy-M-d")
 				+ "ClientActionsubmitAsyncurEventNameValidateForm_RequestId...formAsynctrueFocusInfo@{\"sFocussedId\": \"ls-datepicker\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		receiveformParams4.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueue));
 		HttpEntity receiveFormEntity4 = new UrlEncodedFormEntity(receiveformParams4, "UTF-8");
 		HttpPost receivePost4 = new HttpPost(url3);
 		receivePost4.addHeader("Accept-Language", "zh-CN");
 		receivePost4
-				.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		receivePost4.setEntity(receiveFormEntity4);
 		CloseableHttpResponse receiveRes4 = httpClient.execute(receivePost4);
 		String responseStr4 = EntityUtils.toString(receiveRes4.getEntity());
@@ -244,20 +259,21 @@ public class MetroDataPullService implements RetailerDataPullService {
 		receiveformParams5.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		receiveformParams5.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
 		String sapEventQueueTo = "InputField_ValidateIdaaaa.GoodsRecView.inputReceivingDateToValue"
-				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_METRO),"yyyy-M-d")
+				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_METRO), "yyyy-M-d")
 				+ "ClientActionsubmitAsyncurEventNameValidateForm_RequestId...formAsynctrueFocusInfo@{\"sFocussedId\": \"ls-datepicker\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		receiveformParams5.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueueTo));
 		HttpEntity receiveFormEntity5 = new UrlEncodedFormEntity(receiveformParams5, "UTF-8");
 		HttpPost receivePost5 = new HttpPost(url3);
 		receivePost5.addHeader("Accept-Language", "zh-CN");
 		receivePost5
-				.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		receivePost5.setEntity(receiveFormEntity5);
 		CloseableHttpResponse receiveRes5 = httpClient.execute(receivePost5);
 		String responseStr5 = EntityUtils.toString(receiveRes5.getEntity());
 		receiveRes5.close();
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		// Search Max500rows  查询结果包含多条记录 
+		// Search Max500rows 查询结果包含多条记录
 		List<NameValuePair> receiveformParams6 = new ArrayList<NameValuePair>();
 		receiveformParams6.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		receiveformParams6.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -272,14 +288,14 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String responseStr6 = EntityUtils.toString(receiveRes6.getEntity());
 		receiveRes6.close();
 		if (responseStr6.contains("查询结果包含多条记录")) {
-			log.info(user+"查询结果超过500条，请减小日期区间!");
-			
+			log.info(user + "查询结果超过500条，请减小日期区间!");
+
 		} else if (responseStr6.contains("没有查询到符合条件的数据")) {
-			log.info(user+"没有查询到符合条件的收货单数据!");
+			log.info(user + "没有查询到符合条件的收货单数据!");
 			return;
 		}
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));		
-		//Select ALL
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+		// Select ALL
 		List<NameValuePair> receiveformParams7 = new ArrayList<NameValuePair>();
 		receiveformParams7.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		receiveformParams7.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -292,9 +308,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		receivePost7.setEntity(receiveFormEntity7);
 		CloseableHttpResponse receiveRes7 = httpClient.execute(receivePost7);
 		receiveRes7.close();
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));		
-		
-		//显示已交货订单明细
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+
+		// 显示已交货订单明细
 		List<NameValuePair> receiveformParams8 = new ArrayList<NameValuePair>();
 		receiveformParams8.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		receiveformParams8.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -305,47 +321,65 @@ public class MetroDataPullService implements RetailerDataPullService {
 		HttpEntity receiveFormEntity8 = new UrlEncodedFormEntity(receiveformParams8, "UTF-8");
 		HttpPost receivePost8 = new HttpPost(url3);
 		receivePost8.addHeader("Accept-Language", "zh-CN");
-		receivePost8.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		receivePost8
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		receivePost8.setEntity(receiveFormEntity8);
 		CloseableHttpResponse receiveRes8 = httpClient.execute(receivePost8);
-		String receiveDetailRes = EntityUtils.toString(receiveRes8.getEntity()); 
+		String receiveDetailRes = EntityUtils.toString(receiveRes8.getEntity());
 		receiveRes8.close();
 		if (receiveDetailRes.contains("数据下载成功")) {
-			receiveDetailRes = receiveDetailRes.substring(receiveDetailRes.indexOf("<![CDATA[") + 9, receiveDetailRes.indexOf("]]></content-update>"));
+			receiveDetailRes = receiveDetailRes.substring(receiveDetailRes.indexOf("<![CDATA[") + 9,
+					receiveDetailRes.indexOf("]]></content-update>"));
 			Document detailResult = Jsoup.parse(receiveDetailRes);
 			Element pageElement = detailResult.select("div[ct=SCB]").first();
 			String pageStr = pageElement.attr("lsdata");
-			pageStr = pageStr.substring(pageStr.indexOf("ROW")+8,pageStr.lastIndexOf("}"));
+			pageStr = pageStr.substring(pageStr.indexOf("ROW") + 8, pageStr.lastIndexOf("}"));
 			int record = Integer.valueOf(pageStr);
-			log.info(user+"收货单明细共有 "+record+" 行");
+			log.info(user + "收货单明细共有 " + record + " 行");
 			int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
 			List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
-			getReceiveDetailByPage(receiveDetailRes,1,record,receiveList,user);
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
-			for (int i=2; i<=page; i++) {
-				int startRow = i*10-9;
-				String detailStr = getReceiveDetailByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
-				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
-				getReceiveDetailByPage(detailStr,startRow,record,receiveList,user);
+			getReceiveDetailByPage(receiveDetailRes, 1, record, receiveList, user);
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+			for (int i = 2; i <= page; i++) {
+				int startRow = i * 10 - 9;
+				String detailStr = getReceiveDetailByPage(httpClient, sap_ext_sid, sap_wd_cltwndid, sap_wd_norefresh,
+						sap_wd_secure_id, startRow);
+				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9,
+						detailStr.indexOf("]]></content-update>"));
+				getReceiveDetailByPage(detailStr, startRow, record, receiveList, user);
 			}
 			FileUtil.exportReceivingInfoToTXT(Constants.RETAILER_METRO, user.getUserId(), receiveList);
 			log.info(user + "收货单下载成功!");
-			summaryBuffer.append("收货单下载成功"+"\r\n");
+			summaryBuffer.append("收货单下载成功" + "\r\n");
+			
+			if (receiveList.size() != 0) {
+				int orderAmount = Utils.getConlidatedOrderNoAmountByReceivingNoteTO(receiveList);
+
+				String receiveDate = receiveList.get(0).getReceivingDate();
+
+				AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+						receiveDate);
+				accountLogTO.setReceivingDownloadAmount(orderAmount);
+				AccountLogUtil.recordReceivingDownloadAmount(accountLogTO);
+			}
 		} else {
-			log.info(user+"下载收货单失败!");
-			summaryBuffer.append("收货单下载失败"+"\r\n");
+			log.info(user + "下载收货单失败!");
+			summaryBuffer.append("收货单下载失败" + "\r\n");
 		}
-		
+
 	}
 
-	public String getReceiveDetailByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
-			String sap_wd_secure_id,int startRow) throws Exception {
+	public String getReceiveDetailByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid,
+			String sap_wd_norefresh, String sap_wd_secure_id, int startRow) throws Exception {
 		List<NameValuePair> receiveformParams = new ArrayList<NameValuePair>();
 		receiveformParams.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		receiveformParams.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		receiveformParams.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		receiveformParams.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
-		String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"
+				+ startRow
+				+ "ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		receiveformParams.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueuePage));
 		HttpEntity receiveFormEntity = new UrlEncodedFormEntity(receiveformParams, "UTF-8");
 		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
@@ -354,17 +388,17 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse receiveRes = httpClient.execute(receivePost);
 		String responseStr = EntityUtils.toString(receiveRes.getEntity()); // 数据下载成功
 		receiveRes.close();
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
 		return responseStr;
-	}	
-	
-	
-	private void getReceiveDetailByPage(String responseStr,int startRow,int record,List<ReceivingNoteTO> receiveList,User user) {
-		log.info(user+"读取收货单明细 "+startRow+"-"+((startRow+9)>record?record:(startRow+9))+" 行");
+	}
+
+	private void getReceiveDetailByPage(String responseStr, int startRow, int record,
+			List<ReceivingNoteTO> receiveList, User user) {
+		log.info(user + "读取收货单明细 " + startRow + "-" + ((startRow + 9) > record ? record : (startRow + 9)) + " 行");
 		Document detailResult = Jsoup.parse(responseStr);
-		
-		for (int i=startRow; i<startRow+10 && i<=record;i++) {
-			Elements dataElements = detailResult.select("tr[rr="+i+"]");
+
+		for (int i = startRow; i < startRow + 10 && i <= record; i++) {
+			Elements dataElements = detailResult.select("tr[rr=" + i + "]");
 			Elements tds = dataElements.first().select("td");
 			ReceivingNoteTO receiveingTo = new ReceivingNoteTO();
 			receiveingTo.setStoreID(tds.get(2).select("span").first().text()); // 门店编号
@@ -381,9 +415,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 	}
 
-	public void getOrder(CloseableHttpClient httpClient,User user,StringBuffer summaryBuffer) throws Exception {
-		
-		log.info(user+"订单数据下载...");
+	public void getOrder(CloseableHttpClient httpClient, User user, StringBuffer summaryBuffer) throws Exception {
+
+		log.info(user + "订单数据下载...");
 		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
 		orderformParams.add(new BasicNameValuePair("NavigationTarget", "navurl://2acb0a958f2485c518851f9e303d829f"));
 		orderformParams.add(new BasicNameValuePair("Command", "SUSPEND"));
@@ -392,10 +426,12 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 		HttpEntity orderFormEntity = new UrlEncodedFormEntity(orderformParams, "UTF-8");
 		String url1 = "https://portal.metro-link.com/irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fevery_user!2fgeneral!2fdefaultAjaxframeworkContent!2fcom.sap.portal.contentarea?ExecuteLocally=true&CurrentWindowId=WID1390061377525&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&windowId=WID1390061377525&NavMode=0&PrevNavTarget=navurl%3A%2F%2Fc81bab1e37e8bb37e6c6ba0a74c170ef";
-		           //  https://portal.metro-link.com/irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fevery_user!2fgeneral!2fdefaultAjaxframeworkContent!2fcom.sap.portal.contentarea?ExecuteLocally=true&CurrentWindowId=WID1390061377525&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&windowId=WID1390061377525&NavMode=0&PrevNavTarget=navurl%3A%2F%2Fc81bab1e37e8bb37e6c6ba0a74c170ef
+		// https://portal.metro-link.com/irj/servlet/prt/portal/prteventname/Navigate/prtroot/pcd!3aportal_content!2fevery_user!2fgeneral!2fdefaultAjaxframeworkContent!2fcom.sap.portal.contentarea?ExecuteLocally=true&CurrentWindowId=WID1390061377525&supportInitialNavNodesFilter=true&filterViewIdList=%3Bmcc%3Bcommon%3B&windowId=WID1390061377525&NavMode=0&PrevNavTarget=navurl%3A%2F%2Fc81bab1e37e8bb37e6c6ba0a74c170ef
 		HttpPost orderPost = new HttpPost(url1);
 		orderPost.addHeader("Accept-Language", "zh-CN");
-		orderPost.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		orderPost
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 
 		orderPost.setEntity(orderFormEntity);
 		CloseableHttpResponse orderRes = httpClient.execute(orderPost);
@@ -417,16 +453,17 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String sap_epcm_guid = doc1.select("input[name=sap-epcm-guid]").first().attr("value");// sap-epcm-guid"
 		String restart = doc1.select("input[name=com.sap.portal.reserved.wd.pb.restart]").first().attr("value");// com.sap.portal.reserved.wd.pb.restart"
 		String dynamicParameter = doc1.select("input[name=DynamicParameter]").first().attr("value"); // DynamicParameter"
-		String supportInitialNavNodesFilter = doc1.select("input[name=supportInitialNavNodesFilter]").first().attr("value");// supportInitialNavNodesFilter"
+		String supportInitialNavNodesFilter = doc1.select("input[name=supportInitialNavNodesFilter]").first()
+				.attr("value");// supportInitialNavNodesFilter"
 		String navigationTarget = doc1.select("input[name=NavigationTarget]").first().attr("value"); // NavigationTarget"
 		String navMode = doc1.select("input[name=NavMode]").first().attr("value");// NavMode"
 		String executeLocally = doc1.select("input[name=ExecuteLocally]").first().attr("value"); // ExecuteLocally"
 		String filterViewIdList = doc1.select("input[name=filterViewIdList]").first().attr("value");// filterViewIdList"
 		String currentWindowId = doc1.select("input[name=CurrentWindowId]").first().attr("value"); // CurrentWindowId"
 		String prevNavTarget = doc1.select("input[name=PrevNavTarget]").first().attr("value"); // PrevNavTarget"
-		
+
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		
+
 		List<NameValuePair> orderformParams2 = new ArrayList<NameValuePair>();
 		orderformParams2.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams2.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -455,7 +492,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String url2 = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
 		HttpPost orderPost2 = new HttpPost(url2);
 		orderPost2.addHeader("Accept-Language", "zh-CN");
-		orderPost2.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		orderPost2
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 
 		orderPost2.setEntity(orderFormEntity2);
 		CloseableHttpResponse orderRes2 = httpClient.execute(orderPost2);
@@ -466,59 +505,63 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String sap_wd_norefresh = doc2.select("input[name=sap-wd-norefresh]").first().attr("value");// sap-wd-norefresh
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		
-		//StartDate
+
+		// StartDate
 		List<NameValuePair> orderformParams3 = new ArrayList<NameValuePair>();
 		orderformParams3.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams3.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams3.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams3.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
 		String sapEventQueueFrom = "InputField_ValidateIdaaaa.OrdersView.inputOrderDateFromValue"
-				+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_METRO),"yyyy-M-d")
+				+ DateUtil.toString(Utils.getStartDate(Constants.RETAILER_METRO), "yyyy-M-d")
 				+ "ClientActionsubmitAsyncurEventNameValidateForm_RequestId...formAsynctrueFocusInfo@{\"sFocussedId\": \"ls-datepicker\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams3.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueueFrom));
 		HttpEntity orderFormEntity3 = new UrlEncodedFormEntity(orderformParams3, "UTF-8");
 		HttpPost orderPost3 = new HttpPost(url2);
 		orderPost3.addHeader("Accept-Language", "zh-CN");
 		orderPost3
-				.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 
 		orderPost3.setEntity(orderFormEntity3);
 		CloseableHttpResponse orderRes3 = httpClient.execute(orderPost3);
 		String responseStr3 = EntityUtils.toString(orderRes3.getEntity());
 		orderRes3.close();
-		
+
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		
-		//EndDate
+
+		// EndDate
 		List<NameValuePair> orderformParams4 = new ArrayList<NameValuePair>();
 		orderformParams4.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams4.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams4.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams4.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
 		String sapEventQueueTo = "InputField_ValidateIdaaaa.OrdersView.inputOrderDateToValue"
-				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_METRO),"yyyy-M-d")
+				+ DateUtil.toString(Utils.getEndDate(Constants.RETAILER_METRO), "yyyy-M-d")
 				+ "ClientActionsubmitAsyncurEventNameValidateForm_RequestId...formAsynctrueFocusInfo@{\"sFocussedId\": \"ls-datepicker\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams4.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueueTo));
 		HttpEntity orderFormEntity4 = new UrlEncodedFormEntity(orderformParams4, "UTF-8");
 		HttpPost orderPost4 = new HttpPost(url2);
 		orderPost4.addHeader("Accept-Language", "zh-CN");
-		orderPost4.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
-		
+		orderPost4
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+
 		orderPost4.setEntity(orderFormEntity4);
 		CloseableHttpResponse orderRes4 = httpClient.execute(orderPost4);
 		String responseStr4 = EntityUtils.toString(orderRes4.getEntity());
 		orderRes4.close();
-		
+
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		
-		// Search Max500rows  查询结果包含多条记录 
+
+		// Search Max500rows 查询结果包含多条记录
 		List<NameValuePair> orderformParams5 = new ArrayList<NameValuePair>();
 		orderformParams5.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams5.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams5.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams5.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
-		//String sapEventQueueSubmit = "ComboBox_SelectIdaaaa.OrdersView.DropDownByKeyMaxResultKey500ByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEButton_PressIdaaaa.OrdersView.ButtonSearchClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonSearch\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		// String sapEventQueueSubmit =
+		// "ComboBox_SelectIdaaaa.OrdersView.DropDownByKeyMaxResultKey500ByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEButton_PressIdaaaa.OrdersView.ButtonSearchClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonSearch\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		String sapEventQueueSubmit = "ComboBox_SelectIdaaaa.OrdersView.DropDownByKeyStatusKeyRECEIVEDByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEComboBox_SelectIdaaaa.OrdersView.DropDownByKeyMaxResultKey500ByEnterfalseurEventNameCOMBOBOXSELECTIONCHANGEButton_PressIdaaaa.OrdersView.ButtonSearchClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonSearch\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams5.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueueSubmit));
 		HttpEntity orderFormEntity5 = new UrlEncodedFormEntity(orderformParams5, "UTF-8");
@@ -528,14 +571,14 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String responseStr5 = EntityUtils.toString(orderRes5.getEntity());
 		orderRes5.close();
 		if (responseStr5.contains("查询结果包含多条记录")) {
-			log.info(user+"查询结果超过500条，请减小日期区间!");
-			
+			log.info(user + "查询结果超过500条，请减小日期区间!");
+
 		} else if (responseStr5.contains("没有查询到符合条件的数据")) {
-			log.info(user+"没有查询到符合条件的订单单数据!");
+			log.info(user + "没有查询到符合条件的订单单数据!");
 			return;
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
-		//Select ALL
+		// Select ALL
 		List<NameValuePair> orderformParams6 = new ArrayList<NameValuePair>();
 		orderformParams6.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams6.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -549,33 +592,46 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse orderRes6 = httpClient.execute(orderPost6);
 		orderRes6.close();
 		/*
-		//显示未交货订单明细
-		getUnDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id);
-		// Back
-		List<NameValuePair> orderformParams8 = new ArrayList<NameValuePair>();
-		orderformParams8.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
-		orderformParams8.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
-		orderformParams8.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
-		orderformParams8.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
-		String back = "Button_PressIdaaaa.OrderLinesView.ButtonBackClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrderLinesView.ButtonBack\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
-		orderformParams8.add(new BasicNameValuePair("SAPEVENTQUEUE", back));
-		HttpEntity orderFormEntity8 = new UrlEncodedFormEntity(orderformParams8, "UTF-8");
-		HttpPost orderPost8 = new HttpPost(url2);
-		orderPost8.addHeader("Accept-Language", "zh-CN");
-		orderPost8.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
-		orderPost8.setEntity(orderFormEntity8);
-		CloseableHttpResponse orderRes8 = httpClient.execute(orderPost8);
-		String backRes = EntityUtils.toString(orderRes8.getEntity()); 
-		orderRes8.close();		
-		*/
-		//显示已交货订单明细
-		getDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,summaryBuffer);
-		
+		 * //显示未交货订单明细
+		 * getUnDispatchOrder(httpClient,user,sap_ext_sid,sap_wd_cltwndid,
+		 * sap_wd_norefresh,sap_wd_secure_id);
+		 * // Back
+		 * List<NameValuePair> orderformParams8 = new
+		 * ArrayList<NameValuePair>();
+		 * orderformParams8.add(new BasicNameValuePair("sap-ext-sid",
+		 * sap_ext_sid));
+		 * orderformParams8.add(new BasicNameValuePair("sap-wd-cltwndid",
+		 * sap_wd_cltwndid));
+		 * orderformParams8.add(new BasicNameValuePair("sap-wd-norefresh",
+		 * sap_wd_norefresh));
+		 * orderformParams8.add(new BasicNameValuePair("sap-wd-secure-id",
+		 * sap_wd_secure_id));
+		 * String back =
+		 * "Button_PressIdaaaa.OrderLinesView.ButtonBackClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrderLinesView.ButtonBack\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle"
+		 * ;
+		 * orderformParams8.add(new BasicNameValuePair("SAPEVENTQUEUE", back));
+		 * HttpEntity orderFormEntity8 = new
+		 * UrlEncodedFormEntity(orderformParams8, "UTF-8");
+		 * HttpPost orderPost8 = new HttpPost(url2);
+		 * orderPost8.addHeader("Accept-Language", "zh-CN");
+		 * orderPost8.addHeader("User-Agent",
+		 * "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"
+		 * );
+		 * orderPost8.setEntity(orderFormEntity8);
+		 * CloseableHttpResponse orderRes8 = httpClient.execute(orderPost8);
+		 * String backRes = EntityUtils.toString(orderRes8.getEntity());
+		 * orderRes8.close();
+		 */
+		// 显示已交货订单明细
+		getDispatchOrder(httpClient, user, sap_ext_sid, sap_wd_cltwndid, sap_wd_norefresh, sap_wd_secure_id,
+				summaryBuffer);
+
 	}
-	private void getUnDispatchOrder(CloseableHttpClient httpClient, User user,String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
-			String sap_wd_secure_id) throws Exception {
-		//显示未交货订单明细
-		log.info(user+"下载未交货订单明细...");
+
+	private void getUnDispatchOrder(CloseableHttpClient httpClient, User user, String sap_ext_sid,
+			String sap_wd_cltwndid, String sap_wd_norefresh, String sap_wd_secure_id) throws Exception {
+		// 显示未交货订单明细
+		log.info(user + "下载未交货订单明细...");
 		List<NameValuePair> orderformParams7 = new ArrayList<NameValuePair>();
 		orderformParams7.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams7.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
@@ -587,101 +643,130 @@ public class MetroDataPullService implements RetailerDataPullService {
 		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
 		HttpPost orderPost7 = new HttpPost(url);
 		orderPost7.addHeader("Accept-Language", "zh-CN");
-		orderPost7.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		orderPost7
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		orderPost7.setEntity(orderFormEntity7);
 		CloseableHttpResponse orderRes7 = httpClient.execute(orderPost7);
-		String orderDetailRes = EntityUtils.toString(orderRes7.getEntity()); 
+		String orderDetailRes = EntityUtils.toString(orderRes7.getEntity());
 		orderRes7.close();
 		if (orderDetailRes.contains("数据下载成功")) {
-			orderDetailRes = orderDetailRes.substring(orderDetailRes.indexOf("<![CDATA[") + 9, orderDetailRes.indexOf("]]></content-update>"));
+			orderDetailRes = orderDetailRes.substring(orderDetailRes.indexOf("<![CDATA[") + 9,
+					orderDetailRes.indexOf("]]></content-update>"));
 			Document detailResult = Jsoup.parse(orderDetailRes);
 			Element pageElement = detailResult.select("div[ct=SCB]").first();
 			String pageStr = pageElement.attr("lsdata");
-			pageStr = pageStr.substring(pageStr.indexOf("ROW")+8,pageStr.lastIndexOf("}"));
+			pageStr = pageStr.substring(pageStr.indexOf("ROW") + 8, pageStr.lastIndexOf("}"));
 			int record = Integer.valueOf(pageStr);
 			int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
-			getOrderDetail(orderDetailRes,1,record,orderList,user);
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
-			for (int i=2; i<=page; i++) {
-				int startRow = i*10-9;
-				String detailStr = getOrderByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
-				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
-				getOrderDetail(detailStr,startRow,record,orderList,user);
+			getOrderDetail(orderDetailRes, 1, record, orderList, user);
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+			for (int i = 2; i <= page; i++) {
+				int startRow = i * 10 - 9;
+				String detailStr = getOrderByPage(httpClient, sap_ext_sid, sap_wd_cltwndid, sap_wd_norefresh,
+						sap_wd_secure_id, startRow);
+				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9,
+						detailStr.indexOf("]]></content-update>"));
+				getOrderDetail(detailStr, startRow, record, orderList, user);
+			}
+
+			FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
+
+			log.info(user + "下载未交货订单明细成功!");
+			
+			if (orderList.size() != 0) {
+				int orderAmount = Utils.getConlidatedOrderNoAmountByOrderTO(orderList);
+
+				String receiveDate = orderList.get(0).getOrderDate();
+
+				AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+						receiveDate);
+				accountLogTO.setOrderDownloadAmount(orderAmount);
+				
+				AccountLogUtil.recordOrderDownloadAmount(accountLogTO);
 			}
 			
-			FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
-			
-			log.info(user + "下载未交货订单明细成功!");
-		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
-			log.info(user+"没有查询到符合条件的未交货订单明细!");
+		} else if (orderDetailRes.contains("没有查询到符合条件的数据")) {
+			log.info(user + "没有查询到符合条件的未交货订单明细!");
 		} else {
-			log.info(user+"下载未交货订单明细失败!");
+			log.info(user + "下载未交货订单明细失败!");
 		}
 	}
-	private void getDispatchOrder(CloseableHttpClient httpClient, User user,String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
-			String sap_wd_secure_id,StringBuffer summaryBuffer) throws Exception {
-		//显示已交货订单明细
-		log.info(user+"下载已交货订单明细...");
+
+	private void getDispatchOrder(CloseableHttpClient httpClient, User user, String sap_ext_sid,
+			String sap_wd_cltwndid, String sap_wd_norefresh, String sap_wd_secure_id, StringBuffer summaryBuffer)
+			throws Exception {
+		// 显示已交货订单明细
+		log.info(user + "下载已交货订单明细...");
 		List<NameValuePair> orderformParams7 = new ArrayList<NameValuePair>();
 		orderformParams7.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams7.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams7.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams7.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
 		String diplayAll = "Button_PressIdaaaa.OrdersView.ButtonShowGRLinesClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{\"sFocussedId\": \"aaaa.OrdersView.ButtonShowGRLines\"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
-	                      //Button_PressIdaaaa.OrdersView.ButtonShowGRLinesClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{"sFocussedId": "aaaa.OrdersView.ButtonShowGRLines"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle
+		// Button_PressIdaaaa.OrdersView.ButtonShowGRLinesClientActionsubmiturEventNameBUTTONCLICKForm_RequestId...formAsyncfalseFocusInfo@{"sFocussedId":
+		// "aaaa.OrdersView.ButtonShowGRLines"}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle
 		orderformParams7.add(new BasicNameValuePair("SAPEVENTQUEUE", diplayAll));
 		HttpEntity orderFormEntity7 = new UrlEncodedFormEntity(orderformParams7, "UTF-8");
 		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
 		HttpPost orderPost7 = new HttpPost(url);
 		orderPost7.addHeader("Accept-Language", "zh-CN");
-		orderPost7.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+		orderPost7
+				.addHeader("User-Agent",
+						"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
 		orderPost7.setEntity(orderFormEntity7);
 		CloseableHttpResponse orderRes7 = httpClient.execute(orderPost7);
-		String orderDetailRes = EntityUtils.toString(orderRes7.getEntity()); 
+		String orderDetailRes = EntityUtils.toString(orderRes7.getEntity());
 		orderRes7.close();
 		if (orderDetailRes.contains("数据下载成功")) {
-			orderDetailRes = orderDetailRes.substring(orderDetailRes.indexOf("<![CDATA[") + 9, orderDetailRes.indexOf("]]></content-update>"));
+			orderDetailRes = orderDetailRes.substring(orderDetailRes.indexOf("<![CDATA[") + 9,
+					orderDetailRes.indexOf("]]></content-update>"));
 			Document detailResult = Jsoup.parse(orderDetailRes);
 			Element pageElement = detailResult.select("div[ct=SCB]").first();
 			String pageStr = pageElement.attr("lsdata");
-			pageStr = pageStr.substring(pageStr.indexOf("ROW")+8,pageStr.lastIndexOf("}"));
+			pageStr = pageStr.substring(pageStr.indexOf("ROW") + 8, pageStr.lastIndexOf("}"));
 			int record = Integer.valueOf(pageStr);
-			log.info(user+"已交货订单明细共有 "+record+" 行");
+			log.info(user + "已交货订单明细共有 " + record + " 行");
 			int page = record % 10 > 0 ? record / 10 + 1 : record / 10;
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
-			getOrderDetail(orderDetailRes,1,record,orderList,user);
-			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
-			for (int i=2; i<=page; i++) {
-				int startRow = i*10-9;
-				String detailStr = getRecOrderByPage(httpClient,sap_ext_sid,sap_wd_cltwndid,sap_wd_norefresh,sap_wd_secure_id,startRow);
-				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9, detailStr.indexOf("]]></content-update>"));
-				getOrderDetail(detailStr,startRow,record,orderList,user);
+			getOrderDetail(orderDetailRes, 1, record, orderList, user);
+			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
+			for (int i = 2; i <= page; i++) {
+				int startRow = i * 10 - 9;
+				String detailStr = getRecOrderByPage(httpClient, sap_ext_sid, sap_wd_cltwndid, sap_wd_norefresh,
+						sap_wd_secure_id, startRow);
+				detailStr = detailStr.substring(detailStr.indexOf("<![CDATA[") + 9,
+						detailStr.indexOf("]]></content-update>"));
+				getOrderDetail(detailStr, startRow, record, orderList, user);
 			}
-			
-		    FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
-			
+
+			FileUtil.exportOrderInfoListToTXT(Constants.RETAILER_METRO, orderList);
+
 			log.info(user + "下载已交货订单明细成功!");
-			summaryBuffer.append("订单下载成功"+"\r\n");
-		} else if ( orderDetailRes.contains("没有查询到符合条件的数据")) {
-			log.info(user+"没有查询到符合条件的已交货订单明细!");
-			summaryBuffer.append("没有查询到符合条件的订单数据"+"\r\n");
+			summaryBuffer.append("订单下载成功" + "\r\n");
+		} else if (orderDetailRes.contains("没有查询到符合条件的数据")) {
+			log.info(user + "没有查询到符合条件的已交货订单明细!");
+			summaryBuffer.append("没有查询到符合条件的订单数据" + "\r\n");
 		} else {
-			log.info(user+"下载已交货订单明细失败!");
-			summaryBuffer.append("订单下载失败"+"\r\n");
+			log.info(user + "下载已交货订单明细失败!");
+			summaryBuffer.append("订单下载失败" + "\r\n");
 		}
 
 	}
-	
-	private String getRecOrderByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
-			String sap_wd_secure_id,int startRow) throws Exception {
+
+	private String getRecOrderByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid,
+			String sap_wd_norefresh, String sap_wd_secure_id, int startRow) throws Exception {
 		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
 		orderformParams.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
-		//String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.OrderLinesView.tableOrderLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
-		String sapEventQueuePageRec = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		// String sapEventQueuePage =
+		// "SapTable_VerticalScrollIdaaaa.OrderLinesView.tableOrderLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		String sapEventQueuePageRec = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"
+				+ startRow
+				+ "ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueuePageRec));
 		HttpEntity orderFormEntity = new UrlEncodedFormEntity(orderformParams, "UTF-8");
 		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
@@ -690,18 +775,22 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse orderRes = httpClient.execute(orderPost);
 		String responseStr = EntityUtils.toString(orderRes.getEntity()); // 数据下载成功
 		orderRes.close();
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
 		return responseStr;
-	}	
-	private String getOrderByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid, String sap_wd_norefresh,
-			String sap_wd_secure_id,int startRow) throws Exception {
+	}
+
+	private String getOrderByPage(CloseableHttpClient httpClient, String sap_ext_sid, String sap_wd_cltwndid,
+			String sap_wd_norefresh, String sap_wd_secure_id, int startRow) throws Exception {
 		List<NameValuePair> orderformParams = new ArrayList<NameValuePair>();
 		orderformParams.add(new BasicNameValuePair("sap-ext-sid", sap_ext_sid));
 		orderformParams.add(new BasicNameValuePair("sap-wd-cltwndid", sap_wd_cltwndid));
 		orderformParams.add(new BasicNameValuePair("sap-wd-norefresh", sap_wd_norefresh));
 		orderformParams.add(new BasicNameValuePair("sap-wd-secure-id", sap_wd_secure_id));
-		String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.OrderLinesView.tableOrderLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
-		//String sapEventQueuePageRec = "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		String sapEventQueuePage = "SapTable_VerticalScrollIdaaaa.OrderLinesView.tableOrderLineFirstVisibleItemIndex"
+				+ startRow
+				+ "ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
+		// String sapEventQueuePageRec =
+		// "SapTable_VerticalScrollIdaaaa.GoodsRecLinesView.tableGRLineFirstVisibleItemIndex"+startRow+"ActionDIRECTCellIdAccessTypeSCROLLBARSelectionFollowFocusfalseShiftfalseCtrlfalseAltfalseClientActionsubmiturEventNameVerticalScrollForm_RequestId...formAsyncfalseFocusInfo@{}HashDomChangedfalseIsDirtyfalseEnqueueCardinalitysingle";
 		orderformParams.add(new BasicNameValuePair("SAPEVENTQUEUE", sapEventQueuePage));
 		HttpEntity orderFormEntity = new UrlEncodedFormEntity(orderformParams, "UTF-8");
 		String url = "https://portal.metro-link.com/webdynpro/resources/sap.com/pb/PageBuilder";
@@ -710,15 +799,15 @@ public class MetroDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse orderRes = httpClient.execute(orderPost);
 		String responseStr = EntityUtils.toString(orderRes.getEntity()); // 数据下载成功
 		orderRes.close();
-		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));	
+		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_METRO));
 		return responseStr;
-	}	
-	
-	private void getOrderDetail(String responseStr,int startRow,int record,List<OrderTO> orderList,User user) {
-		log.info(user+"读取已交货订单明细 "+startRow+"-"+((startRow+9)>record?record:(startRow+9))+" 行");
+	}
+
+	private void getOrderDetail(String responseStr, int startRow, int record, List<OrderTO> orderList, User user) {
+		log.info(user + "读取已交货订单明细 " + startRow + "-" + ((startRow + 9) > record ? record : (startRow + 9)) + " 行");
 		Document detailResult = Jsoup.parse(responseStr);
-		for (int i=startRow; i<startRow+10 && i<=record;i++) {
-			Elements dataElements = detailResult.select("tr[rr="+i+"]");
+		for (int i = startRow; i < startRow + 10 && i <= record; i++) {
+			Elements dataElements = detailResult.select("tr[rr=" + i + "]");
 			Elements tds = dataElements.first().select("td");
 			OrderTO orderTo = new OrderTO();
 			orderTo.setStoreID(tds.get(2).select("span").first().text()); // 门店编号

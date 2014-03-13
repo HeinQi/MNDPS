@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,10 +30,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
+import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
@@ -56,50 +59,21 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	protected Map<String, List<ReceivingNoteTO>> getReceivingInfoFromFile(String retailerID, Date startDate,
 			Date endDate, File receivingFile) throws BaseException {
 		Map<String, List<ReceivingNoteTO>> receivingNoteMap = new HashMap<String, List<ReceivingNoteTO>>();
+		List<ReceivingNoteTO> receivingNoteList = Utils.getReceivingNoteTOListFromFileForRainbow(receivingFile);
+		for (ReceivingNoteTO receivingNoteTO : receivingNoteList) {
 
-		if (receivingFile.exists()) {
-			BufferedReader reader = null;
-			try {
-				// Open the file
-				FileInputStream fileInput = new FileInputStream(receivingFile);
-				InputStreamReader inputStrReader = new InputStreamReader(fileInput, "UTF-8");
-				reader = new BufferedReader(inputStrReader);
-				reader.readLine();
-				// Read line by line
-				String receivingLine = null;
-				while ((receivingLine = reader.readLine()) != null) {
-					RainbowReceivingTO receivingNoteTO = new RainbowReceivingTO(receivingLine);
-					String orderNo = receivingNoteTO.getOrderNo();
-
-					List<ReceivingNoteTO> receivingNoteTOList = null;
-					if (receivingNoteMap.containsKey(orderNo)) {
-						receivingNoteTOList = receivingNoteMap.get(orderNo);
-					} else {
-						receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
-						// Test the Hashmap
-						receivingNoteMap.put(orderNo, receivingNoteTOList);
-					}
-
-					log.debug("收货单详细条目: " + receivingNoteTO.toString());
-					receivingNoteTOList.add(receivingNoteTO);
-
-				}
-
-			} catch (FileNotFoundException e) {
-				log.error(e);
-				throw new BaseException(e);
-			} catch (IOException e) {
-
-				log.error(e);
-				throw new BaseException(e);
-
-			} finally {
-
-				FileUtil.closeFileReader(reader);
+			String orderNo = receivingNoteTO.getOrderNo();
+			List<ReceivingNoteTO> receivingNoteTOList = null;
+			if (receivingNoteMap.containsKey(orderNo)) {
+				receivingNoteTOList = receivingNoteMap.get(orderNo);
+			} else {
+				receivingNoteTOList = new ArrayList<ReceivingNoteTO>();
+				// Test the Hashmap
+				receivingNoteMap.put(orderNo, receivingNoteTOList);
 			}
 
-			log.info("收货单: " + receivingFile.getName() + " 包含的详单数量为:" + receivingNoteMap.size());
-
+			log.debug("收货单详细条目: " + receivingNoteTO.toString());
+			receivingNoteTOList.add(receivingNoteTO);
 		}
 		return receivingNoteMap;
 	}
@@ -285,6 +259,7 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	 */
 	private void mergeReceiving(BufferedWriter writer, List<ReceivingNoteTO> receivingNotelist) throws BaseException {
 
+		Map<String, Set<String>> orderNoMap = new HashMap<String, Set<String>>();
 		int failedCount = 0;
 		for (int i = 0; i < receivingNotelist.size(); i++) {
 
@@ -300,7 +275,20 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 				throw new BaseException(e);
 			}
 
+			Set<String> orderNoSet = new HashSet<String>();
+			String key = getRetailerID() + "--" + receivingNoteTO.getUserID() + "--"
+					+ receivingNoteTO.getReceivingDate();
+			if (orderNoMap.containsKey(key)) {
+				orderNoSet = orderNoMap.get(key);
+			}
+			String orderNo = receivingNoteTO.getOrderNo();
+			orderNoSet.add(orderNo);
+			orderNoMap.put(key, orderNoSet);
 		}
+
+		// 记录处理完成的订单总数
+		AccountLogUtil.updateProcessedOrderInfo(orderNoMap);
+
 		if (failedCount != 0) {
 			getLog().info("收货单整合失败数量: " + failedCount);
 		}
@@ -313,54 +301,26 @@ public class RainbowDataConversionService extends RetailerDataConversionService 
 	@Override
 	protected Map<String, List<SalesTO>> getSalesInfoFromFile(String retailerID, Date startDate, Date endDate,
 			File salesFile) throws BaseException {
+
+		List<SalesTO> salesTOList = Utils.getSalesTOListFromFileForRainbow(salesFile);
+
 		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
-		try {
-			InputStream sourceExcel = new FileInputStream(salesFile);
-
-			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-			if (sourceWorkbook.getNumberOfSheets() != 0) {
-				Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-				for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
-					Row sourceRow = sourceSheet.getRow(i);
-					if (sourceRow == null) {
-						continue;
-					}
-
-					String salesDateStr = sourceRow.getCell(8).getStringCellValue();
-					Date salesDate = DateUtil.toDate(salesDateStr);
-
-					// If receivingDate is in the date range
-					if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {
-
-						SalesTO salesTO = new SalesTO();
-						List<SalesTO> salesTOList = null;
-
-						salesTO.setItemID(sourceRow.getCell(1).getStringCellValue());
-						salesTO.setItemName(sourceRow.getCell(2).getStringCellValue());
-						salesTO.setStoreID(sourceRow.getCell(5).getStringCellValue());
-						salesTO.setSalesDate(salesDateStr);
-						salesTO.setSalesQuantity(sourceRow.getCell(6).getStringCellValue());
-						salesTO.setSalesAmount(sourceRow.getCell(7).getStringCellValue());
-
-						if (salesMap.containsKey(salesDateStr)) {
-							salesTOList = salesMap.get(salesDateStr);
-						} else {
-							salesTOList = new ArrayList<SalesTO>();
-							salesMap.put(salesDateStr, salesTOList);
-						}
-
-						log.debug("销售单详细条目: " + salesTO.toString());
-						salesTOList.add(salesTO);
-
-					}
+		for (SalesTO salesTO : salesTOList) {
+			String salesDateStr = salesTO.getSalesDate();
+			Date salesDate = DateUtil.toDate(salesDateStr);
+			// If receivingDate is in the date range
+			if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {
+				List<SalesTO> salesList = null;
+				if (salesMap.containsKey(salesDateStr)) {
+					salesList = salesMap.get(salesDateStr);
+				} else {
+					salesList = new ArrayList<SalesTO>();
+					salesMap.put(salesDateStr, salesList);
 				}
+
+				log.debug("销售单详细条目: " + salesTO.toString());
+				salesList.add(salesTO);
 			}
-		} catch (FileNotFoundException e) {
-			log.error(e);
-			throw new BaseException(e);
-		} catch (IOException e) {
-			log.error(e);
-			throw new BaseException(e);
 		}
 		return salesMap;
 	}

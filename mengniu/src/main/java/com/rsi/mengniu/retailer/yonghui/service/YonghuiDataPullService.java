@@ -1,5 +1,6 @@
 package com.rsi.mengniu.retailer.yonghui.service;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -26,7 +26,8 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
-import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.common.service.RetailerDataPullServiceImpl;
+import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -36,102 +37,102 @@ import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
 //http://vss.yonghui.cn:9999/vss/logon/logon.jsp
-public class YonghuiDataPullService implements RetailerDataPullService {
+public class YonghuiDataPullService extends RetailerDataPullServiceImpl {
 	private static Log log = LogFactory.getLog(YonghuiDataPullService.class);
 	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_YONGHUI);
 	private OCR ocr;
 
-	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
-		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_YONGHUI),
-				Utils.getEndDate(Constants.RETAILER_YONGHUI));
-		StringBuffer summaryBuffer = new StringBuffer();
-		summaryBuffer.append("运行时间: "+new Date()+"\r\n");
-		summaryBuffer.append("零售商: "+user.getRetailer()+"\r\n");
-		summaryBuffer.append("用户: "+user.getUserId()+"\r\n");
-		String loginResult = null;
-		int loginCount = 0; // 如果验证码出错重新login,最多20次
-		try {
-			do {
-				loginResult = login(httpClient, user);
-				loginCount++;
-			} while ("InvalidCode".equals(loginResult) && loginCount < 20);
-			// Invalid Password and others
-			if (!"Success".equals(loginResult)) {
-				summaryBuffer.append("登录失败!\r\n");
-				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
-				summaryLog.info(summaryBuffer);
-				return;
-			}
-		} catch (Exception e) {
-			log.error(user + "网站登录出错,请检查!");
-			errorLog.error(user, e);
-			summaryBuffer.append("登录失败!\r\n");
-			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
-			summaryLog.info(summaryBuffer);
-			DataPullTaskPool.addFailedUser(user);
-			return;
-		}
-		
-		String venderIds ="";
-		try {
-			venderIds = getVenders(httpClient);
-		} catch (Exception e) {
-			errorLog.error(user, e);
-		}
-		//System.out.println(venderIds);
-		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING+"\r\n");
-		
-		for (Date searchDate : dates) {
-			try {
-				// receive
-				summaryBuffer.append("收货单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getReceive(httpClient, user, searchDate);
-			} catch (Exception e) {
-				log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
-				summaryBuffer.append("收货单下载失败"+"\r\n");
-			}
-		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER+"\r\n");
-		
-		for (Date searchDate : dates) {
-			try {
-				// order
-				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getOrder(httpClient, user, searchDate);
-				summaryBuffer.append("订单下载成功" + "\r\n");
-			} catch (Exception e) {
-				summaryBuffer.append("订单下载失败" + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
-			}
-		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
-		for (Date searchDate : dates) {
-			try {
-				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getSales(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),venderIds);
-				summaryBuffer.append("销售数据下载成功\r\n");
-			} catch (Exception e) {
-				summaryBuffer.append("销售数据下载失败" + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
-			}
-		}
-
-		try {
-			httpClient.close();
-		} catch (IOException e) {
-			errorLog.error(user, e);
-		}
-		
-		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE+"\r\n");
-		summaryLog.info(summaryBuffer);
-	}
+//	public void dataPull(User user) {
+//		CloseableHttpClient httpClient = Utils.createHttpClient();
+//		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_YONGHUI),
+//				Utils.getEndDate(Constants.RETAILER_YONGHUI));
+//		StringBuffer summaryBuffer = new StringBuffer();
+//		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
+//		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
+//		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
+//		String loginResult = null;
+//		int loginCount = 0; // 如果验证码出错重新login,最多20次
+//		try {
+//			do {
+//				loginResult = login(httpClient, user);
+//				loginCount++;
+//			} while ("InvalidCode".equals(loginResult) && loginCount < 20);
+//			// Invalid Password and others
+//			if (!"Success".equals(loginResult)) {
+//				summaryBuffer.append("登录失败!\r\n");
+//				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+//				summaryLog.info(summaryBuffer);
+//				return;
+//			}
+//		} catch (Exception e) {
+//			log.error(user + "网站登录出错,请检查!");
+//			errorLog.error(user, e);
+//			summaryBuffer.append("登录失败!\r\n");
+//			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+//			summaryLog.info(summaryBuffer);
+//			DataPullTaskPool.addFailedUser(user);
+//			return;
+//		}
+//
+//		// String venderIds ="";
+//		// try {
+//		// venderIds = getVenders(httpClient);
+//		// } catch (Exception e) {
+//		// errorLog.error(user, e);
+//		// }
+//		// System.out.println(venderIds);
+//		summaryBuffer.append(Constants.SUMMARY_TITLE_RECEIVING + "\r\n");
+//
+//		for (Date searchDate : dates) {
+//			try {
+//				// receive
+//				summaryBuffer.append("收货单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+//				getReceive(httpClient, user, searchDate, summaryBuffer);
+//			} catch (Exception e) {
+//				log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
+//				errorLog.error(user, e);
+//				DataPullTaskPool.addFailedUser(user);
+//				summaryBuffer.append("收货单下载失败" + "\r\n");
+//			}
+//		}
+//		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
+//
+//		for (Date searchDate : dates) {
+//			try {
+//				// order
+//				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+//				getOrder(httpClient, user, searchDate, summaryBuffer);
+//				summaryBuffer.append("订单下载成功" + "\r\n");
+//			} catch (Exception e) {
+//				summaryBuffer.append("订单下载失败" + "\r\n");
+//				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
+//				errorLog.error(user, e);
+//				DataPullTaskPool.addFailedUser(user);
+//			}
+//		}
+//		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
+//		for (Date searchDate : dates) {
+//			try {
+//				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+//				getSales(httpClient, user, searchDate, summaryBuffer);
+//				summaryBuffer.append("销售数据下载成功\r\n");
+//			} catch (Exception e) {
+//				summaryBuffer.append("销售数据下载失败" + "\r\n");
+//				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+//				errorLog.error(user, e);
+//				DataPullTaskPool.addFailedUser(user);
+//			}
+//		}
+//
+//		try {
+//			httpClient.close();
+//		} catch (IOException e) {
+//			errorLog.error(user, e);
+//		}
+//
+//		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+//		summaryLog.info(summaryBuffer);
+//	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
@@ -194,10 +195,10 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public void getReceive(CloseableHttpClient httpClient, User user, Date searchDate) throws Exception {
-		if (Utils.isReceivingFileExist(user.getRetailer(),user.getUserId(),searchDate)) {
-			log.info(user+"收货单已存在,不再下载");
-			return;
+	public int getReceive(CloseableHttpClient httpClient, User user, Date searchDate, StringBuffer summaryBuffer) throws Exception {
+		if (Utils.isReceivingFileExist(user.getRetailer(), user.getUserId(), searchDate)) {
+			log.info(user + "收货单已存在,不再下载");
+			return 0;
 		}
 		log.info(user + "开始下载收货单...");
 		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
@@ -215,9 +216,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		receiveRes.close();
 		Document xmlDoc = Jsoup.parse(responseStr, "", Parser.xmlParser());
 		Elements sheetIdElements = xmlDoc.select("sheetid");
-		log.info(user + "查询到从" + searchDateStr + "到"
-				+ searchDateStr + ",共有"
-				+ sheetIdElements.size() + "条收货单");
+		log.info(user + "查询到从" + searchDateStr + "到" + searchDateStr + ",共有" + sheetIdElements.size() + "条收货单");
 		int count = 0;
 		List<ReceivingNoteTO> receiveList = new ArrayList<ReceivingNoteTO>();
 		for (Element eSheetId : sheetIdElements) {
@@ -251,20 +250,24 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 			count++;
 			log.info(user + "成功下载收货单[" + count + "],验收单号:" + sheetId);
 		}
-		Utils.exportReceivingInfoToTXT(Constants.RETAILER_YONGHUI,user.getUserId(),searchDate,receiveList);
+		Utils.exportReceivingInfoToTXT(Constants.RETAILER_YONGHUI, user.getUserId(), searchDate, receiveList);
 		log.info(user + "收货单数据下载成功!");
+
+		// Get Order No amount for account log
+		return Utils.getConlidatedOrderNoAmountByReceivingNoteTO(receiveList);
 	}
 
-	public void getOrder(CloseableHttpClient httpClient, User user, Date searchDate) throws Exception {
+	public int getOrder(CloseableHttpClient httpClient, User user, Date searchDate, StringBuffer summaryBuffer)
+			throws Exception {
 		String fileNm = "Order_" + user.getRetailer() + "_" + user.getUserId() + "_"
 				+ DateUtil.toStringYYYYMMDD(searchDate) + ".xls";
 		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
-		if (Utils.isOrderFileExist(user.getRetailer(),fileNm)) {
-			log.info(user+"订单日期: "+searchDateStr+"的订单已存在,不再下载");
-			return;
+		if (Utils.isOrderFileExist(user.getRetailer(), fileNm)) {
+			log.info(user + "订单日期: " + searchDateStr + "的订单已存在,不再下载");
+			return 0;
 		}
 		log.info(user + "订单数据下载...");
-		
+
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		// http://vss.yonghui.cn:9999/vss/DownloadSheet?orderdate_min=2014-01-01&orderdate_max=2014-01-05&operation=eptOrderSheet
 		String orderPath = Utils.getProperty(user.getRetailer() + Constants.ORDER_INBOUND_PATH);
@@ -278,19 +281,28 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		response.getEntity().writeTo(orderFos);
 		response.close();
 		log.info(user + "订单数据下载成功");
+
+		List<OrderTO> orderTOList = Utils.getOrderTOListFromFileForYonghui(new File(orderPath + fileNm));
+
+		return Utils.getConlidatedOrderNoAmountByOrderTO(orderTOList);
+
 	}
 
-	public void getSales(CloseableHttpClient httpClient, User user, String searchDate,String venderIds) throws Exception {
-		if (Utils.isSalesFileExist(user.getRetailer(), user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
-			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
-			return;			
-		}		
+	public int getSales(CloseableHttpClient httpClient, User user, Date searchDate, StringBuffer summaryBuffer)
+			throws Exception {
+		if (Utils.isSalesFileExist(user.getRetailer(), user.getUserId(), searchDate)) {
+			log.info(user + "销售日期: " + searchDate + "的销售数据已存在,不再下载");
+			return 0;
+		}
+		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
+		List<SalesTO> salesList = new ArrayList<SalesTO>();
+		String venderIds = getVenders(httpClient);
 		log.info(user + "下载日期为" + searchDate + "的销售数据...");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
 		searchformParams.add(new BasicNameValuePair("reportname", "salecost"));
-		searchformParams.add(new BasicNameValuePair("sdate_min", searchDate));
-		searchformParams.add(new BasicNameValuePair("sdate_max", searchDate));
+		searchformParams.add(new BasicNameValuePair("sdate_min", searchDateStr));
+		searchformParams.add(new BasicNameValuePair("sdate_max", searchDateStr));
 		searchformParams.add(new BasicNameValuePair("nosale", "false"));
 		searchformParams.add(new BasicNameValuePair("action", "getwithoutshop"));
 		searchformParams.add(new BasicNameValuePair("venderidarray", venderIds));
@@ -303,14 +315,14 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 
 		if (goodsIds != null) {
 			log.info(user + "查询到日期为" + searchDate + "销售的货物" + goodsIds.size() + "条");
-			List<SalesTO> salesList = new ArrayList<SalesTO>();
+
 			for (Element eGoodsId : goodsIds) {
 				Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 				String goodsId = eGoodsId.text();
 				List<NameValuePair> withShopformParams = new ArrayList<NameValuePair>();
 				withShopformParams.add(new BasicNameValuePair("reportname", "salecost"));
-				withShopformParams.add(new BasicNameValuePair("sdate_min", searchDate));
-				withShopformParams.add(new BasicNameValuePair("sdate_max", searchDate));
+				withShopformParams.add(new BasicNameValuePair("sdate_min", searchDateStr));
+				withShopformParams.add(new BasicNameValuePair("sdate_max", searchDateStr));
 				withShopformParams.add(new BasicNameValuePair("goodsid", goodsId));
 				withShopformParams.add(new BasicNameValuePair("action", "getwithshop"));
 				withShopformParams.add(new BasicNameValuePair("venderidarray", venderIds));
@@ -326,7 +338,7 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 						SalesTO salesTo = new SalesTO();
 						salesTo.setStoreID(row.select("shopid").text());
 						salesTo.setItemID(goodsId);
-						salesTo.setSalesDate(searchDate);
+						salesTo.setSalesDate(searchDateStr);
 						salesTo.setItemName(row.select("goodsname").text());
 						salesTo.setSalesQuantity(row.select("qty").text());
 						salesTo.setSalesAmount(row.select("truevalue").text());
@@ -334,15 +346,15 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 					}
 				}
 			}
-			Utils.exportSalesInfoToTXT(Constants.RETAILER_YONGHUI, user.getUserId(),
-					DateUtil.toDate(searchDate, "yyyy-MM-dd"), salesList);
+			Utils.exportSalesInfoToTXT(Constants.RETAILER_YONGHUI, user.getUserId(), searchDate, salesList);
 			log.info(user + "成功下载日期为" + searchDate + "的销售数据");
 		} else {
 			log.info(user + "没有查询到销售数据或网站出错");
 		}
+
+		return salesList.size();
 	}
 
-	
 	private String getVenders(CloseableHttpClient httpClient) throws Exception {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/DaemonShopList?sheetname=vender");
@@ -353,17 +365,35 @@ public class YonghuiDataPullService implements RetailerDataPullService {
 		String venderIds = "";
 		if (venderPageStr.contains("ddlSubVender") && venderPageStr != null) {
 			Elements venders = venderPage.select("option");
-			for (Element vender: venders) {
-				venderIds += vender.attr("value")+",";
+			for (Element vender : venders) {
+				venderIds += vender.attr("value") + ",";
 			}
-			venderIds = venderIds.substring(0, venderIds.length()-1);
+			venderIds = venderIds.substring(0, venderIds.length() - 1);
 		}
 		return venderIds;
-		
+
 	}
-	
+
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
 	}
+
+	@Override
+	protected Log getLog() {
+
+		return log;
+	}
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
+
+	@Override
+	protected String getRetailerID() {
+
+		return Constants.RETAILER_YONGHUI;
+	}
+
 
 }

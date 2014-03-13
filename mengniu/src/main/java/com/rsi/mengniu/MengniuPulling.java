@@ -32,41 +32,49 @@ public class MengniuPulling {
 				}
 				exec.shutdown();
 				mDoneSignal.await(); // Wait all thread done
-				
-				if (DataPullTaskPool.hasRetryTask() && (num+1)<=retryNum) {
+
+				if (DataPullTaskPool.hasRetryTask() && (num + 1) <= retryNum) {
 					DataPullTaskPool.processFaileTask();
-					log.info("有失败的用户,系统将对失败的用户进行第"+(num+1)+"次重试下载!");
+					log.info("有失败的用户,系统将对失败的用户进行第" + (num + 1) + "次重试下载!");
 				} else {
 					break;
 				}
 			}
 			if ("ALL".equalsIgnoreCase(retailerId)) {
-				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService) appContext.getBean("carrefour.data.conversion");
+				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService) appContext
+						.getBean("carrefour.data.conversion");
 				carrefourConversion.retailerDataProcessing();
 
-				RetailerDataConversionService tescoConversion = (RetailerDataConversionService) appContext.getBean("tesco.data.conversion");
+				RetailerDataConversionService tescoConversion = (RetailerDataConversionService) appContext
+						.getBean("tesco.data.conversion");
 				tescoConversion.retailerDataProcessing();
 
-				RetailerDataConversionService yonhuiConversion = (RetailerDataConversionService) appContext.getBean("yonghui.data.conversion");
+				RetailerDataConversionService yonhuiConversion = (RetailerDataConversionService) appContext
+						.getBean("yonghui.data.conversion");
 				yonhuiConversion.retailerDataProcessing();
 
-				RetailerDataConversionService renrenleConversion = (RetailerDataConversionService) appContext.getBean("renrenle.data.conversion");
+				RetailerDataConversionService renrenleConversion = (RetailerDataConversionService) appContext
+						.getBean("renrenle.data.conversion");
 				renrenleConversion.retailerDataProcessing();
 
-				RetailerDataConversionService rainbowConversion = (RetailerDataConversionService) appContext.getBean("rainbow.data.conversion");
+				RetailerDataConversionService rainbowConversion = (RetailerDataConversionService) appContext
+						.getBean("rainbow.data.conversion");
 				rainbowConversion.retailerDataProcessing();
 
-				RetailerDataConversionService hualianConversion = (RetailerDataConversionService) appContext.getBean("hualian.data.conversion");
+				RetailerDataConversionService hualianConversion = (RetailerDataConversionService) appContext
+						.getBean("hualian.data.conversion");
 				hualianConversion.retailerDataProcessing();
 
-				RetailerDataConversionService metroConversion = (RetailerDataConversionService) appContext.getBean("metro.data.conversion");
+				RetailerDataConversionService metroConversion = (RetailerDataConversionService) appContext
+						.getBean("metro.data.conversion");
 				metroConversion.retailerDataProcessing();
 
 			} else if (appContext.containsBean(retailerId + ".data.conversion")) {
-				RetailerDataConversionService dataConversion = (RetailerDataConversionService) appContext.getBean(retailerId + ".data.conversion");
+				RetailerDataConversionService dataConversion = (RetailerDataConversionService) appContext
+						.getBean(retailerId + ".data.conversion");
 				dataConversion.retailerDataProcessing();
 			}
-AccountLogUtil.writeAccountLogToFile();
+			AccountLogUtil.writeAccountLogToFile();
 		} catch (Exception e) {
 			log.error(Utils.getTrace(e));
 		}

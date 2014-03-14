@@ -29,34 +29,11 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
 		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
 		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
-		String loginResult = null;
-		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
-		int loginCount = 0; // 如果验证码出错重新login,最多15次
-		try {
-			do {
-				loginResult = login(httpClient, user);
-				loginCount++;
-			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
-			// Invalid Password and others
-			if (!"Success".equals(loginResult)) {
-				summaryBuffer.append("登录失败!\r\n");
-				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-				getSummaryLog().info(summaryBuffer);
-				AccountLogUtil.loginFailed(accountLogLoginTO);
-				return;
-			}
-			AccountLogUtil.loginSuccess(accountLogLoginTO);
-		} catch (Exception e) {
-			summaryBuffer.append("登录失败!\r\n");
-			getLog().error(user + "网站登录出错,请检查!");
-			errorLog.error(user, e);
-			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-			getSummaryLog().info(summaryBuffer);
-			DataPullTaskPool.addFailedUser(user);
-//			AccountLogUtil.loginFailed(accountLogLoginTO);
 
+		// Login
+		boolean loginInd = login(user, httpClient, summaryBuffer);
+		if (!loginInd)
 			return;
-		}
 
 		String retailerID = getRetailerID();
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(retailerID), Utils.getEndDate(retailerID));
@@ -84,6 +61,41 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 
 	}
 
+	public boolean login(User user, CloseableHttpClient httpClient, StringBuffer summaryBuffer) {
+
+		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
+
+		String loginResult = null;
+		int loginCount = 0; // 如果验证码出错重新login,最多15次
+		try {
+			do {
+				loginResult = loginDetail(httpClient, user);
+				loginCount++;
+			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
+			// Invalid Password and others
+			if (!"Success".equals(loginResult)) {
+				summaryBuffer.append("登录失败!\r\n");
+				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+				getSummaryLog().info(summaryBuffer);
+				
+				AccountLogUtil.loginFailed(accountLogLoginTO);
+				
+				return false;
+			}
+			AccountLogUtil.loginSuccess(accountLogLoginTO);
+		} catch (Exception e) {
+			summaryBuffer.append("登录失败!\r\n");
+			getLog().error(user + "网站登录出错,请检查!");
+			errorLog.error(user, e);
+			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+			getSummaryLog().info(summaryBuffer);
+			DataPullTaskPool.addFailedUser(user);
+
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Login
 	 * 
@@ -92,7 +104,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 	 * @return
 	 * @throws Exception
 	 */
-	protected abstract String login(CloseableHttpClient httpClient, User user) throws Exception;
+	protected abstract String loginDetail(CloseableHttpClient httpClient, User user) throws Exception;
 
 	/**
 	 * Get Order Data

@@ -109,7 +109,7 @@ public class RenrenleDataPullService extends RetailerDataPullServiceImpl {
 //
 //	}
 
-	public String login(CloseableHttpClient httpClient, User user) throws Exception {
+	public String loginDetail(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		HttpGet httpGet = new HttpGet("http://www.renrenle.cn/scm/verifyCode.jsp");

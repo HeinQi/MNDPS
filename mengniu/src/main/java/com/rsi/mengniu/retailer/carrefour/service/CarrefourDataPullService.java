@@ -43,7 +43,7 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 	private OCR ocr;
 
 
-	public String login(CloseableHttpClient httpClient, User user) throws Exception {
+	public String loginDetail(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
 		HttpGet httpGet = new HttpGet("http://supplierweb.carrefour.com.cn/includes/image.jsp");
 		String imgName = String.valueOf(java.lang.System.currentTimeMillis());

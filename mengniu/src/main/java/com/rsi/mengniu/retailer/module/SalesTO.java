@@ -10,6 +10,7 @@ public class SalesTO extends BaseTO {
 	private String salesQuantity = "";
 	private String salesAmount = "";
 	private String userID = "";
+	private String agency = "";
 
 	public String toString() {
 		return this.itemID + "\t" + this.itemName + "\t" + this.salesDate
@@ -89,6 +90,14 @@ public class SalesTO extends BaseTO {
 
 	public void setUserID(String userID) {
 		this.userID = userID;
+	}
+
+	public String getAgency() {
+		return agency;
+	}
+
+	public void setAgency(String agency) {
+		this.agency = agency;
 	}
 
 }

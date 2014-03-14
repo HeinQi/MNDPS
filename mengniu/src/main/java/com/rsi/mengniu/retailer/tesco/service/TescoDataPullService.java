@@ -128,7 +128,7 @@ public class TescoDataPullService extends RetailerDataPullServiceImpl {
 //		summaryLog.info(summaryBuffer);
 //	}
 
-	protected String login(CloseableHttpClient httpClient, User user) throws Exception {
+	protected String loginDetail(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("j_username", user.getUserId()));

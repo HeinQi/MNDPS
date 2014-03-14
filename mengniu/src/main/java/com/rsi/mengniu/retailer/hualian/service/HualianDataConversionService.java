@@ -67,6 +67,9 @@ public class HualianDataConversionService extends RetailerDataConversionService 
 		Map<String, List<SalesTO>> salesMap = new HashMap<String, List<SalesTO>>();
 
 		if (salesFile.exists()) {
+			String[] splitStr = fileName.split("_");
+			String agency = splitStr[2];
+			String userID = splitStr[3];
 			BufferedReader reader = null;
 			try {
 				// Open the file
@@ -79,6 +82,8 @@ public class HualianDataConversionService extends RetailerDataConversionService 
 				String salesLine = null;
 				while ((salesLine = reader.readLine()) != null) {
 					SalesTO salesTO = new SalesTO(salesLine);
+					salesTO.setUserID(userID);
+					salesTO.setAgency(agency);
 					String salesDateStr = salesTO.getSalesDate();
 					Date salesDate = DateUtil.toDate(salesDateStr);
 					if (DateUtil.isInDateRange(salesDate, startDate, endDate)) {

@@ -134,7 +134,7 @@ public class YonghuiDataPullService extends RetailerDataPullServiceImpl {
 //		summaryLog.info(summaryBuffer);
 //	}
 
-	public String login(CloseableHttpClient httpClient, User user) throws Exception {
+	public String loginDetail(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_YONGHUI));
 		HttpGet httpGet = new HttpGet("http://vss.yonghui.cn:9999/vss/logon/logon.jsp");

@@ -53,6 +53,7 @@ import org.xml.sax.SAXException;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.exception.BaseException;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.RainbowReceivingTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
@@ -535,15 +536,16 @@ public class Utils {
 
 	}
 
-	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, String agency,
-			String userID, Date slaesDate, List<SalesTO> salesList) throws BaseException {
+	public static void exportSalesInfoToTXTForHualian(String retailerID, String districtName, User user,
+			Date slaesDate, List<SalesTO> salesList) throws BaseException {
 
 		String salesInboundFolderPath = Utils.getProperty(retailerID + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesInboundFolderPath);
 
+		String userAgency = user.getAgency();
 		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_"
-				+ (districtName.equals("") ? "" : (districtName + "_")) + (agency.equals("") ? "" : (agency + "_"))
-				+ userID + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+				+ (districtName.equals("") ? "" : (districtName + "_")) + (userAgency.equals("") ? "" : (userAgency + "_"))
+				+ user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
 
 		File salesFile = new File(salesFilePath);
 
@@ -572,6 +574,11 @@ public class Utils {
 			FileUtil.closeFileWriter(writer);
 
 		}
+		
+		//记录下载数量
+		AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), DateUtil.toString(slaesDate), user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
+		accountLogTO.setSalesDownloadAmount(salesList.size());
+		AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
 
 	}
 

@@ -24,8 +24,10 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.Utils;
 //建平地区
@@ -37,12 +39,18 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = Utils.createHttpClient();
+
+		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
+
+				AccountLogUtil.loginFailed(accountLogLoginTO);
+				
 				return;
 			}
+			AccountLogUtil.loginSuccess(accountLogLoginTO);
 		} catch (Exception e) {
 			log.error(user + "网站登录出错,请检查!");
 			errorLog.error(user, e);
@@ -108,7 +116,7 @@ public class NoStoreHualianDataPullService implements RetailerDataPullService {
 			// String storeId = store.attr("value");
 			getSalesByStore(httpClient, user, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
 			// }
-			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN, "", user.getAgency(), user.getUserId(), searchDate, salesList);
+			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN, "", user, searchDate, salesList);
 
 		}
 

@@ -24,8 +24,10 @@ import org.jsoup.select.Elements;
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
+import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.Utils;
 
@@ -35,12 +37,17 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = Utils.createHttpClient();
+		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
+
+				AccountLogUtil.loginFailed(accountLogLoginTO);
+				
 				return;
 			}
+			AccountLogUtil.loginSuccess(accountLogLoginTO);
 		} catch (Exception e) {
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
@@ -99,7 +106,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 			for (String storeId : sotres) {
 				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
 			}
-			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user.getAgency(), user.getUserId(),searchDate, salesList);
+			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user, searchDate,salesList);
 		}
 		log.info(user + "销售数据下载成功");
 	}
@@ -121,7 +128,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
 		Element dataTable = doc.select("table").first();
-		log.info(user +" 订单页面内容" + dataTable.toString());
+		
 		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");

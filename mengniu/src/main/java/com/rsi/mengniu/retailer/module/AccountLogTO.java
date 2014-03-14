@@ -10,6 +10,14 @@ public class AccountLogTO extends BaseTO {
 	private String retailerID = "";
 	private String userID = "";
 	private String password = "";
+	
+
+	private String url = "";
+	private String district = ""; 
+	private String agency = "";
+	private String loginNm = "";
+	private String storeNo = "";
+	
 	private String loginInd = "";
 	private String processDateStr = "";
 	private int orderDownloadAmount;
@@ -107,6 +115,49 @@ public class AccountLogTO extends BaseTO {
 		this.successInd = successInd;
 	}
 
+	
+	
+	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getAgency() {
+		return agency;
+	}
+
+	public void setAgency(String agency) {
+		this.agency = agency;
+	}
+
+	public String getLoginNm() {
+		return loginNm;
+	}
+
+	public void setLoginNm(String loginNm) {
+		this.loginNm = loginNm;
+	}
+
+	public String getStoreNo() {
+		return storeNo;
+	}
+
+	public void setStoreNo(String storeNo) {
+		this.storeNo = storeNo;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -124,6 +175,19 @@ public class AccountLogTO extends BaseTO {
 		this.password = password;
 		this.processDateStr = processDateStr;
 //		this.successInd = "Y";
+	}
+
+	public AccountLogTO(String retailerID, String userID, String password, String processDateStr, String url,
+			String district, String agency, String loginNm, String storeNo) {
+		this.retailerID = retailerID;
+		this.userID = userID;
+		this.password = password;
+		this.processDateStr = processDateStr;
+		this.url = url;
+		this.district = district;
+		this.agency = agency;
+		this.loginNm = loginNm;
+		this.storeNo = storeNo;
 	}
 	
 	

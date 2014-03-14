@@ -41,7 +41,7 @@ public class AccountLogUtil {
 	 * @param accountLogTO
 	 */
 	public static void addAccountLogTO(AccountLogTO accountLogTO) {
-		String key = accountLogTO.getRetailerID() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
+		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
 		accountLogMap.put(key, accountLogTO);
 	}
 
@@ -51,7 +51,7 @@ public class AccountLogUtil {
 	 * @param accountLogTO
 	 */
 	public static AccountLogTO getAccountLogTO(AccountLogTO accountLogTO) {
-		String key = accountLogTO.getRetailerID() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
+		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
 		if (accountLogMap.containsKey(key)) {
 			return accountLogMap.get(key);
 		}
@@ -64,12 +64,12 @@ public class AccountLogUtil {
 	 * @param accountLogTO
 	 */
 	public static void updateAccountLogTO(AccountLogTO accountLogTO) {
-		String key = accountLogTO.getRetailerID() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
+		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
 		accountLogMap.put(key, accountLogTO);
 	}
 
 	public static void removeAccountLogTO(AccountLogTO accountLogTO) {
-		String key = accountLogTO.getRetailerID() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
+		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
 		accountLogMap.remove(key);
 	}
 
@@ -132,14 +132,19 @@ public class AccountLogUtil {
 			row.createCell(0).setCellValue(accountLogTO.getRetailerID());
 			row.createCell(1).setCellValue(accountLogTO.getUserID());
 			row.createCell(2).setCellValue(accountLogTO.getPassword());
-			row.createCell(3).setCellValue(accountLogTO.getLoginInd());
-			row.createCell(4).setCellValue(accountLogTO.getProcessDateStr());
-			row.createCell(5).setCellValue(accountLogTO.getOrderDownloadAmount());
-			row.createCell(6).setCellValue(accountLogTO.getReceivingDownloadAmount());
-			row.createCell(7).setCellValue(accountLogTO.getOrderProcessedAmount());
-			row.createCell(8).setCellValue(accountLogTO.getSalesDownloadAmount());
-			row.createCell(9).setCellValue(accountLogTO.getSalesProcessedAmount());
-			row.createCell(10).setCellValue(accountLogTO.getSuccessInd());
+			row.createCell(3).setCellValue(accountLogTO.getUrl());
+			row.createCell(4).setCellValue(accountLogTO.getDistrict());
+			row.createCell(5).setCellValue(accountLogTO.getAgency());
+			row.createCell(6).setCellValue(accountLogTO.getLoginNm());
+			row.createCell(7).setCellValue(accountLogTO.getStoreNo());
+			row.createCell(8).setCellValue(accountLogTO.getLoginInd());
+			row.createCell(9).setCellValue(accountLogTO.getProcessDateStr());
+			row.createCell(10).setCellValue(accountLogTO.getOrderDownloadAmount());
+			row.createCell(11).setCellValue(accountLogTO.getReceivingDownloadAmount());
+			row.createCell(12).setCellValue(accountLogTO.getOrderProcessedAmount());
+			row.createCell(13).setCellValue(accountLogTO.getSalesDownloadAmount());
+			row.createCell(14).setCellValue(accountLogTO.getSalesProcessedAmount());
+			row.createCell(15).setCellValue(accountLogTO.getSuccessInd());
 			
 		}
 		try {
@@ -172,7 +177,8 @@ public class AccountLogUtil {
 	}
 
 	public static void loginSuccess(AccountLogTO accountLogTO) {
-		removeAccountLogTO(accountLogTO);
+		accountLogTO.setLoginInd("Y");
+		addAccountLogTO(accountLogTO);
 
 	}
 
@@ -290,7 +296,8 @@ public class AccountLogUtil {
 	public static void recordSalesProcessedAmount(String retailerID, String processDateStr, List<SalesTO> salesList) {
 		for(SalesTO salesTO:salesList){
 			String userID = salesTO.getUserID();
-			AccountLogTO accountLogTO = new AccountLogTO(retailerID,userID,"",processDateStr);
+			String agency = salesTO.getAgency();
+			AccountLogTO accountLogTO = new AccountLogTO(retailerID,userID,"",processDateStr, "", "", agency, "", "");
 			accountLogTO.setSalesProcessedAmount(1);
 			recordSalesProcessedAmount(accountLogTO);
 		}

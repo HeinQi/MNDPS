@@ -2,7 +2,6 @@ package com.rsi.mengniu.retailer.renrenle.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -26,7 +24,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
-import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
+import com.rsi.mengniu.retailer.common.service.RetailerDataPullServiceImpl;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
@@ -36,80 +34,80 @@ import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
 
 //http://www.renrenle.cn/scm/welcome.do
-public class RenrenleDataPullService implements RetailerDataPullService {
+public class RenrenleDataPullService extends RetailerDataPullServiceImpl {
 	private static Log log = LogFactory.getLog(RenrenleDataPullService.class);
 	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_RENRENLE);
 	private OCR ocr;
 
-	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
-		StringBuffer summaryBuffer = new StringBuffer();
-		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
-		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
-		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
-		String loginResult = null;
-		int loginCount = 0; // 如果验证码出错重新login,最多15次
-		try {
-			do {
-				loginResult = login(httpClient, user);
-				loginCount++;
-			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
-			// Invalid Password and others
-			if (!"Success".equals(loginResult)) {
-				summaryBuffer.append("登录失败!\r\n");
-				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-				summaryLog.info(summaryBuffer);
-				return;
-			}
-		} catch (Exception e) {
-			log.error(user + "网站登录出错,请检查!");
-			errorLog.error(user, e);
-			summaryBuffer.append("登录失败!\r\n");
-			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-			summaryLog.info(summaryBuffer);
-			DataPullTaskPool.addFailedUser(user);
-			return;
-		}
-		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
-
-		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
-				Utils.getEndDate(Constants.RETAILER_RENRENLE));
-		
-		for (Date searchDate : dates) {
-			try {
-				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"), summaryBuffer);
-			} catch (Exception e) {
-				summaryBuffer.append("销售数据下载失败" + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
-			}
-		}
-
-		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
-		for (Date searchDate : dates) {
-			try {
-				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
-				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),summaryBuffer);
-				summaryBuffer.append("订单下载成功" + "\r\n");
-			} catch (Exception e) {
-				summaryBuffer.append("订单下载失败" + "\r\n");
-				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
-				errorLog.error(user, e);
-				DataPullTaskPool.addFailedUser(user);
-			}
-		}
-		try {
-			httpClient.close();
-		} catch (IOException e) {
-			errorLog.error(user, e);
-		}
-
-		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
-		summaryLog.info(summaryBuffer);
-
-	}
+//	public void dataPull(User user) {
+//		CloseableHttpClient httpClient = Utils.createHttpClient();
+//		StringBuffer summaryBuffer = new StringBuffer();
+//		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
+//		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
+//		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
+//		String loginResult = null;
+//		int loginCount = 0; // 如果验证码出错重新login,最多15次
+//		try {
+//			do {
+//				loginResult = login(httpClient, user);
+//				loginCount++;
+//			} while ("InvalidCode".equals(loginResult) && loginCount < 15);
+//			// Invalid Password and others
+//			if (!"Success".equals(loginResult)) {
+//				summaryBuffer.append("登录失败!\r\n");
+//				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+//				summaryLog.info(summaryBuffer);
+//				return;
+//			}
+//		} catch (Exception e) {
+//			log.error(user + "网站登录出错,请检查!");
+//			errorLog.error(user, e);
+//			summaryBuffer.append("登录失败!\r\n");
+//			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+//			summaryLog.info(summaryBuffer);
+//			DataPullTaskPool.addFailedUser(user);
+//			return;
+//		}
+//		summaryBuffer.append(Constants.SUMMARY_TITLE_SALES + "\r\n");
+//
+//		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_RENRENLE),
+//				Utils.getEndDate(Constants.RETAILER_RENRENLE));
+//		
+//		for (Date searchDate : dates) {
+//			try {
+//				summaryBuffer.append("销售日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+//				getSalesExcel(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"), summaryBuffer);
+//			} catch (Exception e) {
+//				summaryBuffer.append("销售数据下载失败" + "\r\n");
+//				log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+//				errorLog.error(user, e);
+//				DataPullTaskPool.addFailedUser(user);
+//			}
+//		}
+//
+//		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
+//		for (Date searchDate : dates) {
+//			try {
+//				summaryBuffer.append("订单日期: " + DateUtil.toString(searchDate, "yyyy-MM-dd") + "\r\n");
+//				getOrders(httpClient, user, DateUtil.toString(searchDate, "yyyy-MM-dd"),summaryBuffer);
+//				summaryBuffer.append("订单下载成功" + "\r\n");
+//			} catch (Exception e) {
+//				summaryBuffer.append("订单下载失败" + "\r\n");
+//				log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
+//				errorLog.error(user, e);
+//				DataPullTaskPool.addFailedUser(user);
+//			}
+//		}
+//		try {
+//			httpClient.close();
+//		} catch (IOException e) {
+//			errorLog.error(user, e);
+//		}
+//
+//		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
+//		summaryLog.info(summaryBuffer);
+//
+//	}
 
 	public String login(CloseableHttpClient httpClient, User user) throws Exception {
 		log.info(user + "开始登录...");
@@ -153,14 +151,15 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		return "Success";
 	}
 
-	public int getSalesExcel(CloseableHttpClient httpClient, User user, String searchDate, StringBuffer summaryBuffer)
+	 protected int getSales(CloseableHttpClient httpClient, User user, Date searchDate, StringBuffer summaryBuffer)
 			throws Exception {
-		if (Utils.isSalesFileExist(Constants.RETAILER_RENRENLE, user.getUserId(), DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
-			log.info(user+"销售日期: "+searchDate+"的销售数据已存在,不再下载");
+		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
+		if (Utils.isSalesFileExist(Constants.RETAILER_RENRENLE, user.getUserId(), searchDate)) {
+			log.info(user+"销售日期: "+searchDateStr+"的销售数据已存在,不再下载");
 			return 0;
 		}
 		
-		log.info(user + "开始下载" + searchDate + "的销售数据...");
+		log.info(user + "开始下载" + searchDateStr + "的销售数据...");
 
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 		// /scm/jump.do?prefix=/sale&page=/saleAction.do?method=querySale&left=1&forward=byShopList&moduleID=401
@@ -185,11 +184,11 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		String salesFilePath = Utils.getProperty(Constants.RETAILER_RENRENLE + Constants.SALES_INBOUND_PATH);
 		FileUtil.createFolder(salesFilePath);
 		String receiveFileNm = "Sales_" + Constants.RETAILER_RENRENLE + "_" + user.getUserId() + "_"
-				+ searchDate.replaceAll("-", "") + ".xls";
+				+ searchDateStr.replaceAll("-", "") + ".xls";
 		FileOutputStream salseFos = new FileOutputStream(salesFilePath + receiveFileNm);
 
 		List<NameValuePair> salesformParams = new ArrayList<NameValuePair>();
-		salesformParams.add(new BasicNameValuePair("searchDate", searchDate));
+		salesformParams.add(new BasicNameValuePair("searchDate", searchDateStr));
 		salesformParams.add(new BasicNameValuePair("searchType", "0"));
 		salesformParams.add(new BasicNameValuePair("saleType", "0"));
 		salesformParams.add(new BasicNameValuePair("orderASC", "false"));
@@ -205,7 +204,7 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 
 		summaryBuffer.append("销售单下载成功" + "\r\n");
 		summaryBuffer.append("文件: " + receiveFileNm + "\r\n");
-		log.info(user + searchDate + "的销售数据下载成功");
+		log.info(user + searchDateStr + "的销售数据下载成功");
 		
 		List<SalesTO> salesTOList = Utils.getSalesTOListFromFileForRenrenle(new File(salesFilePath + receiveFileNm));
 		
@@ -213,8 +212,10 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		
 	}
 
-	public int getOrders(CloseableHttpClient httpClient, User user, String searchDate,StringBuffer summaryBuffer) throws Exception {
-		log.info(user + "开始下载" + searchDate + "的订单数据...");
+	 protected int getOrder(CloseableHttpClient httpClient, User user, Date searchDate,StringBuffer summaryBuffer) throws Exception {
+		
+		String searchDateStr = DateUtil.toString(searchDate, "yyyy-MM-dd");
+		log.info(user + "开始下载" + searchDateStr + "的订单数据...");
 //http://www.renrenle.cn/scm/jump.do?prefix=/order&page=/orderAction.do?method=queryOrder&left=1&moduleID=202
 		HttpGet httpGet = new HttpGet(
 				"http://www.renrenle.cn/scm/jump.do?prefix=/order&page=/orderAction.do?method=queryOrder&left=1&moduleID=202");
@@ -235,8 +236,8 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 		do {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RENRENLE));
 			List<NameValuePair> searchformParams = new ArrayList<NameValuePair>();
-			searchformParams.add(new BasicNameValuePair("startDate", searchDate));
-			searchformParams.add(new BasicNameValuePair("endDate", searchDate));
+			searchformParams.add(new BasicNameValuePair("startDate", searchDateStr));
+			searchformParams.add(new BasicNameValuePair("endDate", searchDateStr));
 			searchformParams.add(new BasicNameValuePair("activeFlag", "1"));
 			searchformParams.add(new BasicNameValuePair("flag", "-1"));
 			searchformParams.add(new BasicNameValuePair("purchaseFlag", "-1"));
@@ -267,21 +268,21 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 			pageNo++;
 		} while (pageNo <= totalPages);
 
-		log.info(user + "查询到" + searchDate + "号订单共" + orderIdList.size() + "条");
+		log.info(user + "查询到" + searchDateStr + "号订单共" + orderIdList.size() + "条");
 		for (int i = 0; i < orderIdList.size(); i++) {
 			String orderId = orderIdList.get(i);
-			if (Utils.isOrderFileExist(Constants.RETAILER_RENRENLE, user.getUserId(),orderId, DateUtil.toDate(searchDate,"yyyy-MM-dd"))) {
-				log.info(user+"订单日期: "+searchDate+" 订单号: "+orderId+"已存在,不再下载");
+			if (Utils.isOrderFileExist(Constants.RETAILER_RENRENLE, user.getUserId(),orderId, searchDate)) {
+				log.info(user+"订单日期: "+searchDateStr+" 订单号: "+orderId+"已存在,不再下载");
 				continue;
 			}
 			
 			List<OrderTO> orderList = new ArrayList<OrderTO>();
-			getOrderDetail(httpClient, user, orderId, searchDate, orderList);
+			getOrderDetail(httpClient, user, orderId, searchDateStr, orderList);
 			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId,
-					DateUtil.toDate(searchDate, "yyyy-MM-dd"), orderList);
+					searchDate, orderList);
 			log.info(user + "成功获取第" + (i + 1) + "条订单,订单号为" + orderId);
 		}
-		log.info(user + searchDate + "的订单数据下载成功");
+		log.info(user + searchDateStr + "的订单数据下载成功");
 		
 		return orderIdList.size();
 	}
@@ -328,4 +329,29 @@ public class RenrenleDataPullService implements RetailerDataPullService {
 	public void setOcr(OCR ocr) {
 		this.ocr = ocr;
 	}
+
+	@Override
+	protected Log getLog() {
+	
+		return log;
+	}
+
+	@Override
+	protected Log getSummaryLog() {
+		return summaryLog;
+	}
+	
+	@Override
+	protected String getRetailerID() {
+
+		return Constants.RETAILER_RENRENLE;
+	}
+
+	@Override
+	protected int getReceive(CloseableHttpClient httpClient, User user, Date processDate, StringBuffer summaryBuffer)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

@@ -80,7 +80,7 @@ public class Utils {
 	}
 
 	public static CloseableHttpClient createHttpClient(String retailerID) {
-		int timeout = Integer.parseInt(retailerID+"."+getProperty(Constants.CONNECTION_TIMEOUT_TIME));
+		int timeout = Integer.parseInt(getProperty(retailerID+"."+Constants.CONNECTION_TIMEOUT_TIME));
 		RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
 				.setConnectionRequestTimeout(timeout).setConnectTimeout(timeout).build();
 		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();

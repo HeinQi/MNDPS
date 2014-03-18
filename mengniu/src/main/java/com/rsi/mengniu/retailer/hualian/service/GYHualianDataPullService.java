@@ -38,7 +38,7 @@ public class GYHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(GYHualianDataPullService.class);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
+		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 
 		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 		try {
@@ -156,4 +156,9 @@ public class GYHualianDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}
 
+
+	public String getRetailerID() {
+
+		return Constants.RETAILER_HUALIAN;
+	}
 }

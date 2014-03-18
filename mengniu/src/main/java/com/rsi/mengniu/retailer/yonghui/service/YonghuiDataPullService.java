@@ -389,8 +389,7 @@ public class YonghuiDataPullService extends RetailerDataPullServiceImpl {
 		return summaryLog;
 	}
 
-	@Override
-	protected String getRetailerID() {
+	public String getRetailerID() {
 
 		return Constants.RETAILER_YONGHUI;
 	}

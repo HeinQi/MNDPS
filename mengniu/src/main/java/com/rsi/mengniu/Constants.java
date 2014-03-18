@@ -56,6 +56,7 @@ public final class Constants {
 	public static final String SUMMARY_SEPERATOR_LINE = "-------------------------------------------";
 	
 	
+	public static final String CONNECTION_TIMEOUT_TIME="connection.timeout.time";
 	
 
 	public static final String SYS_ERROR = "syserror";

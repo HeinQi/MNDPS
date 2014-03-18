@@ -498,8 +498,7 @@ public class TescoDataPullService extends RetailerDataPullServiceImpl {
 		return summaryLog;
 	}
 
-	@Override
-	protected String getRetailerID() {
+	public String getRetailerID() {
 
 		return Constants.RETAILER_TESCO;
 	}

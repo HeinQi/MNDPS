@@ -42,7 +42,7 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 	private static Log log = LogFactory.getLog(NXHualianDataPullService.class);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
+		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 
 		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 		//		String urlRoot = Utils.getUrlRoot(user.getUrl());
@@ -163,4 +163,9 @@ public class NXHualianDataPullService implements RetailerDataPullService {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}
 
+
+	public String getRetailerID() {
+
+		return Constants.RETAILER_HUALIAN;
+	}
 }

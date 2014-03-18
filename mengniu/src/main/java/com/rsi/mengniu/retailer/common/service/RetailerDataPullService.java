@@ -10,5 +10,7 @@ public interface RetailerDataPullService {
 
 	public static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);
 	public void dataPull(User user);
+	
+	public String getRetailerID();
 
 }

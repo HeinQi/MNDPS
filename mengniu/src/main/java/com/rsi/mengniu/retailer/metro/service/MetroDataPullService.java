@@ -38,7 +38,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 	private static Log summaryLog = LogFactory.getLog(Constants.SUMMARY_METRO);
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
+		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 		StringBuffer summaryBuffer = new StringBuffer();
 		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
 		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
@@ -824,4 +824,9 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 	}
 
+
+	public String getRetailerID() {
+
+		return Constants.RETAILER_METRO;
+	}
 }

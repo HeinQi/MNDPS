@@ -39,7 +39,7 @@ public class HZHualianDataPullService implements RetailerDataPullService {
 		private static Log log = LogFactory.getLog(HZHualianDataPullService.class);
 
 		public void dataPull(User user) {
-			CloseableHttpClient httpClient = Utils.createHttpClient();
+			CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 
 			AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 			HashMap<String, Object> contextMap = new HashMap<String, Object>();
@@ -188,4 +188,9 @@ public class HZHualianDataPullService implements RetailerDataPullService {
 			Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		}
 
+
+		public String getRetailerID() {
+
+			return Constants.RETAILER_HUALIAN;
+		}
 	}

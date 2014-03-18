@@ -21,10 +21,9 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 
 	protected abstract Log getSummaryLog();
 
-	protected abstract String getRetailerID();
 
 	public void dataPull(User user) {
-		CloseableHttpClient httpClient = Utils.createHttpClient();
+		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 		StringBuffer summaryBuffer = new StringBuffer();
 		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
 		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");

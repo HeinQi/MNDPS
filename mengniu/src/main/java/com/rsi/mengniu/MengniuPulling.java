@@ -28,6 +28,8 @@ public class MengniuPulling {
 
 				ExecutorService exec = Executors.newFixedThreadPool(threadNum);
 				for (int i = 0; i < threadNum; i++) {
+
+					Thread.sleep(3000);
 					exec.execute(new DataPullThread(mDoneSignal));
 				}
 				exec.shutdown();

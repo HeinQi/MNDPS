@@ -339,8 +339,7 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 		return summaryLog;
 	}
 	
-	@Override
-	protected String getRetailerID() {
+	public String getRetailerID() {
 
 		return Constants.RETAILER_CARREFOUR;
 	}

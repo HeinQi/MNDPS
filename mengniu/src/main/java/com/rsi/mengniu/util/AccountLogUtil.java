@@ -72,6 +72,10 @@ public class AccountLogUtil {
 		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID() + accountLogTO.getProcessDateStr();
 		accountLogMap.remove(key);
 	}
+	public static void removeloginAccountLogTO(AccountLogTO accountLogTO) {
+		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID();
+		accountLogMap.remove(key);
+	}
 
 	/**
 	 * Write Account Log to File
@@ -170,6 +174,7 @@ public class AccountLogUtil {
 	 * @param accoutLogLoginTO
 	 */
 	public static void loginFailed(AccountLogTO accountLogTO) {
+		removeloginAccountLogTO(accountLogTO);
 		accountLogTO.setLoginInd("N");
 		accountLogTO.setSuccessInd("N");
 		addAccountLogTO(accountLogTO);
@@ -177,12 +182,14 @@ public class AccountLogUtil {
 	}
 
 	public static void loginSuccess(AccountLogTO accountLogTO) {
+		removeloginAccountLogTO(accountLogTO);
 		accountLogTO.setLoginInd("Y");
 		addAccountLogTO(accountLogTO);
 
 	}
 
 	public static void recordOrderDownloadAmount(AccountLogTO accountLogUpdateTO) {
+		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
 		if (accountLogTO != null) {
 			accountLogTO.setOrderDownloadAmount(accountLogTO.getOrderDownloadAmount()
@@ -194,6 +201,7 @@ public class AccountLogUtil {
 	}
 
 	public static void recordReceivingDownloadAmount(AccountLogTO accountLogUpdateTO) {
+		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
 		if (accountLogTO != null) {
 			accountLogTO.setReceivingDownloadAmount(accountLogTO.getReceivingDownloadAmount()
@@ -205,6 +213,7 @@ public class AccountLogUtil {
 	}
 
 	public static void recordOrderProcessedAmount(AccountLogTO accountLogUpdateTO) {
+		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
 		if (accountLogTO != null) {
 			accountLogTO.setOrderProcessedAmount(accountLogTO.getOrderProcessedAmount()
@@ -216,6 +225,7 @@ public class AccountLogUtil {
 	}
 
 	public static void recordSalesDownloadAmount(AccountLogTO accountLogUpdateTO) {
+		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
 		if (accountLogTO != null) {
 			accountLogTO.setSalesDownloadAmount(accountLogTO.getSalesDownloadAmount()
@@ -227,6 +237,7 @@ public class AccountLogUtil {
 	}
 
 	public static void recordSalesProcessedAmount(AccountLogTO accountLogUpdateTO) {
+		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
 		if (accountLogTO != null) {
 			accountLogTO.setSalesProcessedAmount(accountLogTO.getSalesProcessedAmount()

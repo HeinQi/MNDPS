@@ -285,6 +285,9 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 //			orderCount.increaseOne();
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);
 		}
+		
+		
+		
 		// FileUtil.exportOrderInfoToTXT("carrefour", orderNo, orderItems);
 		Utils.exportOrderInfoListToTXT(Constants.RETAILER_CARREFOUR, user.getUserId(),
 				processDate, orderItems);

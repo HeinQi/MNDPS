@@ -138,7 +138,6 @@ public class LZHualianDataPullService implements RetailerDataPullService {
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
 		Element dataTable = doc.select("table").first();
-		log.info(user + "订单页面内容" + dataTable.toString());
 		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");

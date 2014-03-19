@@ -198,6 +198,10 @@
 	北京嘉万成糖烟酒商贸有限公司
 	 -->
 	<bean id ="http://bj.beijing-hualian.com/index_cs.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	<!-- 
+	南昌蒙牛销售乳业有限责任公司
+	 -->	
+	<bean id ="http://59.53.170.90:8001/index.asp" class="com.rsi.mengniu.retailer.hualian.service.ConfigStoreHualianDataPullService"></bean>
 
 	
 

@@ -32,7 +32,7 @@ public class DataPullThread implements Runnable {
 				dataPull.dataPull(user);
 				user = DataPullTaskPool.getTask();
 			} catch (Exception e) {
-				user = null;
+				user = DataPullTaskPool.getTask();
 				log.error(user, e);
 			}
 		}

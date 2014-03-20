@@ -202,7 +202,7 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 		String processDateStr = DateUtil.toString(processDate, "dd-MM-yyyy");
 		if (Utils.isOrderFileExistForCarrefour(Constants.RETAILER_CARREFOUR, user.getUserId(), processDate)) {
 			log.info(user + "订单日期: " + processDate + "的订单已存在,不再下载");
-			return null;
+			return orderItems;
 		}
 		log.info(user + "跳转到订单查询页面...");
 		summaryBuffer.append("订单日期: " + processDate + "\r\n");
@@ -236,7 +236,7 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 		String recordStr = table.select("tr[align=right]").select("td").get(0).text();
 		if (recordStr == null || recordStr.equals("")) {
 			log.info(user + "订单日期" + processDate + "记录为 0");
-			return null;
+			return orderItems;
 		}
 		recordStr = recordStr.substring(recordStr.indexOf("共") + 1, recordStr.indexOf("记"));
 		recordStr = recordStr.replaceAll(",", "");
@@ -291,7 +291,6 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 				orderItems.add(orderTo);
 				// 计算成功的订单数量 以订单号为单位
 			}
-
 			count++;
 			// orderCount.increaseOne();
 			log.info(user + "成功下载订单[" + count + "],订单号:" + orderNo);

@@ -216,7 +216,7 @@ public class Utils {
 	public static String getCarrefourStoreIDByOrderStoreName(String orderStoreName) throws BaseException {
 		Map<String, String> carrefourStoreMapping = getCarrefourOrderStoreMapping();
 		String storeID = carrefourStoreMapping.get(orderStoreName);
-		return storeID == null ? "" : storeID;
+		return storeID == null ? "EmptyStoreMapping" : storeID;
 	}
 
 	public static Map<String, String> getCarrefourOrderStoreMapping() throws BaseException {
@@ -260,7 +260,7 @@ public class Utils {
 	public static String getCarrefourStoreIDByReceivingStoreID(String receivingStoreID) throws BaseException {
 		Map<String, String> carrefourStoreMapping = getCarrefourReceivingStoreMapping();
 		String storeID = carrefourStoreMapping.get(receivingStoreID);
-		return storeID == null ? "" : storeID;
+		return storeID == null ? "EmptyStoreMapping" : storeID;
 	}
 
 	public static Map<String, String> getCarrefourReceivingStoreMapping() throws BaseException {

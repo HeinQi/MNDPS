@@ -17,12 +17,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,7 +36,9 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -80,10 +81,22 @@ public class Utils {
 	}
 
 	public static CloseableHttpClient createHttpClient(String retailerID) {
-		int timeout = Integer.parseInt(getProperty(retailerID+"."+Constants.CONNECTION_TIMEOUT_TIME));
-		RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
-				.setConnectionRequestTimeout(timeout).setConnectTimeout(timeout).build();
+		int timeout = Integer.parseInt(getProperty(retailerID + "." + Constants.CONNECTION_TIMEOUT_TIME));
+
+		// 4.3版本超时设置
+		RequestConfig globalConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
+				.setConnectionRequestTimeout(timeout).build();// 设置请求和传输超时时间
+		// RequestConfig globalConfig =
+		// RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+		// .setConnectionRequestTimeout(3000).setConnectTimeout(3000).build();
 		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
+
+		// 4.X版本的超时设置(4.3后已过时)
+		// CloseableHttpClient httpClient = HttpClients.createDefault();
+		// httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,
+		// 10000);
+		// httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,
+		// 10000);
 		return httpClient;
 	}
 
@@ -545,8 +558,9 @@ public class Utils {
 
 		String userAgency = user.getAgency();
 		String salesFilePath = salesInboundFolderPath + "Sales_" + retailerID + "_"
-				+ (districtName.equals("") ? "" : (districtName + "_")) + (userAgency.equals("") ? "" : (userAgency + "_"))
-				+ user.getUserId() + "_" + DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
+				+ (districtName.equals("") ? "" : (districtName + "_"))
+				+ (userAgency.equals("") ? "" : (userAgency + "_")) + user.getUserId() + "_"
+				+ DateUtil.toStringYYYYMMDD(slaesDate) + ".txt";
 
 		File salesFile = new File(salesFilePath);
 
@@ -575,9 +589,11 @@ public class Utils {
 			FileUtil.closeFileWriter(writer);
 
 		}
-		
-		//记录下载数量
-		AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), DateUtil.toString(slaesDate), user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
+
+		// 记录下载数量
+		AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
+				DateUtil.toString(slaesDate), user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(),
+				user.getStoreNo());
 		accountLogTO.setSalesDownloadAmount(salesList.size());
 		AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
 

@@ -2,7 +2,9 @@ package com.rsi.mengniu.retailer.metro.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,6 +25,7 @@ import org.jsoup.select.Elements;
 
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
+import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
 import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.OrderTO;
@@ -79,6 +82,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 			log.error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
 			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
+			AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+					"");
+			accountLogTO.setErrorMessage("收货单页面加载失败，请登录网站检查收货单功能是否正常！");
+			AccountLogUtil.failureDownload(accountLogTO);
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
 		try {
@@ -90,6 +97,11 @@ public class MetroDataPullService implements RetailerDataPullService {
 			log.error(user + "页面加载失败，请登录网站检查订单查询功能是否正常!");
 			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
+			
+			AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+					"");
+			accountLogTO.setErrorMessage("订单页面加载失败，请登录网站检查订单查询功能是否正常!");
+			AccountLogUtil.failureDownload(accountLogTO);
 		}
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 		summaryLog.info(summaryBuffer);
@@ -357,22 +369,36 @@ public class MetroDataPullService implements RetailerDataPullService {
 			summaryBuffer.append("收货单下载成功" + "\r\n");
 			
 			if (receiveList.size() != 0) {
-				int orderAmount = Utils.getConlidatedOrderNoAmountByReceivingNoteTO(receiveList);
+				Map<String,List<ReceivingNoteTO>> orderMapbyDate = new HashMap<String, List<ReceivingNoteTO>>();
+				for(ReceivingNoteTO receivingNoteTO:receiveList){
+					String processDateStr = receivingNoteTO.getReceivingDate();
+					List<ReceivingNoteTO> receivingNoteList = null;
+					if(orderMapbyDate.containsKey(processDateStr)){
+						receivingNoteList = orderMapbyDate.get(processDateStr);
+					} else {
+						receivingNoteList = new ArrayList<ReceivingNoteTO>();
+					}
+					receivingNoteList.add(receivingNoteTO);
+					orderMapbyDate.put(processDateStr, receivingNoteList);
+				}
+				
+				for(String processDateStr:orderMapbyDate.keySet()){
+					List<ReceivingNoteTO> receivingNoteList = orderMapbyDate.get(processDateStr);
+					int orderAmount = Utils.getConlidatedOrderNoAmountByReceivingNoteTO(receivingNoteList);
 
-				String receiveDate = receiveList.get(0).getReceivingDate();
-
-				AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
-						receiveDate);
-				accountLogTO.setReceivingDownloadAmount(orderAmount);
-				AccountLogUtil.recordReceivingDownloadAmount(accountLogTO);
+					AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+							processDateStr);
+					accountLogTO.setReceivingDownloadAmount(orderAmount);
+					AccountLogUtil.recordReceivingDownloadAmount(accountLogTO);
+				}
+				
+				
 			}
 		} else {
 			log.info(user + "下载收货单失败!");
 			summaryBuffer.append("收货单下载失败" + "\r\n");
-			AccountLogTO accountLogLoginTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
-					"");
-			accountLogLoginTO.setErrorMessage("收货单下载失败"+"......"+"页面加载失败，请登录网站检查收货单功能是否正常！");
-			AccountLogUtil.failureDownload(accountLogLoginTO);
+			throw new BaseException("下载收货单失败!");
+			
 		}
 
 	}
@@ -695,17 +721,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 			}
 			
 		} else if (orderDetailRes.contains("没有查询到符合条件的数据")) {
-			AccountLogTO accountLogLoginTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
-					"");
-			accountLogLoginTO.setErrorMessage("没有查询到符合条件的未交货订单明细");
-			AccountLogUtil.failureDownload(accountLogLoginTO);
 			log.info(user + "没有查询到符合条件的未交货订单明细!");
 		} else {
-			AccountLogTO accountLogLoginTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
-					"");
-			accountLogLoginTO.setErrorMessage("下载未交货订单明细失败!");
-			AccountLogUtil.failureDownload(accountLogLoginTO);
 			log.info(user + "下载未交货订单明细失败!");
+			throw new BaseException("下载未交货订单明细失败!");
 		}
 	}
 
@@ -760,12 +779,26 @@ public class MetroDataPullService implements RetailerDataPullService {
 
 			log.info(user + "下载已交货订单明细成功!");
 			summaryBuffer.append("订单下载成功" + "\r\n");
+			
+			if (orderList.size() != 0) {
+				int orderAmount = Utils.getConlidatedOrderNoAmountByOrderTO(orderList);
+
+				String receiveDate = orderList.get(0).getOrderDate();
+
+				AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+						receiveDate);
+				accountLogTO.setOrderDownloadAmount(orderAmount);
+				
+				AccountLogUtil.recordOrderDownloadAmount(accountLogTO);
+			}
+			
 		} else if (orderDetailRes.contains("没有查询到符合条件的数据")) {
 			log.info(user + "没有查询到符合条件的已交货订单明细!");
 			summaryBuffer.append("没有查询到符合条件的订单数据" + "\r\n");
 		} else {
 			log.info(user + "下载已交货订单明细失败!");
 			summaryBuffer.append("订单下载失败" + "\r\n");
+			throw new BaseException("下载已交货订单明细失败!");
 		}
 
 	}

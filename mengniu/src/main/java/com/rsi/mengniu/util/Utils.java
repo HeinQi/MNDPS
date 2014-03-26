@@ -630,12 +630,7 @@ public class Utils {
 
 		}
 
-		// 记录下载数量
-		AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
-				DateUtil.toString(slaesDate), user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(),
-				user.getStoreNo());
-		accountLogTO.setSalesDownloadAmount(salesList.size());
-		AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
+	
 
 	}
 

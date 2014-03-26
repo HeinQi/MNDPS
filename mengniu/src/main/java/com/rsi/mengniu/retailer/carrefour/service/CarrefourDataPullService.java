@@ -94,12 +94,10 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 		try {
 			// receive
 			String fileFullPath = getReceiveExcel(httpClient, user, summaryBuffer);
-
 			// 计算Receiving下载成功的数量
 			Map<String, Set<String>> receivingMapByDate = Utils.getReceivingAmountFromFileForCarrefour(
 					fileFullPath, Utils.getStartDate(Constants.RETAILER_CARREFOUR),
 					Utils.getEndDate(Constants.RETAILER_CARREFOUR));
-
 			for (String processDateStr : receivingMapByDate.keySet()) {
 				AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
 						processDateStr);
@@ -110,6 +108,9 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 			summaryBuffer.append("收货单下载失败" + "\r\n");
 			getLog().error(user + "页面加载失败，请登录网站检查收货单功能是否正常！");
 			errorLog.error(user, e);
+			AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
+			accountLogLoginTO.setErrorMessage("收货单下载失败"+"......"+"页面加载失败，请登录网站检查收货单功能是否正常！");
+			AccountLogUtil.FailureDownload(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			// getLog().error(user + Utils.getTrace(e));
 		}
@@ -173,7 +174,6 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_CARREFOUR));
 
 		return receiveFilePath + receiveFileNm;
-
 	}
 
 	@Override

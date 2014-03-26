@@ -47,14 +47,16 @@ public class JQHualianDataPullService implements RetailerDataPullService {
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
 
+				accountLogLoginTO.setErrorMessage("登录失败!");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
-				
 				return;
 			}
 			AccountLogUtil.loginSuccess(accountLogLoginTO);
 		} catch (Exception e) {
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
+			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
@@ -115,12 +117,23 @@ public class JQHualianDataPullService implements RetailerDataPullService {
 		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
-			for (Element store : sElements) {
-				String storeId = store.attr("value");
-				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
-			}
-			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user, searchDate,salesList);
-
+		
+			AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
+					DateUtil.toString(searchDate), user.getUrl(), user.getDistrict(), user.getAgency(),
+					user.getLoginNm(), user.getStoreNo());
+			try {
+				for (Element store : sElements) {
+					String storeId = store.attr("value");
+					getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+				}
+				Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user, searchDate,salesList);
+				// 记录下载数量
+				accountLogTO.setSalesDownloadAmount(salesList.size());
+				AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
+			} catch (Exception e) {
+				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				AccountLogUtil.FailureDownload(accountLogTO);
+			}		
 		}
 
 		log.info(user + "销售数据下载成功");

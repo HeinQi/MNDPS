@@ -40,62 +40,65 @@ public class GXFCGHualianDataPullService implements RetailerDataPullService {
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 
-		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
+		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "",
+				user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 		HashMap<String, Object> contextMap = new HashMap<String, Object>();
 		List<String> districtList = null;
 		try {
 			districtList = getDistrict(httpClient);
-			for (String district:districtList) {
-				String loginResult = login(httpClient, user,district,contextMap);
+			for (String district : districtList) {
+				String loginResult = login(httpClient, user, district, contextMap);
 				// Invalid Password and others
 				if ("Success".equals(loginResult)) {
 					break;
-				}				
+				}
 			}
-			if ((Boolean)contextMap.get("login") == false) {
+			if ((Boolean) contextMap.get("login") == false) {
 				log.info(user + "错误的密码,退出!");
 				Utils.recordIncorrectUser(user);
-
+				accountLogLoginTO.setErrorMessage("登录失败!");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
-				
+
 				return;
 			}
 			AccountLogUtil.loginSuccess(accountLogLoginTO);
 		} catch (Exception e) {
-			log.error(user+"网站登录出错,请检查!");
-			errorLog.error(user,e);
+			log.error(user + "网站登录出错,请检查!");
+			errorLog.error(user, e);
+			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			return;
 		}
 
-		
 		try {
 			getSales(httpClient, user);
-			httpClient.close();			
+			httpClient.close();
 		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-			errorLog.error(user,e);
+			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
 		}
 	}
-	
-public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception {
-	List<String> districtList = new ArrayList<String>();
-	HttpGet httpGet = new HttpGet("http://gxfcg.beijing-hualian.com/supplier/index.asp");
-	CloseableHttpResponse formResponse = httpClient.execute(httpGet);
-	HttpEntity formEntity = formResponse.getEntity();
-	Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
-	Element storeElement = doc.select("#selectsuppl").first();
-	formResponse.close();	
-	Elements sElements = storeElement.select("option[value]");
-	for (Element store : sElements) {
-		String storeId = store.attr("value");
-		districtList.add(storeId);
+
+	public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception {
+		List<String> districtList = new ArrayList<String>();
+		HttpGet httpGet = new HttpGet("http://gxfcg.beijing-hualian.com/supplier/index.asp");
+		CloseableHttpResponse formResponse = httpClient.execute(httpGet);
+		HttpEntity formEntity = formResponse.getEntity();
+		Document doc = Jsoup.parse(new String(EntityUtils.toString(formEntity).getBytes("ISO_8859_1"), "GBK"));
+		Element storeElement = doc.select("#selectsuppl").first();
+		formResponse.close();
+		Elements sElements = storeElement.select("option[value]");
+		for (Element store : sElements) {
+			String storeId = store.attr("value");
+			districtList.add(storeId);
+		}
+		return districtList;
 	}
-	return districtList;
-}
-	
-	public String login(CloseableHttpClient httpClient, User user,String district,HashMap<String, Object> contextMap) throws Exception {
+
+	public String login(CloseableHttpClient httpClient, User user, String district, HashMap<String, Object> contextMap)
+			throws Exception {
 		log.info(user + "开始登录...");
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("UsernameGet", user.getUserId()));
@@ -109,9 +112,9 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 		String reponseLogin = new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK");
 		loginResponse.close();
 		if (reponseLogin.contains("您的供应商编号或密码有误")) {
-			contextMap.put("login",false);
-			//log.info(user + "错误的密码,退出!");
-			//Utils.recordIncorrectUser(user);
+			contextMap.put("login", false);
+			// log.info(user + "错误的密码,退出!");
+			// Utils.recordIncorrectUser(user);
 			return "Error";
 		}
 		// forward
@@ -125,7 +128,7 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 		}
 		response.close();
 		log.info(user + "登录成功!");
-		contextMap.put("login",true);
+		contextMap.put("login", true);
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		return "Success";
 	}
@@ -140,14 +143,26 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 		formResponse.close();
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 		Elements sElements = storeElement.select("option[value]");
-		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
+		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN),
+				Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
-			for (Element store : sElements) {
-				String storeId = store.attr("value");
-				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+			AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
+					DateUtil.toString(searchDate), user.getUrl(), user.getDistrict(), user.getAgency(),
+					user.getLoginNm(), user.getStoreNo());
+			try {
+				for (Element store : sElements) {
+					String storeId = store.attr("value");
+					getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+				}
+				Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN, "", user, searchDate, salesList);
+				// 记录下载数量
+				accountLogTO.setSalesDownloadAmount(salesList.size());
+				AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
+			} catch (Exception e) {
+				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				AccountLogUtil.FailureDownload(accountLogTO);
 			}
-			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user, searchDate,salesList);
 
 		}
 
@@ -155,8 +170,8 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 	}
 
 	// /suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user, String storeId, List<SalesTO> salesList, String searchDate)
-			throws Exception {
+	private void getSalesByStore(CloseableHttpClient httpClient, User user, String storeId, List<SalesTO> salesList,
+			String searchDate) throws Exception {
 
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("RadioGroup1", "2"));
@@ -169,7 +184,8 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 		HttpPost httppost = new HttpPost("http://gxfcg.beijing-hualian.com/supplier/suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
+		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),
+				"GBK"));
 		Element dataTable = doc.select("table[bgcolor=#FFFFFF]").first();
 		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i = 0; i < rows.size() - 1; i++) {
@@ -185,8 +201,6 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}
-
-
 
 	public String getRetailerID() {
 

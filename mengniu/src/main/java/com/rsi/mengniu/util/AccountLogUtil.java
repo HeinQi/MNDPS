@@ -68,7 +68,7 @@ public class AccountLogUtil {
 								accountLogTO.getSalesDownloadAmount()
 										+ accountLogMap.get(combineKey).getSalesDownloadAmount());
 						accountLogMap.get(combineKey).setSuccessInd(accountLogMap.get(combineKey).getSuccessInd());
-					}else{
+					} else {
 						accountLogMap.put(combineKey, accountLogTO);
 					}
 				}
@@ -98,7 +98,7 @@ public class AccountLogUtil {
 	 * 
 	 * @param accountLogTO
 	 */
-	//内部
+	// 内部
 	public static AccountLogTO getAccountLogTO(AccountLogTO accountLogTO) {
 		String key = accountLogTO.getRetailerID() + accountLogTO.getAgency() + accountLogTO.getUserID()
 				+ accountLogTO.getProcessDateStr();
@@ -182,8 +182,8 @@ public class AccountLogUtil {
 			addAccountLogTO(accountLogUpdateTO);
 		}
 	}
-	
-//记录下载失败的ErrorMessage
+
+	// 记录下载失败的ErrorMessage
 	public static void FailureDownload(AccountLogTO accountLogUpdateTO) {
 		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
@@ -194,8 +194,6 @@ public class AccountLogUtil {
 			addAccountLogTO(accountLogUpdateTO);
 		}
 	}
-
-
 
 	// //////////////////////////////////////////////////////////////////下面为merage阶段
 	// 外部merage

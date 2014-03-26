@@ -37,30 +37,33 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 
 	public void dataPull(User user) {
 		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
-		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "", user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
+		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "",
+				user.getUrl(), user.getDistrict(), user.getAgency(), user.getLoginNm(), user.getStoreNo());
 		try {
 			String loginResult = login(httpClient, user);
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
-
+				accountLogLoginTO.setErrorMessage("登录失败!");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
-				
+
 				return;
 			}
 			AccountLogUtil.loginSuccess(accountLogLoginTO);
 		} catch (Exception e) {
-			log.error(user+"网站登录出错,请检查!");
-			errorLog.error(user,e);
+			log.error(user + "网站登录出错,请检查!");
+			errorLog.error(user, e);
+			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
-			
+
 			return;
 		}
 		try {
 			getSales(httpClient, user);
-			httpClient.close();			
+			httpClient.close();
 		} catch (Exception e) {
-			log.error(user+"页面加载失败，请登录网站检查销售数据查询功能是否正常!");
-			errorLog.error(user,e);
+			log.error(user + "页面加载失败，请登录网站检查销售数据查询功能是否正常!");
+			errorLog.error(user, e);
 			DataPullTaskPool.addFailedUser(user);
 		}
 	}
@@ -71,7 +74,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 		formParams.add(new BasicNameValuePair("UsernameGet", user.getUserId()));
 		formParams.add(new BasicNameValuePair("PasswordGet", user.getPassword())); // 错误的密码
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"checksuppllogin.asp");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl()) + "checksuppllogin.asp");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
 
@@ -83,7 +86,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 			return "Error";
 		}
 		// forward
-		HttpGet httpGet = new HttpGet(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp");
+		HttpGet httpGet = new HttpGet(Utils.getUrlRoot(user.getUrl()) + "suppl_select.asp");
 		CloseableHttpResponse response = httpClient.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		String loginStr = new String(EntityUtils.toString(entity).getBytes("ISO_8859_1"), "GBK");
@@ -97,23 +100,35 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 		return "Success";
 	}
 
-	public void getSales(CloseableHttpClient httpClient, User user) throws Exception {
+	public void getSales(CloseableHttpClient httpClient, User user) {
 		log.info(user + "开始下载销售数据...");
 		String[] sotres = user.getStoreNo().split(",");
-		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN), Utils.getEndDate(Constants.RETAILER_HUALIAN));
+		List<Date> dates = DateUtil.getDateArrayByRange(Utils.getStartDate(Constants.RETAILER_HUALIAN),
+				Utils.getEndDate(Constants.RETAILER_HUALIAN));
 		for (Date searchDate : dates) {
 			List<SalesTO> salesList = new ArrayList<SalesTO>();
-			for (String storeId : sotres) {
-				getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+			AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(),
+					DateUtil.toString(searchDate), user.getUrl(), user.getDistrict(), user.getAgency(),
+					user.getLoginNm(), user.getStoreNo());
+			try {
+				for (String storeId : sotres) {
+					getSalesByStore(httpClient, user, storeId, salesList, DateUtil.toString(searchDate, "yyyyMMdd"));
+				}
+				Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN, "", user, searchDate, salesList);
+				// 记录下载数量
+				accountLogTO.setSalesDownloadAmount(salesList.size());
+				AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
+			} catch (Exception e) {
+				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				AccountLogUtil.FailureDownload(accountLogTO);
 			}
-			Utils.exportSalesInfoToTXTForHualian(Constants.RETAILER_HUALIAN,"",user, searchDate,salesList);
 		}
 		log.info(user + "销售数据下载成功");
 	}
 
 	// /suppl_select.asp?action=salesel
-	private void getSalesByStore(CloseableHttpClient httpClient, User user, String storeId, List<SalesTO> salesList, String searchDate)
-			throws Exception {
+	private void getSalesByStore(CloseableHttpClient httpClient, User user, String storeId, List<SalesTO> salesList,
+			String searchDate) throws Exception {
 
 		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		formParams.add(new BasicNameValuePair("store_no", storeId));
@@ -123,12 +138,13 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 		log.info(user + "下载店号为[" + storeId + "],日期为 " + searchDate + " 的销售数据");
 
 		HttpEntity loginEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl())+"suppl_select.asp?action=salesel");
+		HttpPost httppost = new HttpPost(Utils.getUrlRoot(user.getUrl()) + "suppl_select.asp?action=salesel");
 		httppost.setEntity(loginEntity);
 		CloseableHttpResponse loginResponse = httpClient.execute(httppost);
-		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"), "GBK"));
+		Document doc = Jsoup.parse(new String(EntityUtils.toString(loginResponse.getEntity()).getBytes("ISO_8859_1"),
+				"GBK"));
 		Element dataTable = doc.select("table").first();
-		
+
 		Elements rows = dataTable.select("tr:gt(0)");
 		for (int i = 0; i < rows.size() - 1; i++) {
 			Elements tds = rows.get(i).select("td");
@@ -140,18 +156,17 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 				sales.setSalesQuantity(tds.get(3).text());
 				sales.setSalesAmount(tds.get(4).text());
 			} else {
-			sales.setStoreID(storeId);
-			sales.setItemID(tds.get(0).text());
-			sales.setItemName(tds.get(1).text());
-			sales.setSalesQuantity(tds.get(2).text());
-			sales.setSalesAmount(tds.get(3).text());
+				sales.setStoreID(storeId);
+				sales.setItemID(tds.get(0).text());
+				sales.setItemName(tds.get(1).text());
+				sales.setSalesQuantity(tds.get(2).text());
+				sales.setSalesAmount(tds.get(3).text());
 			}
 			sales.setSalesDate(DateUtil.toString(DateUtil.toDate(searchDate, "yyyyMMdd"), "yyyy-MM-dd"));
 			salesList.add(sales);
 		}
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_HUALIAN));
 	}
-
 
 	public String getRetailerID() {
 

@@ -84,7 +84,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 			errorLog.error(user, e);
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			getSummaryLog().info(summaryBuffer);
-			accountLogLoginTO.setErrorMessage("网站登录出错,请检查!");
+			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
 			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			return false;

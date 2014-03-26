@@ -52,6 +52,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 				summaryBuffer.append("登录失败!\r\n");
 				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 				summaryLog.info(summaryBuffer);
+				accountLogLoginTO.setErrorMessage("登录失败!");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
 				return;
 			}
@@ -63,6 +64,8 @@ public class MetroDataPullService implements RetailerDataPullService {
 			summaryLog.info(summaryBuffer);
 			log.error(user + "网站登录出错,请检查!");
 			errorLog.error(user, e);
+			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 //			AccountLogUtil.loginFailed(accountLogLoginTO);
 			return;
@@ -366,6 +369,10 @@ public class MetroDataPullService implements RetailerDataPullService {
 		} else {
 			log.info(user + "下载收货单失败!");
 			summaryBuffer.append("收货单下载失败" + "\r\n");
+			AccountLogTO accountLogLoginTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+					"");
+			accountLogLoginTO.setErrorMessage("收货单下载失败"+"......"+"页面加载失败，请登录网站检查收货单功能是否正常！");
+			AccountLogUtil.FailureDownload(accountLogLoginTO);
 		}
 
 	}
@@ -688,8 +695,16 @@ public class MetroDataPullService implements RetailerDataPullService {
 			}
 			
 		} else if (orderDetailRes.contains("没有查询到符合条件的数据")) {
+			AccountLogTO accountLogLoginTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+					"");
+			accountLogLoginTO.setErrorMessage("没有查询到符合条件的未交货订单明细");
+			AccountLogUtil.FailureDownload(accountLogLoginTO);
 			log.info(user + "没有查询到符合条件的未交货订单明细!");
 		} else {
+			AccountLogTO accountLogLoginTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
+					"");
+			accountLogLoginTO.setErrorMessage("下载未交货订单明细失败!");
+			AccountLogUtil.FailureDownload(accountLogLoginTO);
 			log.info(user + "下载未交货订单明细失败!");
 		}
 	}

@@ -1,21 +1,20 @@
 package com.rsi.mengniu;
 
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
+import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.Utils;
 
 public class MengniuPulling {
 	private static Log log = LogFactory.getLog(MengniuPulling.class);
-
 	public static void main(String[] args) {
 		String retailerId = args[0];
 		try {
@@ -24,23 +23,22 @@ public class MengniuPulling {
 			int threadNum = Integer.parseInt(Utils.getProperty("datapull.thread.amount"));
 			int retryNum = Integer.parseInt(Utils.getProperty("datapull.retry.amount"));
 			for (int num = 0; num <= retryNum; num++) {
+				AccountLogUtil.initRoundLogMap();
 				final CountDownLatch mDoneSignal = new CountDownLatch(threadNum);
-
 				ExecutorService exec = Executors.newFixedThreadPool(threadNum);
 				for (int i = 0; i < threadNum; i++) {
-
 					Thread.sleep(3000);
 					exec.execute(new DataPullThread(mDoneSignal));
 				}
 				exec.shutdown();
 				mDoneSignal.await(); // Wait all thread done
-
+				AccountLogUtil.mergeRoundLogMapToAccountLogMap();	
 				if (DataPullTaskPool.hasRetryTask() && (num + 1) <= retryNum) {
 					DataPullTaskPool.processFaileTask();
 					log.info("有失败的用户,系统将对失败的用户进行第" + (num + 1) + "次重试下载!");
 				} else {
 					break;
-				}
+				}	
 			}
 			if ("ALL".equalsIgnoreCase(retailerId)) {
 				RetailerDataConversionService carrefourConversion = (RetailerDataConversionService) appContext
@@ -81,7 +79,6 @@ public class MengniuPulling {
 			log.error(Utils.getTrace(e));
 		}
 		log.info("All Data Pull Thread End!");
-
 	}
 
 }

@@ -10,14 +10,11 @@ public class AccountLogTO extends BaseTO {
 	private String retailerID = "";
 	private String userID = "";
 	private String password = "";
-	
-
 	private String url = "";
 	private String district = ""; 
 	private String agency = "";
 	private String loginNm = "";
 	private String storeNo = "";
-	
 	private String loginInd = "";
 	private String processDateStr = "";
 	private int orderDownloadAmount;
@@ -26,6 +23,14 @@ public class AccountLogTO extends BaseTO {
 	private int orderProcessedAmount;
 	private int salesProcessedAmount;
 	private String successInd = "";
+	private String errorMessage = "";
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 
 	public String getRetailerID() {
 		return retailerID;
@@ -189,7 +194,6 @@ public class AccountLogTO extends BaseTO {
 		this.loginNm = loginNm;
 		this.storeNo = storeNo;
 	}
-	
 	
 
 }

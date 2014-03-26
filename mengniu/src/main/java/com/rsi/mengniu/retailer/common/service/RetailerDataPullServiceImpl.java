@@ -2,6 +2,7 @@ package com.rsi.mengniu.retailer.common.service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -21,14 +22,12 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 
 	protected abstract Log getSummaryLog();
 
-
-	public void dataPull(User user) {
+	public void dataPull(User user) {	
 		CloseableHttpClient httpClient = Utils.createHttpClient(getRetailerID());
 		StringBuffer summaryBuffer = new StringBuffer();
 		summaryBuffer.append("运行时间: " + new Date() + "\r\n");
 		summaryBuffer.append("零售商: " + user.getRetailer() + "\r\n");
 		summaryBuffer.append("用户: " + user.getUserId() + "\r\n");
-
 		// Login
 		boolean loginInd = login(user, httpClient, summaryBuffer);
 		if (!loginInd)
@@ -61,9 +60,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 	}
 
 	public boolean login(User user, CloseableHttpClient httpClient, StringBuffer summaryBuffer) {
-
 		AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
-
 		String loginResult = null;
 		int loginCount = 0; // 如果验证码出错重新login,最多15次
 		try {
@@ -76,9 +73,8 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("登录失败!\r\n");
 				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 				getSummaryLog().info(summaryBuffer);
-				
+				accountLogLoginTO.setErrorMessage("登录失败!");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
-				
 				return false;
 			}
 			AccountLogUtil.loginSuccess(accountLogLoginTO);
@@ -88,8 +84,9 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 			errorLog.error(user, e);
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			getSummaryLog().info(summaryBuffer);
+			accountLogLoginTO.setErrorMessage("网站登录出错,请检查!");
+			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
-
 			return false;
 		}
 		return true;
@@ -129,7 +126,10 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("成功数量: " + orderAmount + "\r\n");
 				getLog().error(user + "页面加载失败，请登录网站检查订单功能是否正常！");
 				errorLog.error(user, e);
+				accountLogTO.setErrorMessage("订单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				AccountLogUtil.FailureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
+				
 			}
 		}
 	}
@@ -172,6 +172,8 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("收货单下载失败" + "\r\n");
 				getLog().error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
 				errorLog.error(user, e);
+				accountLogTO.setErrorMessage("收货单下载失败......页面加载失败，请登录网站检查订单功能是否正常！");
+				AccountLogUtil.FailureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 			}
 		}
@@ -208,6 +210,8 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("成功数量: " + salesAmount + "\r\n");
 				getLog().error(user + "页面加载失败，请登录网站检查销售单功能是否正常！");
 				errorLog.error(user, e);
+				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				AccountLogUtil.FailureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 			}
 		}

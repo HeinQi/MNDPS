@@ -125,6 +125,29 @@
 	<!-- 
 	 -->
 	<bean id ="http://anshun.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+	<!-- 
+ http://leshan.beijing-hualian.com/ jh111
+	 -->
+	<bean id ="http://chongqing.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+		<!-- 
+ http://leshan.beijing-hualian.com/  jh2222  
+ 
+	 -->
+	<bean id ="http://leshan.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+	<!-- 
+http://scdz.beijing-hualian.com  jh333333  
+ 
+	 -->
+	<bean id ="http://scdz.beijing-hualian.com" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+		<!-- 
+http://suining.beijing-hualian.com/index.asp  jh444
+	 -->
+	<bean id ="http://suining.beijing-hualian.com/index.asp" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>
+	
+	
 	<!-- 
 	 -->
 	<bean id ="http://shandong.beijing-hualian.com/" class="com.rsi.mengniu.retailer.hualian.service.NoStoreHualianDataPullService"></bean>

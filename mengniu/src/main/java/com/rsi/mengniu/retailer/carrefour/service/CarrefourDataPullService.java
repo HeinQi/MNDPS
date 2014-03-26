@@ -94,6 +94,9 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 		try {
 			// receive
 			String fileFullPath = getReceiveExcel(httpClient, user, summaryBuffer);
+			if(fileFullPath==null){
+				return;
+			}
 			// 计算Receiving下载成功的数量
 			Map<String, Set<String>> receivingMapByDate = Utils.getReceivingAmountFromFileForCarrefour(
 					fileFullPath, Utils.getStartDate(Constants.RETAILER_CARREFOUR),

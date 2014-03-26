@@ -84,8 +84,8 @@ public class Utils {
 		int timeout = Integer.parseInt(getProperty(retailerID + "." + Constants.CONNECTION_TIMEOUT_TIME));
 
 		// 4.3版本超时设置
-		RequestConfig globalConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
-				.setConnectionRequestTimeout(timeout).build();// 设置请求和传输超时时间
+		RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+				.setSocketTimeout(timeout).setConnectTimeout(timeout).setConnectionRequestTimeout(timeout).build();// 设置请求和传输超时时间
 		// RequestConfig globalConfig =
 		// RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
 		// .setConnectionRequestTimeout(3000).setConnectTimeout(3000).build();
@@ -224,6 +224,46 @@ public class Utils {
 			rainbowStoreMap.put(storeName, storeID);
 		}
 		return rainbowStoreMap;
+	}
+
+	public static Map<String, Set<String>> getReceivingAmountFromFileForCarrefour(String fileFullPath, Date startDate,
+			Date endDate) throws BaseException {
+		Map<String, Set<String>> receivingMapByDate = new HashMap<String, Set<String>>();
+		try {
+			InputStream sourceExcel = new FileInputStream(fileFullPath);
+
+			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
+			if (sourceWorkbook.getNumberOfSheets() != 0) {
+				Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
+				for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
+					Row sourceRow = sourceSheet.getRow(i);
+					if (sourceRow == null) {
+						continue;
+					}
+
+					String receivingDateStr = sourceRow.getCell(6).getStringCellValue();
+					Date receivingDate = DateUtil.toDate(receivingDateStr);
+
+					// If receivingDate is in the date range
+					if (DateUtil.isInDateRange(receivingDate, startDate, endDate)) {
+						Set<String> orderNoSet = new HashSet<String>();
+						if (receivingMapByDate.containsKey(receivingDateStr)) {
+							orderNoSet = receivingMapByDate.get(receivingDateStr);
+						}
+						String orderNo = sourceRow.getCell(7).getStringCellValue();
+						orderNoSet.add(orderNo);
+						receivingMapByDate.put(receivingDateStr, orderNoSet);
+					}
+				}
+			}
+			return receivingMapByDate;
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			throw new BaseException(e);
+		} catch (IOException e) {
+			log.error(e);
+			throw new BaseException(e);
+		}
 	}
 
 	public static String getCarrefourStoreIDByOrderStoreName(String orderStoreName) throws BaseException {

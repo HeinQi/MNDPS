@@ -195,46 +195,7 @@ public class AccountLogUtil {
 		}
 	}
 
-	// 家乐福
-	public static Map<String, Set<String>> getReceivingAmountFromFileForCarrefour(String fileFullPath, Date startDate,
-			Date endDate) throws BaseException {
-		Map<String, Set<String>> receivingMapByDate = new HashMap<String, Set<String>>();
-		try {
-			InputStream sourceExcel = new FileInputStream(fileFullPath);
 
-			Workbook sourceWorkbook = new HSSFWorkbook(sourceExcel);
-			if (sourceWorkbook.getNumberOfSheets() != 0) {
-				Sheet sourceSheet = sourceWorkbook.getSheetAt(0);
-				for (int i = 1; i <= sourceSheet.getPhysicalNumberOfRows(); i++) {
-					Row sourceRow = sourceSheet.getRow(i);
-					if (sourceRow == null) {
-						continue;
-					}
-
-					String receivingDateStr = sourceRow.getCell(6).getStringCellValue();
-					Date receivingDate = DateUtil.toDate(receivingDateStr);
-
-					// If receivingDate is in the date range
-					if (DateUtil.isInDateRange(receivingDate, startDate, endDate)) {
-						Set<String> orderNoSet = new HashSet<String>();
-						if (receivingMapByDate.containsKey(receivingDateStr)) {
-							orderNoSet = receivingMapByDate.get(receivingDateStr);
-						}
-						String orderNo = sourceRow.getCell(7).getStringCellValue();
-						orderNoSet.add(orderNo);
-						receivingMapByDate.put(receivingDateStr, orderNoSet);
-					}
-				}
-			}
-			return receivingMapByDate;
-		} catch (FileNotFoundException e) {
-			log.error(e);
-			throw new BaseException(e);
-		} catch (IOException e) {
-			log.error(e);
-			throw new BaseException(e);
-		}
-	}
 
 	// //////////////////////////////////////////////////////////////////下面为merage阶段
 	// 外部merage

@@ -160,12 +160,14 @@ public class AccountLogUtil {
 	 */
 	// 登录失败
 	public static void loginFailed(AccountLogTO accountLogTO) {
+		removeloginAccountLogTO(accountLogTO);
 		accountLogTO.setLoginInd("N");
 		addAccountLogTO(accountLogTO);
 	}
 
 	// 登录成功
 	public static void loginSuccess(AccountLogTO accountLogTO) {
+		removeloginAccountLogTO(accountLogTO);
 		accountLogTO.setLoginInd("Y");
 		addAccountLogTO(accountLogTO);
 	}

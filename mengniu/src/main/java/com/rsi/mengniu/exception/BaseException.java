@@ -1,6 +1,5 @@
 package com.rsi.mengniu.exception;
 
-import java.text.ParseException;
 
 public class BaseException extends Exception {
 

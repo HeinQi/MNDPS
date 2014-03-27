@@ -27,8 +27,6 @@ import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
-import com.rsi.mengniu.retailer.module.SalesTO;
-import com.rsi.mengniu.retailer.module.User;
 
 public class FileUtil {
 	private static Log errorLog = LogFactory.getLog(Constants.SYS_ERROR);

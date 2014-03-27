@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -15,14 +14,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.exception.BaseException;
@@ -33,6 +30,7 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
+import com.rsi.mengniu.util.ExceptionUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.Utils;
 
@@ -55,7 +53,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 				summaryBuffer.append("登录失败!\r\n");
 				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 				summaryLog.info(summaryBuffer);
-				accountLogLoginTO.setErrorMessage("登录失败!");
+				accountLogLoginTO.setErrorMessage("用户名或密码错误");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
 				return;
 			}
@@ -67,7 +65,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			summaryLog.info(summaryBuffer);
 			log.error(user + "网站登录出错,请检查!");
 			errorLog.error(user, e);
-			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			accountLogLoginTO.setErrorMessage(Constants.ERROR_TITLE_LOGIN+ExceptionUtil.fromExceptionToMessage(e));	
 			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 //			AccountLogUtil.loginFailed(accountLogLoginTO);
@@ -84,7 +82,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			DataPullTaskPool.addFailedUser(user);
 			AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
 					"");
-			accountLogTO.setErrorMessage("收货单页面加载失败，请登录网站检查收货单功能是否正常！");
+			accountLogTO.setErrorMessage(Constants.ERROR_TITLE_RECEIVING+ExceptionUtil.fromExceptionToMessage(e));
 			AccountLogUtil.failureDownload(accountLogTO);
 		}
 		summaryBuffer.append(Constants.SUMMARY_TITLE_ORDER + "\r\n");
@@ -100,7 +98,7 @@ public class MetroDataPullService implements RetailerDataPullService {
 			
 			AccountLogTO accountLogTO = new AccountLogTO(Constants.RETAILER_METRO, user.getUserId(), user.getPassword(),
 					"");
-			accountLogTO.setErrorMessage("订单页面加载失败，请登录网站检查订单查询功能是否正常!");
+			accountLogTO.setErrorMessage(Constants.ERROR_TITLE_ORDER+ExceptionUtil.fromExceptionToMessage(e));
 			AccountLogUtil.failureDownload(accountLogTO);
 		}
 		summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");

@@ -3,7 +3,6 @@ package com.rsi.mengniu.retailer.hualian.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -13,14 +12,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullService;
@@ -29,6 +26,7 @@ import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
+import com.rsi.mengniu.util.ExceptionUtil;
 import com.rsi.mengniu.util.Utils;
 //http://bhgs1.beijing-hualian.com/Account/Login.aspx
 //沈阳博思智业贸易有限公司
@@ -44,7 +42,7 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 			// Invalid Password and others
 			if (!"Success".equals(loginResult)) {
 
-				accountLogLoginTO.setErrorMessage("登录失败!");
+				accountLogLoginTO.setErrorMessage("用户名或密码错误");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
 				
 				return;
@@ -53,7 +51,7 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 		} catch (Exception e) {
 			log.error(user+"网站登录出错,请检查!");
 			errorLog.error(user,e);
-			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			accountLogLoginTO.setErrorMessage(Constants.ERROR_TITLE_LOGIN+ExceptionUtil.fromExceptionToMessage(e));
 			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			return;
@@ -143,7 +141,7 @@ public class SYHualianDataPullService implements RetailerDataPullService {
 				accountLogTO.setSalesDownloadAmount(salesList.size());
 				AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
 			} catch (Exception e) {
-				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				accountLogTO.setErrorMessage(Constants.ERROR_TITLE_SALES+ExceptionUtil.fromExceptionToMessage(e));
 				AccountLogUtil.failureDownload(accountLogTO);
 			}		
 		}

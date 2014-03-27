@@ -2,18 +2,16 @@ package com.rsi.mengniu.retailer.common.service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.http.impl.client.CloseableHttpClient;
-
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.module.AccountLogTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
+import com.rsi.mengniu.util.ExceptionUtil;
 import com.rsi.mengniu.util.Utils;
 
 public abstract class RetailerDataPullServiceImpl implements RetailerDataPullService {
@@ -73,7 +71,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("登录失败!\r\n");
 				summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 				getSummaryLog().info(summaryBuffer);
-				accountLogLoginTO.setErrorMessage("登录失败!");
+				accountLogLoginTO.setErrorMessage("用户名或密码错误");
 				AccountLogUtil.loginFailed(accountLogLoginTO);
 				return false;
 			}
@@ -84,7 +82,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 			errorLog.error(user, e);
 			summaryBuffer.append(Constants.SUMMARY_SEPERATOR_LINE + "\r\n");
 			getSummaryLog().info(summaryBuffer);
-			accountLogLoginTO.setErrorMessage("登录失败!......网站登录出错,请检查!");
+			accountLogLoginTO.setErrorMessage(Constants.ERROR_TITLE_LOGIN+ExceptionUtil.fromExceptionToMessage(e));
 			AccountLogUtil.loginFailed(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			return false;
@@ -126,7 +124,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("成功数量: " + orderAmount + "\r\n");
 				getLog().error(user + "页面加载失败，请登录网站检查订单功能是否正常！");
 				errorLog.error(user, e);
-				accountLogTO.setErrorMessage("订单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				accountLogTO.setErrorMessage(Constants.ERROR_TITLE_ORDER+ExceptionUtil.fromExceptionToMessage(e));
 				AccountLogUtil.failureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 				
@@ -172,7 +170,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("收货单下载失败" + "\r\n");
 				getLog().error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
 				errorLog.error(user, e);
-				accountLogTO.setErrorMessage("收货单下载失败......页面加载失败，请登录网站检查订单功能是否正常！");
+				accountLogTO.setErrorMessage(Constants.ERROR_TITLE_RECEIVING+ExceptionUtil.fromExceptionToMessage(e));
 				AccountLogUtil.failureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 			}
@@ -210,7 +208,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				summaryBuffer.append("成功数量: " + salesAmount + "\r\n");
 				getLog().error(user + "页面加载失败，请登录网站检查销售单功能是否正常！");
 				errorLog.error(user, e);
-				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
+				accountLogTO.setErrorMessage(Constants.ERROR_TITLE_SALES+ExceptionUtil.fromExceptionToMessage(e));
 				AccountLogUtil.failureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 			}

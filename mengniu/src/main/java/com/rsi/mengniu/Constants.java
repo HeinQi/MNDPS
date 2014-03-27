@@ -56,9 +56,19 @@ public final class Constants {
 	public static final String SUMMARY_SEPERATOR_LINE = "-------------------------------------------";
 	
 	
+	public static final String ERROR_TITLE_LOGIN = "登录出错:";
+	public static final String ERROR_TITLE_ORDER = "订单下载出错:";
+	public static final String ERROR_TITLE_RECEIVING = "收货单下载出错:";
+	public static final String ERROR_TITLE_SALES = "销售单下载出错:";
+	
+	public static final String ERROR_MESSAGE_TIMEOUT= "网络超时";
+	public static final String ERROR_MESSAGE_NOTFIND = "文件访问错误";
+	public static final String ERROR_MESSAGE_NORESPONSE = "网络无响应";
+	public static final String ERROR_MESSAGE_USERORPASSWORD="用户名或密码错误";
+	public static final String ERROR_MESSAGE_UNKNOWN = "网站访问出错";
+	
 	public static final String CONNECTION_TIMEOUT_TIME="connection.timeout.time";
 	
-
 	public static final String SYS_ERROR = "syserror";
 
 }

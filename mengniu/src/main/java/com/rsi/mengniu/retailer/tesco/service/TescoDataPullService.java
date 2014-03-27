@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import net.lingala.zip4j.exception.ZipException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -28,9 +26,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import com.rsi.mengniu.Constants;
-import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullServiceImpl;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;

@@ -2,11 +2,9 @@ package com.rsi.mengniu.retailer.yonghui.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -23,9 +21,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
-
 import com.rsi.mengniu.Constants;
-import com.rsi.mengniu.DataPullTaskPool;
 import com.rsi.mengniu.retailer.common.service.RetailerDataPullServiceImpl;
 import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.ReceivingNoteTO;

@@ -162,7 +162,6 @@ public class RainbowDataPullService extends RetailerDataPullServiceImpl {
 		log.info(user + "登录成功!");
 		Thread.sleep(Utils.getSleepTime(Constants.RETAILER_RAINBOW));
 		return "Success";
-
 	}
 
 
@@ -176,7 +175,6 @@ public class RainbowDataPullService extends RetailerDataPullServiceImpl {
 		}
 
 		String receivingDateStr = DateUtil.toString(receivingDate);
-
 		log.info(user + "收货单日期：" + receivingDateStr);
 		List<ReceivingNoteTO> receivingList = new ArrayList<ReceivingNoteTO>();
 

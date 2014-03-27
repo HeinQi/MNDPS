@@ -32,6 +32,7 @@ import com.rsi.mengniu.retailer.module.OrderTO;
 import com.rsi.mengniu.retailer.module.User;
 import com.rsi.mengniu.util.AccountLogUtil;
 import com.rsi.mengniu.util.DateUtil;
+import com.rsi.mengniu.util.ExceptionUtil;
 import com.rsi.mengniu.util.FileUtil;
 import com.rsi.mengniu.util.OCR;
 import com.rsi.mengniu.util.Utils;
@@ -111,9 +112,9 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 			summaryBuffer.append("收货单下载失败" + "\r\n");
 			getLog().error(user + "页面加载失败，请登录网站检查收货单功能是否正常！");
 			errorLog.error(user, e);
-			AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
-			accountLogLoginTO.setErrorMessage("收货单下载失败"+"......"+"页面加载失败，请登录网站检查收货单功能是否正常！");
-			AccountLogUtil.failureDownload(accountLogLoginTO);
+			AccountLogTO accountLogTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
+			accountLogTO.setErrorMessage(Constants.ERROR_TITLE_RECEIVING+ExceptionUtil.fromExceptionToMessage(e));
+			AccountLogUtil.failureDownload(accountLogTO);
 			DataPullTaskPool.addFailedUser(user);
 			// getLog().error(user + Utils.getTrace(e));
 		}

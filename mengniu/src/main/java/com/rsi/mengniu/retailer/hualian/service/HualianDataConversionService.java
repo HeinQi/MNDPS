@@ -11,11 +11,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.common.service.RetailerDataConversionService;
@@ -24,7 +21,6 @@ import com.rsi.mengniu.retailer.module.ReceivingNoteTO;
 import com.rsi.mengniu.retailer.module.SalesTO;
 import com.rsi.mengniu.util.DateUtil;
 import com.rsi.mengniu.util.FileUtil;
-import com.rsi.mengniu.util.Utils;
 
 public class HualianDataConversionService extends RetailerDataConversionService {
 	private Log log = LogFactory.getLog(HualianDataConversionService.class);

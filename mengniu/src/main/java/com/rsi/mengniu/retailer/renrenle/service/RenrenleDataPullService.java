@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -269,6 +272,7 @@ public class RenrenleDataPullService extends RetailerDataPullServiceImpl {
 		} while (pageNo <= totalPages);
 
 		log.info(user + "查询到" + searchDateStr + "号订单共" + orderIdList.size() + "条");
+		Set<String> orderSet = new HashSet<String>();
 		for (int i = 0; i < orderIdList.size(); i++) {
 			String orderId = orderIdList.get(i);
 			if (Utils.isOrderFileExist(Constants.RETAILER_RENRENLE, user.getUserId(),orderId, searchDate)) {
@@ -281,10 +285,11 @@ public class RenrenleDataPullService extends RetailerDataPullServiceImpl {
 			Utils.exportOrderInfoToTXT(Constants.RETAILER_RENRENLE, user.getUserId(), orderId,
 					searchDate, orderList);
 			log.info(user + "成功获取第" + (i + 1) + "条订单,订单号为" + orderId);
+			orderSet.add(orderId);
 		}
 		log.info(user + searchDateStr + "的订单数据下载成功");
 		
-		return orderIdList.size();
+		return orderSet.size();
 	}
 
 	private void getOrderDetail(CloseableHttpClient httpClient, User user, String orderId, String searchDate,

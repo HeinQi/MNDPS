@@ -47,6 +47,7 @@ public class AccountLogUtil {
 			if (accountLogTO.getProcessDateStr() == "") {
 				if (accountLogMap.containsKey(combineKey)) {
 					accountLogMap.get(combineKey).setErrorMessage(accountLogTO.getErrorMessage());
+					accountLogMap.get(combineKey).setSuccessInd(accountLogTO.getSuccessInd());
 				} else {
 					accountLogMap.put(combineKey, accountLogTO);
 				}
@@ -67,7 +68,7 @@ public class AccountLogUtil {
 						accountLogMap.get(combineKey).setSalesDownloadAmount(
 								accountLogTO.getSalesDownloadAmount()
 										+ accountLogMap.get(combineKey).getSalesDownloadAmount());
-						accountLogMap.get(combineKey).setSuccessInd(accountLogMap.get(combineKey).getSuccessInd());
+						accountLogMap.get(combineKey).setSuccessInd(accountLogTO.getSuccessInd());
 					} else {
 						accountLogMap.put(combineKey, accountLogTO);
 					}

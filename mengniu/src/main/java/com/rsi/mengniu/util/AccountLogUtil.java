@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -22,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+
 import com.rsi.mengniu.Constants;
 import com.rsi.mengniu.exception.BaseException;
 import com.rsi.mengniu.retailer.module.AccountLogTO;
@@ -44,9 +47,28 @@ public class AccountLogUtil {
 			} else {
 				accountLogTO.setSuccessInd("N");
 			}
+
+//			if (accountLogTO.getSuccessInd() != "N" && accountLogTO.getSuccessInd() != "Y") {
+//				try {
+//					writeAccountLogToFileCeshi();
+//				} catch (BaseException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+
 			if (accountLogTO.getProcessDateStr() == "") {
 				if (accountLogMap.containsKey(combineKey)) {
 					accountLogMap.get(combineKey).setErrorMessage(accountLogTO.getErrorMessage());
+					accountLogMap.get(combineKey).setOrderDownloadAmount(
+							accountLogTO.getOrderDownloadAmount()
+									+ accountLogMap.get(combineKey).getOrderDownloadAmount());
+					accountLogMap.get(combineKey).setReceivingDownloadAmount(
+							accountLogTO.getReceivingDownloadAmount()
+									+ accountLogMap.get(combineKey).getReceivingDownloadAmount());
+					accountLogMap.get(combineKey).setSalesDownloadAmount(
+							accountLogTO.getSalesDownloadAmount()
+									+ accountLogMap.get(combineKey).getSalesDownloadAmount());
 					accountLogMap.get(combineKey).setSuccessInd(accountLogTO.getSuccessInd());
 				} else {
 					accountLogMap.put(combineKey, accountLogTO);
@@ -185,7 +207,7 @@ public class AccountLogUtil {
 	}
 
 	// 记录下载失败的ErrorMessage
-	public static void FailureDownload(AccountLogTO accountLogUpdateTO) {
+	public static void failureDownload(AccountLogTO accountLogUpdateTO) {
 		removeloginAccountLogTO(accountLogUpdateTO);
 		AccountLogTO accountLogTO = getAccountLogTO(accountLogUpdateTO);
 		if (accountLogTO != null) {
@@ -196,7 +218,7 @@ public class AccountLogUtil {
 		}
 	}
 
-	// //////////////////////////////////////////////////////////////////下面为merage阶段
+	// ////////////////////////////////////////////////////////////////下面为merage阶段
 	// 外部merage
 	public static void updateProcessedOrderInfo(Map<String, Set<String>> processedOrderMap) {
 		for (String key : processedOrderMap.keySet()) {
@@ -356,4 +378,80 @@ public class AccountLogUtil {
 		}
 	}
 
+	// 测试/////////////////////测试
+	public static void writeAccountLogToFileCeshi() throws BaseException {
+		if (roundLogMap.size() != 0) {
+			writeAccountLogToExcelCeshi();
+		}
+	}
+
+	private static void writeAccountLogToExcelCeshi() throws BaseException {
+		String filePath = Utils.getProperty(Constants.ACCOUNT_LOG_PATH);
+		String fileName = Utils.getProperty(Constants.ACCOUNT_LOG_FILENAME);
+		String fieldNames = Utils.getProperty(Constants.ACCOUNT_LOG_FIELDNAME);
+		String[] fieldNameList = fieldNames.split(",");
+		String processTimeStr = DateUtil.toString(new Date(), "yyyyMMdd-HHmmss");
+		fileName = fileName + processTimeStr + ".xls";
+		String fileFullPath = filePath + fileName;
+		FileUtil.initExcelXLS(filePath, fileName);
+		FileUtil.initExcelHeader(fileFullPath, fieldNameList);
+		FileOutputStream fileOut = null;
+		File excelFile = new File(fileFullPath);
+		HSSFWorkbook workbook;
+		try {
+			workbook = new HSSFWorkbook(new FileInputStream(fileFullPath));
+		} catch (FileNotFoundException e) {
+			throw new BaseException(e);
+		} catch (IOException e) {
+			throw new BaseException(e);
+		}
+		HSSFSheet sheet = workbook.getSheetAt(0);
+		int lastRowNo = sheet.getLastRowNum();
+		Object[] accountLogKeyList = roundLogMap.keySet().toArray();
+
+		Arrays.sort(accountLogKeyList);
+
+		// Iterator Receiving Map by Date
+		for (int i = 0; i < accountLogKeyList.length; i++, lastRowNo++) {
+			String accountLogKey = (String) accountLogKeyList[i];
+
+			AccountLogTO accountLogTO = roundLogMap.get(accountLogKey);
+			HSSFRow row = sheet.createRow(lastRowNo + 1);
+			row.createCell(0).setCellValue(accountLogTO.getRetailerID());
+			row.createCell(1).setCellValue(accountLogTO.getUserID());
+			row.createCell(2).setCellValue(accountLogTO.getPassword());
+			row.createCell(3).setCellValue(accountLogTO.getUrl());
+			row.createCell(4).setCellValue(accountLogTO.getDistrict());
+			row.createCell(5).setCellValue(accountLogTO.getAgency());
+			row.createCell(6).setCellValue(accountLogTO.getLoginNm());
+			row.createCell(7).setCellValue(accountLogTO.getStoreNo());
+			row.createCell(8).setCellValue(accountLogTO.getLoginInd());
+			row.createCell(9).setCellValue(accountLogTO.getProcessDateStr());
+			row.createCell(10).setCellValue(accountLogTO.getOrderDownloadAmount());
+			row.createCell(11).setCellValue(accountLogTO.getReceivingDownloadAmount());
+			row.createCell(12).setCellValue(accountLogTO.getOrderProcessedAmount());
+			row.createCell(13).setCellValue(accountLogTO.getSalesDownloadAmount());
+			row.createCell(14).setCellValue(accountLogTO.getSalesProcessedAmount());
+			row.createCell(15).setCellValue(accountLogTO.getSuccessInd());
+			
+//			if (accountLogTO.getSuccessInd() == "N") {
+				row.createCell(16).setCellValue(accountLogTO.getErrorMessage());
+//			}
+		}
+		try {
+			fileOut = new FileOutputStream(excelFile);
+			workbook.write(fileOut);
+			fileOut.close();
+		} catch (IOException e) {
+			throw new BaseException(e);
+		} finally {
+			try {
+				if (fileOut != null) {
+					fileOut.close();
+				}
+			} catch (IOException e) {
+				throw new BaseException(e);
+			}
+		}
+	}
 }

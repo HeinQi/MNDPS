@@ -127,7 +127,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				getLog().error(user + "页面加载失败，请登录网站检查订单功能是否正常！");
 				errorLog.error(user, e);
 				accountLogTO.setErrorMessage("订单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
-				AccountLogUtil.FailureDownload(accountLogTO);
+				AccountLogUtil.failureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 				
 			}
@@ -173,7 +173,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				getLog().error(user + "页面加载失败，请登录网站检查收货单查询功能是否正常!");
 				errorLog.error(user, e);
 				accountLogTO.setErrorMessage("收货单下载失败......页面加载失败，请登录网站检查订单功能是否正常！");
-				AccountLogUtil.FailureDownload(accountLogTO);
+				AccountLogUtil.failureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 			}
 		}
@@ -211,7 +211,7 @@ public abstract class RetailerDataPullServiceImpl implements RetailerDataPullSer
 				getLog().error(user + "页面加载失败，请登录网站检查销售单功能是否正常！");
 				errorLog.error(user, e);
 				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
-				AccountLogUtil.FailureDownload(accountLogTO);
+				AccountLogUtil.failureDownload(accountLogTO);
 				DataPullTaskPool.addFailedUser(user);
 			}
 		}

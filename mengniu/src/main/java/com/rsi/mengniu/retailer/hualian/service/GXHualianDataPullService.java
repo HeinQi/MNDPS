@@ -161,7 +161,7 @@ public List<String> getDistrict(CloseableHttpClient httpClient) throws Exception
 				AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
 			} catch (Exception e) {
 				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
-				AccountLogUtil.FailureDownload(accountLogTO);
+				AccountLogUtil.failureDownload(accountLogTO);
 			}
 			
 			

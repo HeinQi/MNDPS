@@ -110,7 +110,7 @@ public class CarrefourDataPullService extends RetailerDataPullServiceImpl {
 			errorLog.error(user, e);
 			AccountLogTO accountLogLoginTO = new AccountLogTO(user.getRetailer(), user.getUserId(), user.getPassword(), "");
 			accountLogLoginTO.setErrorMessage("收货单下载失败"+"......"+"页面加载失败，请登录网站检查收货单功能是否正常！");
-			AccountLogUtil.FailureDownload(accountLogLoginTO);
+			AccountLogUtil.failureDownload(accountLogLoginTO);
 			DataPullTaskPool.addFailedUser(user);
 			// getLog().error(user + Utils.getTrace(e));
 		}

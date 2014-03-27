@@ -120,7 +120,7 @@ public class ConfigStoreHualianDataPullService implements RetailerDataPullServic
 				AccountLogUtil.recordSalesDownloadAmount(accountLogTO);
 			} catch (Exception e) {
 				accountLogTO.setErrorMessage("销售单下载出错......页面加载失败，请登录网站检查订单功能是否正常！");
-				AccountLogUtil.FailureDownload(accountLogTO);
+				AccountLogUtil.failureDownload(accountLogTO);
 			}
 		}
 		log.info(user + "销售数据下载成功");
